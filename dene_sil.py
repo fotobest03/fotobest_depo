@@ -100,6 +100,15 @@ if menu == "Müşteri Teklif Formu":
     email = st.text_input("E-Posta Adresi *")
 
     st.subheader("📅 Rezervasyon Tarihi")
+
+    # --- KAMPANYALI TARİHLERİ MÜŞTERİYE GÖSTERME ALANI ---
+    if st.session_state.campaign_dates:
+        kampanya_metni = "✨ **İndirimli Kampanyalı Günlerimiz:**\n"
+        for d, oran in sorted(st.session_state.campaign_dates.items()):
+            if d >= date.today(): # Geçmiş tarihleri göstermeyelim
+                kampanya_metni += f"- 📅 **{d.strftime('%d.%m.%Y')}** tarihine özel **%{oran} İndirim!**\n"
+        st.info(kampanya_metni)
+
     rezervasyon_tarihi = st.date_input("Çekim Tarihi Seçiniz", value=date.today(), min_value=date.today())
 
     # Kontroller
