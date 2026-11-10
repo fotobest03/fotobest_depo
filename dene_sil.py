@@ -147,7 +147,7 @@ if menu == "Müşteri Teklif Formu":
                 
                 try:
                     response = requests.post(GOOGLE_SCRIPT_URL, json=veri)
-                     tablo_basarili = True
+                    tablo_basarili = True
                 except:
                     tablo_basarili = False
 
