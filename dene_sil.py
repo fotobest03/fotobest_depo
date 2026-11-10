@@ -40,7 +40,7 @@ if "closed_dates" not in st.session_state:
     st.session_state.closed_dates = []
 
 if "campaign_dates" not in st.session_state:
-    st.session_state.campaign_dates = {}  # Örnek yapı: {date(2026, 6, 1): 15} -> %15 indirim
+    st.session_state.campaign_dates = {}
 
 # --- E-POSTA GÖNDERME FONKSİYONU ---
 def mail_gonder(alici_eposta, ad_soyad, telefon, email, tarih_str, detaylar, toplam_tutar):
@@ -62,7 +62,7 @@ def mail_gonder(alici_eposta, ad_soyad, telefon, email, tarih_str, detaylar, top
         Seçilen Paket Detayları:
         {detaylar}
         
-        Ödenecek Tutar (Kampanyalı/İndirimli): {toplam_tutar:,.2f} TL
+        Ödenecek Tutar: {toplam_tutar:,.2f} TL
         """
         msg.attach(MIMEText(govde, 'plain', 'utf-8'))
 
@@ -137,18 +137,19 @@ if menu == "Müşteri Teklif Formu":
         f_ana_album = f_album = f_tablo = f_poz = f_mekan = f_klip = 0.0
 
     ham_tutar = f_ana_album + f_album + f_tablo + f_poz + f_mekan + f_klip
+    toplam_tutar = ham_tutar  # Varsayılan tutar
 
     # Kampanya İndirimi Uygulama
     if kampanya_orani > 0:
         indirimli_tutar = ham_tutar * (1 - kampanya_orani / 100)
         st.success(f"🎉 Kampanyalı Tarih! Bu tarihe özel **%{kampanya_orani} indirim** tanımlanmıştır.")
         st.markdown(f"~~Normal Tutar: {ham_tutar:,.2f} TL~~")
-        st.markdown(f"### **İndirimli Toplam Tutar: {indirimli_tutar:,.2f} TL**")
         toplam_tutar = indirimli_tutar
         kampanya_detay_str = f" (%{kampanya_orani} Kampanya İndirimli)"
     else:
-        st.markdown(f"### **Toplam Tutar: {toplam_tutar:,.2f} TL**")
         kampanya_detay_str = " (Normal Fiyat)"
+
+    st.markdown(f"### **Toplam Tutar: {toplam_tutar:,.2f} TL**")
 
     submitted = st.button("Teklifi Gönder ve Kaydet")
 
