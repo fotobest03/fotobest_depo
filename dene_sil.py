@@ -22,10 +22,9 @@ hide_streamlit_style = """
 st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 
 # --- AYARLAR VE GİZLİ BİLGİLER ---
-GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwHwoTfWFY7UftXR4n0oc6sj_6vrQ8h7eKkStXwnEGuwOeeL6D9hxU0B-C17fjchwd7/exec"
+GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxaQIbJXdF67i4VASY5Q3uN_3PN0AsMW6FkAie6xqcaxy5pdATBHGsmJ_JddWhBAPII/exec"
 GMAIL_KULLANICI = "afotobest@gmail.com"
 GMAIL_SIFRE = "byyewfosgesogdft"
-
 
 # --- GOOGLE SHEETS'TEN VERİLERİ HER YENİLEMEDE ÇEKME ---
 # Fiyatlar için ilk açılış kontrolü
