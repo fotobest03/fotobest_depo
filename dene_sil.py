@@ -10,7 +10,6 @@ from email.mime.multipart import MIMEMultipart
 # --- SAYFA YAPILANDIRMASI VE GÖRÜNÜM AYARI ---
 st.set_page_config(page_title="Teklif ve Fiyat Yönetimi", page_icon="📸", layout="centered")
 
-# Sağ alt köşedeki Streamlit rozetini ve üst menüleri tamamen gizleyen CSS
 hide_streamlit_style = """
     <style>
     #MainMenu {visibility: hidden;}
@@ -23,20 +22,51 @@ hide_streamlit_style = """
 st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 
 # --- AYARLAR VE GİZLİ BİLGİLER ---
-GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwkniKw0mYQUiVpDjupS6eNg9ZlOSGzk8vTbDsJFKPkCbEl3tHKts6cbDNqxIsk2EQ/exec"
+GOOGLE_SCRIPT_URL = https://script.google.com/macros/s/AKfycbwIl-DKosK0q9WatmbXVGxRVMOZDZNUpiP0B9Cd-qofacOQRiiL5a6VEmxvltYRfq8n/exec
 GMAIL_KULLANICI = "afotobest@gmail.com"
 GMAIL_SIFRE = "byyewfosgesogdft"
 
-# --- GOOGLE SHEETS'TEN FİYATLARI ÇEKME ---
-if "prices_df" not in st.session_state:
+# --- GOOGLE SHEETS'TEN VERİLERİ ÇEKME (Fiyatlar, Kapalı & Kampanyalı Tarihler) ---
+if "prices_df" not in st.session_state or "closed_dates" not in st.session_state or "campaign_dates" not in st.session_state:
     try:
         response = requests.get(GOOGLE_SCRIPT_URL)
         data = response.json()
-        if data and isinstance(data, list):
-            st.session_state.prices_df = pd.DataFrame(data)
+        
+        # Fiyatlar
+        if "fiyatlar" in data and data["fiyatlar"]:
+            st.session_state.prices_df = pd.DataFrame(data["fiyatlar"])
         else:
-            raise Exception("Boş veri")
+            raise Exception()
+
+        # Kapalı Tarihler (Metin -> Date nesnesine çevrilir)
+        st.session_state.closed_dates = []
+        if "kapali_tarihler" in data:
+            for t_str in data["kapali_tarihler"]:
+                try:
+                    # Gelen format YYYY-MM-DD veya GG.AA.YYYY olabilir
+                    if "-" in t_str:
+                        dt = datetime.strptime(t_str.split("T")[0], "%Y-%m-%d").date()
+                    else:
+                        dt = datetime.strptime(t_str, "%d.%m.%Y").date()
+                    st.session_state.closed_dates.append(dt)
+                except:
+                    pass
+
+        # Kampanyalı Tarihler
+        st.session_state.campaign_dates = {}
+        if "kampanyalar" in data:
+            for t_str, oran in data["kampanyalar"].items():
+                try:
+                    if "-" in t_str:
+                        dt = datetime.strptime(t_str.split("T")[0], "%Y-%m-%d").date()
+                    else:
+                        dt = datetime.strptime(t_str, "%d.%m.%Y").date()
+                    st.session_state.campaign_dates[dt] = int(oran)
+                except:
+                    pass
+
     except:
+        # Yedek veriler
         st.session_state.prices_df = pd.DataFrame([
             {"Kategori": "Ana Albüm", "Secenek": "30 x 60 Mat Albüm", "Fiyat": 3500},
             {"Kategori": "Ana Albüm", "Secenek": "30 x 76 Mat Albüm", "Fiyat": 4500},
@@ -47,12 +77,8 @@ if "prices_df" not in st.session_state:
             {"Kategori": "Dış Çekim Klibi", "Secenek": "Evet", "Fiyat": 3000},
             {"Kategori": "Dış Çekim Klibi", "Secenek": "Hayır", "Fiyat": 0}
         ])
-
-if "closed_dates" not in st.session_state:
-    st.session_state.closed_dates = []
-
-if "campaign_dates" not in st.session_state:
-    st.session_state.campaign_dates = {}
+        st.session_state.closed_dates = []
+        st.session_state.campaign_dates = {}
 
 # --- E-POSTA GÖNDERME FONKSİYONU ---
 def mail_gonder(alici_eposta, ad_soyad, telefon, email, tarih_str, detaylar, toplam_tutar):
@@ -88,6 +114,21 @@ def mail_gonder(alici_eposta, ad_soyad, telefon, email, tarih_str, detaylar, top
         print(f"Mail gönderme hatası: {e}")
         return False
 
+# --- YARDIMCI KAYDETME FONKSİYONLARI ---
+def google_kapali_guncelle():
+    tarih_listesi = [d.strftime('%Y-%m-%d') for d in st.session_state.closed_dates]
+    try:
+        requests.post(GOOGLE_SCRIPT_URL, json={"islem": "kapali_tarih_guncelle", "tarihler": tarih_listesi})
+    except:
+        pass
+
+def google_kampanya_guncelle():
+    kampanya_listesi = [{"tarih": d.strftime('%Y-%m-%d'), "oran": oran} for d, oran in st.session_state.campaign_dates.items()]
+    try:
+        requests.post(GOOGLE_SCRIPT_URL, json={"islem": "kampanya_guncelle", "kampanyalar": kampanya_listesi})
+    except:
+        pass
+
 # --- UYGULAMA MENÜSÜ ---
 menu = st.sidebar.radio("Sayfa Seçin", ["Müşteri Teklif Formu", "Yönetici Paneli (Fiyat & Takvim)"])
 
@@ -113,7 +154,6 @@ if menu == "Müşteri Teklif Formu":
 
     st.subheader("📅 Rezervasyon Tarihi")
 
-    # Kampanyalı tarihleri müşteriye gösteren şık kutu
     if st.session_state.campaign_dates:
         kampanya_metni = "✨ **İndirimli Kampanyalı Günlerimiz:**\n"
         for d, oran in sorted(st.session_state.campaign_dates.items()):
@@ -145,7 +185,6 @@ if menu == "Müşteri Teklif Formu":
     secilen_mekan = st.selectbox("Çekim Mekanı", mekan_opts['Secenek'].tolist()) if not mekan_opts.empty else ""
     secilen_klip = st.radio("Dış Çekim Klibi İstiyorum", klip_opts['Secenek'].tolist()) if not klip_opts.empty else ""
 
-    # Fiyat Hesaplama
     try:
         f_ana_album = float(ana_album_opts[ana_album_opts['Secenek'] == secilen_ana_album]['Fiyat'].values[0]) if secilen_ana_album else 0.0
         f_album = float(album_opts[album_opts['Secenek'] == secilen_album]['Fiyat'].values[0]) if secilen_album else 0.0
@@ -219,20 +258,12 @@ elif menu == "Yönetici Paneli (Fiyat & Takvim)":
             
             if st.button("Fiyatları Güncelle"):
                 st.session_state.prices_df = edited_df
-                
                 fiyat_listesi = edited_df.to_dict(orient="records")
-                guncelleme_verisi = {
-                    "islem": "fiyat_guncelle",
-                    "fiyatlar": fiyat_listesi
-                }
                 try:
-                    res = requests.post(GOOGLE_SCRIPT_URL, json=guncelleme_verisi)
-                    if res.status_code == 200:
-                        st.success("Fiyatlar hem bellekte hem de Google E-Tabloda başarıyla güncellendi!")
-                    else:
-                        st.warning("Fiyatlar güncellendi ancak E-Tabloya yazılırken bir hata oluştu.")
+                    requests.post(GOOGLE_SCRIPT_URL, json={"islem": "fiyat_guncelle", "fiyatlar": fiyat_listesi})
+                    st.success("Fiyatlar Google E-Tabloda güncellendi!")
                 except Exception as ex:
-                    st.error(f"Bağlantı hatası: {ex}")
+                    st.error(f"Hata: {ex}")
 
         with tab2:
             st.subheader("Çekime Kapalı / Dolu Tarih Ayarları")
@@ -240,10 +271,12 @@ elif menu == "Yönetici Paneli (Fiyat & Takvim)":
             
             if kapatma_turu == "Tek Gün Kapat":
                 tek_tarih = st.date_input("Kapatılacak Tarih", value=date.today(), min_value=date.today())
-                if st.button("Seçilen Günü Kapat"):
+                if st.button("Seçilen Günü Kapat ve Kaydet"):
                     if tek_tarih not in st.session_state.closed_dates:
                         st.session_state.closed_dates.append(tek_tarih)
-                        st.success(f"{tek_tarih.strftime('%d.%m.%Y')} tarihi kapalı tarihlere eklendi.")
+                        google_kapali_guncelle()
+                        st.success(f"{tek_tarih.strftime('%d.%m.%Y')} kapatıldı ve E-Tabloya kaydedildi!")
+                        st.rerun()
                     else:
                         st.warning("Bu tarih zaten kapalı listesinde bulunuyor.")
             
@@ -254,7 +287,7 @@ elif menu == "Yönetici Paneli (Fiyat & Takvim)":
                 with col2:
                     bitis_tarihi = st.date_input("Bitiş Tarihi", value=date.today(), min_value=date.today(), key="kapat_bit")
                 
-                if st.button("Tarih Aralığını Kapat"):
+                if st.button("Tarih Aralığını Kapat ve Kaydet"):
                     if baslangic_tarihi > bitis_tarihi:
                         st.error("Başlangıç tarihi bitiş tarihinden sonra olamaz!")
                     else:
@@ -265,7 +298,9 @@ elif menu == "Yönetici Paneli (Fiyat & Takvim)":
                                 st.session_state.closed_dates.append(curr)
                                 eklenen_sayisi += 1
                             curr += timedelta(days=1)
-                        st.success(f"{baslangic_tarihi.strftime('%d.%m.%Y')} ile {bitis_tarihi.strftime('%d.%m.%Y')} arasındaki {eklenen_sayisi} yeni tarih kapalı listesine eklendi.")
+                        google_kapali_guncelle()
+                        st.success(f"Seçilen aralıktaki {eklenen_sayisi} yeni tarih kapatıldı ve E-Tabloya kaydedildi!")
+                        st.rerun()
 
             st.write("---")
             st.markdown("### 🚫 Şu An Kapalı Olan Tüm Tarihler:")
@@ -277,20 +312,23 @@ elif menu == "Yönetici Paneli (Fiyat & Takvim)":
                     with c2:
                         if st.button("Aç / Kaldır", key=str(d)):
                             st.session_state.closed_dates.remove(d)
+                            google_kapali_guncelle()
                             st.rerun()
             else:
                 st.info("Şu an kapalı/rezerve edilmiş özel bir tarih bulunmuyor.")
 
         with tab3:
             st.subheader("🎉 Kampanyalı Tarih ve İndirim Oranı Belirleme")
-            kampanya_turu = st.radio("Kampanya Ekleme Yöntemi", ["Tek Gün Kampanya", "Tarih Aralığı Kampanya"])
+            kampanya_turu = st.radio("Kampanya Ekleme Yöntemi", ["Tek Gün Kampanya", "Tarih Aralığı Kampanya"], key="kamp_tur_sec")
             indirim_orani = st.number_input("İndirim Oranı (%)", min_value=1, max_value=99, value=10, step=1)
             
             if kampanya_turu == "Tek Gün Kampanya":
                 k_tek_tarih = st.date_input("Kampanyalı Tarih Seçin", value=date.today(), min_value=date.today(), key="kamp_tek")
-                if st.button("Kampanya Ekle (Tek Gün)"):
+                if st.button("Kampanya Ekle ve Kaydet"):
                     st.session_state.campaign_dates[k_tek_tarih] = indirim_orani
-                    st.success(f"{k_tek_tarih.strftime('%d.%m.%Y')} tarihi için %{indirim_orani} indirim tanımlandı!")
+                    google_kampanya_guncelle()
+                    st.success(f"{k_tek_tarih.strftime('%d.%m.%Y')} için %{indirim_orani} indirim kaydedildi!")
+                    st.rerun()
             else:
                 col_k1, col_k2 = st.columns(2)
                 with col_k1:
@@ -298,7 +336,7 @@ elif menu == "Yönetici Paneli (Fiyat & Takvim)":
                 with col_k2:
                     k_bit = st.date_input("Bitiş Tarihi", value=date.today(), min_value=date.today(), key="kamp_bit")
                 
-                if st.button("Kampanya Ekle (Tarih Aralığı)"):
+                if st.button("Kampanya Aralığı Ekle ve Kaydet"):
                     if k_bas > k_bit:
                         st.error("Başlangıç tarihi bitiş tarihinden sonra olamaz!")
                     else:
@@ -308,7 +346,9 @@ elif menu == "Yönetici Paneli (Fiyat & Takvim)":
                             st.session_state.campaign_dates[curr] = indirim_orani
                             sayac += 1
                             curr += timedelta(days=1)
-                        st.success(f"{k_bas.strftime('%d.%m.%Y')} - {k_bit.strftime('%d.%m.%Y')} arasındaki {sayac} gün için %{indirim_orani} indirim tanımlandı!")
+                        google_kampanya_guncelle()
+                        st.success(f"Aralıktaki {sayac} gün için %{indirim_orani} indirim kaydedildi!")
+                        st.rerun()
 
             st.write("---")
             st.markdown("### 🏷️ Aktif Kampanyalı Tarihler ve İndirim Oranları:")
@@ -320,6 +360,7 @@ elif menu == "Yönetici Paneli (Fiyat & Takvim)":
                     with kc2:
                         if st.button("Kaldır", key=f"kampanya_sil_{d}"):
                             del st.session_state.campaign_dates[d]
+                            google_kampanya_guncelle()
                             st.rerun()
             else:
                 st.info("Şu an tanımlı aktif bir kampanyalı tarih bulunmuyor.")
