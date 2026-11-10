@@ -26,6 +26,8 @@ if "prices_df" not in st.session_state:
             raise Exception("Boş veri")
     except:
         st.session_state.prices_df = pd.DataFrame([
+            {"Kategori": "Ana Albüm", "Secenek": "30 x 60 Mat Albüm", "Fiyat": 3500},
+            {"Kategori": "Ana Albüm", "Secenek": "30 x 76 Mat Albüm", "Fiyat": 4500},
             {"Kategori": "Aile Albümü", "Secenek": "2'li Albüm", "Fiyat": 1500},
             {"Kategori": "Tablo Seçimi", "Secenek": "30 x 40 Çerçeveli", "Fiyat": 2000},
             {"Kategori": "Poz Sayısı", "Secenek": "40", "Fiyat": 1000},
@@ -103,12 +105,16 @@ if menu == "Müşteri Teklif Formu":
 
     st.subheader("🎁 Paket ve Çekim Seçenekleri")
     
+    # Kategorileri ayırıyoruz
+    ana_album_opts = df_prices[df_prices['Kategori'] == 'Ana Albüm']
     album_opts = df_prices[df_prices['Kategori'] == 'Aile Albümü']
     tablo_opts = df_prices[df_prices['Kategori'] == 'Tablo Seçimi']
     poz_opts = df_prices[df_prices['Kategori'] == 'Poz Sayısı']
     mekan_opts = df_prices[df_prices['Kategori'] == 'Çekim Mekanı']
     klip_opts = df_prices[df_prices['Kategori'] == 'Dış Çekim Klibi']
 
+    # Sıralama: Ana Albüm en üstte, hemen altında Aile Albümü
+    secilen_ana_album = st.selectbox("Ana Albüm", ana_album_opts['Secenek'].tolist()) if not ana_album_opts.empty else ""
     secilen_album = st.selectbox("Aile Albümü", album_opts['Secenek'].tolist()) if not album_opts.empty else ""
     secilen_tablo = st.selectbox("Tablo Seçimi", tablo_opts['Secenek'].tolist()) if not tablo_opts.empty else ""
     secilen_poz = st.selectbox("Albüm İçi Poz Sayısı", poz_opts['Secenek'].tolist()) if not poz_opts.empty else ""
@@ -117,15 +123,16 @@ if menu == "Müşteri Teklif Formu":
 
     # Fiyat Hesaplama (Anlık Güncellenir)
     try:
+        f_ana_album = float(ana_album_opts[ana_album_opts['Secenek'] == secilen_ana_album]['Fiyat'].values[0]) if secilen_ana_album else 0.0
         f_album = float(album_opts[album_opts['Secenek'] == secilen_album]['Fiyat'].values[0]) if secilen_album else 0.0
         f_tablo = float(tablo_opts[tablo_opts['Secenek'] == secilen_tablo]['Fiyat'].values[0]) if secilen_tablo else 0.0
         f_poz = float(poz_opts[poz_opts['Secenek'] == secilen_poz]['Fiyat'].values[0]) if secilen_poz else 0.0
         f_mekan = float(mekan_opts[mekan_opts['Secenek'] == secilen_mekan]['Fiyat'].values[0]) if secilen_mekan else 0.0
         f_klip = float(klip_opts[klip_opts['Secenek'] == secilen_klip]['Fiyat'].values[0]) if secilen_klip else 0.0
     except:
-        f_album = f_tablo = f_poz = f_mekan = f_klip = 0.0
+        f_ana_album = f_album = f_tablo = f_poz = f_mekan = f_klip = 0.0
 
-    toplam_tutar = f_album + f_tablo + f_poz + f_mekan + f_klip
+    toplam_tutar = f_ana_album + f_album + f_tablo + f_poz + f_mekan + f_klip
 
     st.markdown(f"### **Toplam Tutar: {toplam_tutar:,.2f} TL**")
     
@@ -138,7 +145,7 @@ if menu == "Müşteri Teklif Formu":
             st.warning("Lütfen zorunlu kişisel bilgileri doldurun.")
         else:
             tarih_str = rezervasyon_tarihi.strftime('%d.%m.%Y')
-            detaylar_str = f"Albüm: {secilen_album} | Tablo: {secilen_tablo} | Poz: {secilen_poz} | Mekan: {secilen_mekan} | Klip: {secilen_klip}"
+            detaylar_str = f"Ana Albüm: {secilen_ana_album} | Aile Albümü: {secilen_album} | Tablo: {secilen_tablo} | Poz: {secilen_poz} | Mekan: {secilen_mekan} | Klip: {secilen_klip}"
             
             veri = {
                 "tarih": tarih_str,
