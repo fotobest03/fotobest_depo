@@ -22,7 +22,7 @@ hide_streamlit_style = """
 st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 
 # --- AYARLAR VE GİZLİ BİLGİLER ---
-GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwHwoTfWFY7UftXR4n0oc6sj_6vrQ8h7eKkStXwnEGuwOeeL6D9hxU0B-C17fjchwd7/exec"
+GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzdX0I72i7VL_EUTpDsqjQiTws3Yn6gGoiR_XwoYsbuIET3-2duUyjJPyTWTg5ecGRd/exec"
 GMAIL_KULLANICI = "afotobest@gmail.com"
 GMAIL_SIFRE = "byyewfosgesogdft"
 
