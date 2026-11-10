@@ -7,22 +7,25 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
-# --- GÖRÜNÜM AYARI (Üst menü ve GitHub simgesini gizleme) ---
+# --- SAYFA YAPILANDIRMASI VE GÖRÜNÜM AYARI ---
+st.set_page_config(page_title="Teklif ve Fiyat Yönetimi", page_icon="📸", layout="centered")
+
+# Sağ alt köşedeki Streamlit rozetini ve üst menüleri tamamen gizleyen CSS
 hide_streamlit_style = """
     <style>
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     header {visibility: hidden;}
+    .stAppDeployButton {display:none;}
+    [data-testid="stStatusWidget"] {visibility: hidden;}
     </style>
 """
 st.markdown(hide_streamlit_style, unsafe_allow_html=True)
+
 # --- AYARLAR VE GİZLİ BİLGİLER ---
 GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwkniKw0mYQUiVpDjupS6eNg9ZlOSGzk8vTbDsJFKPkCbEl3tHKts6cbDNqxIsk2EQ/exec"
 GMAIL_KULLANICI = "afotobest@gmail.com"
 GMAIL_SIFRE = "byyewfosgesogdft"
-
-# --- SAYFA YAPILANDIRMASI ---
-st.set_page_config(page_title="Teklif ve Fiyat Yönetimi", page_icon="📸", layout="centered")
 
 # --- GOOGLE SHEETS'TEN FİYATLARI ÇEKME ---
 if "prices_df" not in st.session_state:
@@ -110,17 +113,16 @@ if menu == "Müşteri Teklif Formu":
 
     st.subheader("📅 Rezervasyon Tarihi")
 
-    # --- KAMPANYALI TARİHLERİ MÜŞTERİYE GÖSTERME ALANI ---
+    # Kampanyalı tarihleri müşteriye gösteren şık kutu
     if st.session_state.campaign_dates:
         kampanya_metni = "✨ **İndirimli Kampanyalı Günlerimiz:**\n"
         for d, oran in sorted(st.session_state.campaign_dates.items()):
-            if d >= date.today(): # Geçmiş tarihleri göstermeyelim
+            if d >= date.today():
                 kampanya_metni += f"- 📅 **{d.strftime('%d.%m.%Y')}** tarihine özel **%{oran} İndirim!**\n"
         st.info(kampanya_metni)
 
     rezervasyon_tarihi = st.date_input("Çekim Tarihi Seçiniz", value=date.today(), min_value=date.today())
 
-    # Kontroller
     tarih_kapali_mi = rezervasyon_tarihi in st.session_state.closed_dates
     kampanya_orani = st.session_state.campaign_dates.get(rezervasyon_tarihi, 0)
 
@@ -155,9 +157,8 @@ if menu == "Müşteri Teklif Formu":
         f_ana_album = f_album = f_tablo = f_poz = f_mekan = f_klip = 0.0
 
     ham_tutar = f_ana_album + f_album + f_tablo + f_poz + f_mekan + f_klip
-    toplam_tutar = ham_tutar  # Varsayılan tutar
+    toplam_tutar = ham_tutar
 
-    # Kampanya İndirimi Uygulama
     if kampanya_orani > 0:
         indirimli_tutar = ham_tutar * (1 - kampanya_orani / 100)
         st.success(f"🎉 Kampanyalı Tarih! Bu tarihe özel **%{kampanya_orani} indirim** tanımlanmıştır.")
