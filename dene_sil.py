@@ -1,6 +1,16 @@
 import streamlit as st
 import pandas as pd
 from datetime import datetime, date, timedelta
+import requests
+import json
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+
+# --- AYARLAR VE GİZLİ BİLGİLER ---
+GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbySOkFbOfTSy0HMswPu3HApYzvoZ-9eantF3dlaEhU361G-MYb1e4W4M7VYmj-4akgQ/exec"
+GMAIL_KULLANICI = "afotobest@gmail.com"
+GMAIL_SIFRE = "byyewfosgesogdft"   # Boşluksuz olarak yazın
 
 # --- SAYFA YAPILANDIRMASI ---
 st.set_page_config(page_title="Teklif ve Fiyat Yönetimi", page_icon="📸", layout="centered")
@@ -18,6 +28,41 @@ if "prices_df" not in st.session_state:
 
 if "closed_dates" not in st.session_state:
     st.session_state.closed_dates = []
+
+# --- E-POSTA GÖNDERME FONKSİYONU ---
+ToEmailSender = lambda alici, konu, icerik: None
+def mail_gonder(alici_eposta, ad_soyad, tarih_str, detaylar, toplam_tutar):
+    try:
+        msg = MIMEMultipart()
+        msg['From'] = GMAIL_KULLANICI
+        msg['To'] = GMAIL_KULLANICI # Yönetmene ve müşteriye bildirim
+        msg['Subject'] = f"📷 Yeni Rezervasyon Talebi: {ad_soyad}"
+
+        govde = f"""
+        Yeni bir rezervasyon talebi alındı!
+        
+        Müşteri Bilgileri:
+        - Ad Soyad: {ad_soyad}
+        - Telefon: {telefon}
+        - E-Posta: {email}
+        - Çekim Tarihi: {tarih_str}
+        
+        Seçilen Paket Detayları:
+        {detaylar}
+        
+        Toplam Tutar: {toplam_tutar:,.2f} TL
+        """
+        msg.attach(MIMEText(govde, 'plain', 'utf-8'))
+
+        server = smtplib.SMTP('smtp.gmail.com', 587)
+        server.starttls()
+        server.login(GMAIL_KULLANICI, GMAIL_SIFRE)
+        server.sendmail(GMAIL_KULLANICI, [GMAIL_KULLANICI, alici_eposta], msg.as_string())
+        server.quit()
+        return True
+    except Exception as e:
+        print(f"Mail gönderme hatası: {e}")
+        return False
 
 # --- UYGULAMA MENÜSÜ ---
 menu = st.sidebar.radio("Sayfa Seçin", ["Müşteri Teklif Formu", "Yönetici Paneli (Fiyat & Takvim)"])
@@ -45,11 +90,8 @@ if menu == "Müşteri Teklif Formu":
         email = st.text_input("E-Posta Adresi *")
 
         st.subheader("📅 Rezervasyon Tarihi")
-        
-        # Geçmiş tarihler engellendi (min_value=date.today())
         rezervasyon_tarihi = st.date_input("Çekim Tarihi Seçiniz", value=date.today(), min_value=date.today())
 
-        # Seçilen tarihin kapalı olup olmadığını kontrol et
         tarih_kapali_mi = rezervasyon_tarihi in st.session_state.closed_dates
         if tarih_kapali_mi:
             st.error(f"⚠️ Seçtiğiniz tarih ({rezervasyon_tarihi.strftime('%d.%m.%Y')}) yönetici tarafından kapatılmıştır/doludur. Lütfen başka bir tarih seçiniz.")
@@ -90,7 +132,30 @@ if menu == "Müşteri Teklif Formu":
             elif not ad_soyad or not telefon or not email:
                 st.warning("Lütfen zorunlu kişisel bilgileri doldurun.")
             else:
-                st.success(f"Talebiniz başarıyla alındı! Seçilen Çekim Tarihi: {rezervasyon_tarihi.strftime('%d.%m.%Y')}")
+                tarih_str = rezervasyon_tarihi.strftime('%d.%m.%Y')
+                detaylar_str = f"Albüm: {secilen_album} | Tablo: {secilen_tablo} | Poz: {secilen_poz} | Mekan: {secilen_mekan} | Klip: {secilen_klip}"
+                
+                # Google E-Tabloya Veri Gönderme
+                veri = {
+                    "tarih": tarih_str,
+                    "ad_soyad": ad_soyad,
+                    "telefon": telefon,
+                    "email": email,
+                    "detaylar": detaylar_str,
+                    "tutar": f"{toplam_tutar:,.2f} TL"
+                }
+                
+                try:
+                    response = requests.post(GOOGLE_SCRIPT_URL, json=veri)
+                     tablo_basarili = True
+                except:
+                    tablo_basarili = False
+
+                # Mail Gönderme
+                mail_gonder(email, ad_soyad, tarih_str, detaylar_str, toplam_tutar)
+
+                st.success(f"Talebiniz başarıyla alındı! Seçilen Çekim Tarihi: {tarih_str}")
+                st.balloons()
 
 # ==========================================
 # 2. YÖNETİCİ FİYAT & TAKVİM YÖNETİM PANELİ
@@ -126,7 +191,7 @@ elif menu == "Yönetici Paneli (Fiyat & Takvim)":
                     else:
                         st.warning("Bu tarih zaten kapalı listesinde bulunuyor.")
             
-            else: # Tarih Aralığı Kapat
+            else: 
                 col1, col2 = st.columns(2)
                 with col1:
                     baslangic_tarihi = st.date_input("Başlangıç Tarihi", value=date.today(), min_value=date.today())
