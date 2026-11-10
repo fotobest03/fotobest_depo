@@ -7,6 +7,15 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
+# --- GÖRÜNÜM AYARI (Üst menü ve GitHub simgesini gizleme) ---
+hide_streamlit_style = """
+    <style>
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    header {visibility: hidden;}
+    </style>
+"""
+st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 # --- AYARLAR VE GİZLİ BİLGİLER ---
 GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwkniKw0mYQUiVpDjupS6eNg9ZlOSGzk8vTbDsJFKPkCbEl3tHKts6cbDNqxIsk2EQ/exec"
 GMAIL_KULLANICI = "afotobest@gmail.com"
