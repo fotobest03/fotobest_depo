@@ -8,34 +8,42 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
 # --- AYARLAR VE GİZLİ BİLGİLER ---
-GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbySOkFbOfTSy0HMswPu3HApYzvoZ-9eantF3dlaEhU361G-MYb1e4W4M7VYmj-4akgQ/exec"
+GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwkniKw0mYQUiVpDjupS6eNg9ZlOSGzk8vTbDsJFKPkCbEl3tHKts6cbDNqxIsk2EQ/exec"
 GMAIL_KULLANICI = "afotobest@gmail.com"
-GMAIL_SIFRE = "byyewfosgesogdft"   # Boşluksuz olarak yazın
+GMAIL_SIFRE = "byyewfosgesogdft"
 
 # --- SAYFA YAPILANDIRMASI ---
 st.set_page_config(page_title="Teklif ve Fiyat Yönetimi", page_icon="📸", layout="centered")
 
-# --- SESSION STATE (Bellek Yönetimi) ---
+# --- GOOGLE SHEETS'TEN FİYATLARI ÇEKME ---
 if "prices_df" not in st.session_state:
-    st.session_state.prices_df = pd.DataFrame([
-        {"Kategori": "Aile Albümü", "Secenek": "2'li Albüm", "Fiyat": 1500},
-        {"Kategori": "Tablo Seçimi", "Secenek": "30 x 40 Çerçeveli", "Fiyat": 2000},
-        {"Kategori": "Poz Sayısı", "Secenek": "40", "Fiyat": 1000},
-        {"Kategori": "Çekim Mekanı", "Secenek": "Ayazin", "Fiyat": 2500},
-        {"Kategori": "Dış Çekim Klibi", "Secenek": "Evet", "Fiyat": 3000},
-        {"Kategori": "Dış Çekim Klibi", "Secenek": "Hayır", "Fiyat": 0}
-    ])
+    try:
+        response = requests.get(GOOGLE_SCRIPT_URL)
+        data = response.json()
+        if data and isinstance(data, list):
+            st.session_state.prices_df = pd.DataFrame(data)
+        else:
+            raise Exception("Boş veri")
+    except:
+        # İnternetten çekemezse varsayılan yedek fiyatlar
+        st.session_state.prices_df = pd.DataFrame([
+            {"Kategori": "Aile Albümü", "Secenek": "2'li Albüm", "Fiyat": 1500},
+            {"Kategori": "Tablo Seçimi", "Secenek": "30 x 40 Çerçeveli", "Fiyat": 2000},
+            {"Kategori": "Poz Sayısı", "Secenek": "40", "Fiyat": 1000},
+            {"Kategori": "Çekim Mekanı", "Secenek": "Ayazin", "Fiyat": 2500},
+            {"Kategori": "Dış Çekim Klibi", "Secenek": "Evet", "Fiyat": 3000},
+            {"Kategori": "Dış Çekim Klibi", "Secenek": "Hayır", "Fiyat": 0}
+        ])
 
 if "closed_dates" not in st.session_state:
     st.session_state.closed_dates = []
 
 # --- E-POSTA GÖNDERME FONKSİYONU ---
-ToEmailSender = lambda alici, konu, icerik: None
-def mail_gonder(alici_eposta, ad_soyad, tarih_str, detaylar, toplam_tutar):
+def mail_gonder(alici_eposta, ad_soyad, telefon, email, tarih_str, detaylar, toplam_tutar):
     try:
         msg = MIMEMultipart()
         msg['From'] = GMAIL_KULLANICI
-        msg['To'] = GMAIL_KULLANICI # Yönetmene ve müşteriye bildirim
+        msg['To'] = GMAIL_KULLANICI 
         msg['Subject'] = f"📷 Yeni Rezervasyon Talebi: {ad_soyad}"
 
         govde = f"""
@@ -73,7 +81,6 @@ menu = st.sidebar.radio("Sayfa Seçin", ["Müşteri Teklif Formu", "Yönetici Pa
 if menu == "Müşteri Teklif Formu":
     st.title("📸 Çekim & Paket Teklif Formu")
     
-    # Kapak Görseli
     try:
         st.image("kapak_foto.jpg", use_container_width=True)
     except:
@@ -94,7 +101,7 @@ if menu == "Müşteri Teklif Formu":
 
         tarih_kapali_mi = rezervasyon_tarihi in st.session_state.closed_dates
         if tarih_kapali_mi:
-            st.error(f"⚠️ Seçtiğiniz tarih ({rezervasyon_tarihi.strftime('%d.%m.%Y')}) yönetici tarafından kapatılmıştır/doludur. Lütfen başka bir tarih seçiniz.")
+            st.error(f"⚠️ Seçtiğiniz tarih ({rezervasyon_tarihi.strftime('%d.%m.%Y')}) yönetici tarafından kapatılmıştır/doludur.")
 
         st.subheader("🎁 Paket ve Çekim Seçenekleri")
         
@@ -104,19 +111,19 @@ if menu == "Müşteri Teklif Formu":
         mekan_opts = df_prices[df_prices['Kategori'] == 'Çekim Mekanı']
         klip_opts = df_prices[df_prices['Kategori'] == 'Dış Çekim Klibi']
 
-        secilen_album = st.selectbox("Aile Albümü", album_opts['Secenek'].tolist())
-        secilen_tablo = st.selectbox("Tablo Seçimi", tablo_opts['Secenek'].tolist())
-        secilen_poz = st.selectbox("Albüm İçi Poz Sayısı", poz_opts['Secenek'].tolist())
-        secilen_mekan = st.selectbox("Çekim Mekanı", mekan_opts['Secenek'].tolist())
-        secilen_klip = st.radio("Dış Çekim Klibi İstiyorum", klip_opts['Secenek'].tolist())
+        secilen_album = st.selectbox("Aile Albümü", album_opts['Secenek'].tolist()) if not album_opts.empty else ""
+        secilen_tablo = st.selectbox("Tablo Seçimi", tablo_opts['Secenek'].tolist()) if not tablo_opts.empty else ""
+        secilen_poz = st.selectbox("Albüm İçi Poz Sayısı", poz_opts['Secenek'].tolist()) if not poz_opts.empty else ""
+        secilen_mekan = st.selectbox("Çekim Mekanı", mekan_opts['Secenek'].tolist()) if not mekan_opts.empty else ""
+        secilen_klip = st.radio("Dış Çekim Klibi İstiyorum", klip_opts['Secenek'].tolist()) if not klip_opts.empty else ""
 
         # Fiyat Hesaplama
         try:
-            f_album = float(album_opts[album_opts['Secenek'] == secilen_album]['Fiyat'].values[0])
-            f_tablo = float(tablo_opts[tablo_opts['Secenek'] == secilen_tablo]['Fiyat'].values[0])
-            f_poz = float(poz_opts[poz_opts['Secenek'] == secilen_poz]['Fiyat'].values[0])
-            f_mekan = float(mekan_opts[mekan_opts['Secenek'] == secilen_mekan]['Fiyat'].values[0])
-            f_klip = float(klip_opts[klip_opts['Secenek'] == secilen_klip]['Fiyat'].values[0])
+            f_album = float(album_opts[album_opts['Secenek'] == secilen_album]['Fiyat'].values[0]) if secilen_album else 0.0
+            f_tablo = float(tablo_opts[tablo_opts['Secenek'] == secilen_tablo]['Fiyat'].values[0]) if secilen_tablo else 0.0
+            f_poz = float(poz_opts[poz_opts['Secenek'] == secilen_poz]['Fiyat'].values[0]) if secilen_poz else 0.0
+            f_mekan = float(mekan_opts[mekan_opts['Secenek'] == secilen_mekan]['Fiyat'].values[0]) if secilen_mekan else 0.0
+            f_klip = float(klip_opts[klip_opts['Secenek'] == secilen_klip]['Fiyat'].values[0]) if secilen_klip else 0.0
         except:
             f_album = f_tablo = f_poz = f_mekan = f_klip = 0.0
 
@@ -135,7 +142,6 @@ if menu == "Müşteri Teklif Formu":
                 tarih_str = rezervasyon_tarihi.strftime('%d.%m.%Y')
                 detaylar_str = f"Albüm: {secilen_album} | Tablo: {secilen_tablo} | Poz: {secilen_poz} | Mekan: {secilen_mekan} | Klip: {secilen_klip}"
                 
-                # Google E-Tabloya Veri Gönderme
                 veri = {
                     "tarih": tarih_str,
                     "ad_soyad": ad_soyad,
@@ -146,13 +152,11 @@ if menu == "Müşteri Teklif Formu":
                 }
                 
                 try:
-                    response = requests.post(GOOGLE_SCRIPT_URL, json=veri)
-                    tablo_basarili = True
+                    requests.post(GOOGLE_SCRIPT_URL, json=veri)
                 except:
-                    tablo_basarili = False
+                    pass
 
-                # Mail Gönderme
-                mail_gonder(email, ad_soyad, tarih_str, detaylar_str, toplam_tutar)
+                mail_gonder(email, ad_soyad, telefon, email, tarih_str, detaylar_str, toplam_tutar)
 
                 st.success(f"Talebiniz başarıyla alındı! Seçilen Çekim Tarihi: {tarih_str}")
                 st.balloons()
@@ -173,13 +177,27 @@ elif menu == "Yönetici Paneli (Fiyat & Takvim)":
         with tab1:
             st.subheader("Ürün ve Fiyat Tablosu")
             edited_df = st.data_editor(st.session_state.prices_df, num_rows="dynamic", use_container_width=True)
+            
             if st.button("Fiyatları Güncelle"):
                 st.session_state.prices_df = edited_df
-                st.success("Fiyatlar başarıyla güncellendi!")
+                
+                # Google E-Tabloya Gönderme
+                fiyat_listesi = edited_df.to_dict(orient="records")
+                guncelleme_verisi = {
+                    "islem": "fiyat_guncelle",
+                    "fiyatlar": fiyat_listesi
+                }
+                try:
+                    res = requests.post(GOOGLE_SCRIPT_URL, json=guncelleme_verisi)
+                    if res.status_code == 200:
+                        st.success("Fiyatlar hem bellekte hem de Google E-Tabloda başarıyla güncellendi!")
+                    else:
+                        st.warning("Fiyatlar güncellendi ancak E-Tabloya yazılırken bir hata oluştu.")
+                except Exception as ex:
+                    st.error(f"Bağlantı hatası: {ex}")
 
         with tab2:
             st.subheader("Çekime Kapalı / Dolu Tarih Ayarları")
-            
             kapatma_turu = st.radio("Kapatma Yöntemi Seçin", ["Tek Gün Kapat", "Tarih Aralığı Kapat"])
             
             if kapatma_turu == "Tek Gün Kapat":
