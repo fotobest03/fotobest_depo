@@ -26,59 +26,62 @@ GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzdX0I72i7VL_EUTpDs
 GMAIL_KULLANICI = "afotobest@gmail.com"
 GMAIL_SIFRE = "byyewfosgesogdft"
 
-# --- GOOGLE SHEETS'TEN VERİLERİ ÇEKME (Fiyatlar, Kapalı & Kampanyalı Tarihler) ---
+# --- GOOGLE SHEETS'TEN VERİLERİ ÇEKME (Kalıcı ve Hatasız) ---
 if "prices_df" not in st.session_state or "closed_dates" not in st.session_state or "campaign_dates" not in st.session_state:
+    # Varsayılan değerler
+    st.session_state.prices_df = pd.DataFrame([
+        {"Kategori": "Ana Albüm", "Secenek": "30 x 60 Mat Albüm", "Fiyat": 3500},
+        {"Kategori": "Ana Albüm", "Secenek": "30 x 76 Mat Albüm", "Fiyat": 4500},
+        {"Kategori": "Aile Albümü", "Secenek": "2'li Albüm", "Fiyat": 1500},
+        {"Kategori": "Tablo Seçimi", "Secenek": "30 x 40 Çerçeveli", "Fiyat": 2000},
+        {"Kategori": "Poz Sayısı", "Secenek": "40", "Fiyat": 1000},
+        {"Kategori": "Çekim Mekanı", "Secenek": "Ayazin", "Fiyat": 2500},
+        {"Kategori": "Dış Çekim Klibi", "Secenek": "Evet", "Fiyat": 3000},
+        {"Kategori": "Dış Çekim Klibi", "Secenek": "Hayır", "Fiyat": 0}
+    ])
+    st.session_state.closed_dates = []
+    st.session_state.campaign_dates = {}
+
     try:
         response = requests.get(GOOGLE_SCRIPT_URL)
         data = response.json()
         
-        # Fiyatlar
+        # 1. Fiyatlar
         if "fiyatlar" in data and data["fiyatlar"]:
             st.session_state.prices_df = pd.DataFrame(data["fiyatlar"])
-        else:
-            raise Exception()
 
-        # Kapalı Tarihler (Metin -> Date nesnesine çevrilir)
-        st.session_state.closed_dates = []
+        # 2. Kapalı Tarihler
         if "kapali_tarihler" in data:
             for t_str in data["kapali_tarihler"]:
-                try:
-                    # Gelen format YYYY-MM-DD veya GG.AA.YYYY olabilir
-                    if "-" in t_str:
-                        dt = datetime.strptime(t_str.split("T")[0], "%Y-%m-%d").date()
-                    else:
-                        dt = datetime.strptime(t_str, "%d.%m.%Y").date()
-                    st.session_state.closed_dates.append(dt)
-                except:
-                    pass
+                if t_str:
+                    try:
+                        # Tarih formatını esnek bir şekilde yakala
+                        t_temiz = str(t_str).split("T")[0].strip()
+                        if "-" in t_temiz:
+                            dt = datetime.strptime(t_temiz, "%Y-%m-%d").date()
+                        else:
+                            dt = datetime.strptime(t_temiz, "%d.%m.%Y").date()
+                        if dt not in st.session_state.closed_dates:
+                            st.session_state.closed_dates.append(dt)
+                    except Exception as e:
+                        print(f"Kapali tarih okuma hatasi: {e}")
 
-        # Kampanyalı Tarihler
-        st.session_state.campaign_dates = {}
+        # 3. Kampanyalı Tarihler
         if "kampanyalar" in data:
             for t_str, oran in data["kampanyalar"].items():
-                try:
-                    if "-" in t_str:
-                        dt = datetime.strptime(t_str.split("T")[0], "%Y-%m-%d").date()
-                    else:
-                        dt = datetime.strptime(t_str, "%d.%m.%Y").date()
-                    st.session_state.campaign_dates[dt] = int(oran)
-                except:
-                    pass
+                if t_str:
+                    try:
+                        t_temiz = str(t_str).split("T")[0].strip()
+                        if "-" in t_temiz:
+                            dt = datetime.strptime(t_temiz, "%Y-%m-%d").date()
+                        else:
+                            dt = datetime.strptime(t_temiz, "%d.%m.%Y").date()
+                        st.session_state.campaign_dates[dt] = int(oran)
+                    except Exception as e:
+                        print(f"Kampanya okuma hatasi: {e}")
 
-    except:
-        # Yedek veriler
-        st.session_state.prices_df = pd.DataFrame([
-            {"Kategori": "Ana Albüm", "Secenek": "30 x 60 Mat Albüm", "Fiyat": 3500},
-            {"Kategori": "Ana Albüm", "Secenek": "30 x 76 Mat Albüm", "Fiyat": 4500},
-            {"Kategori": "Aile Albümü", "Secenek": "2'li Albüm", "Fiyat": 1500},
-            {"Kategori": "Tablo Seçimi", "Secenek": "30 x 40 Çerçeveli", "Fiyat": 2000},
-            {"Kategori": "Poz Sayısı", "Secenek": "40", "Fiyat": 1000},
-            {"Kategori": "Çekim Mekanı", "Secenek": "Ayazin", "Fiyat": 2500},
-            {"Kategori": "Dış Çekim Klibi", "Secenek": "Evet", "Fiyat": 3000},
-            {"Kategori": "Dış Çekim Klibi", "Secenek": "Hayır", "Fiyat": 0}
-        ])
-        st.session_state.closed_dates = []
-        st.session_state.campaign_dates = {}
+    except Exception as ex:
+        print(f"Google Sheets bağlantı hatası: {ex}")
 
 # --- E-POSTA GÖNDERME FONKSİYONU ---
 def mail_gonder(alici_eposta, ad_soyad, telefon, email, tarih_str, detaylar, toplam_tutar):
