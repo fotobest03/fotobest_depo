@@ -27,7 +27,6 @@ GMAIL_KULLANICI = "afotobest@gmail.com"
 GMAIL_SIFRE = "byyewfosgesogdft"
 
 # --- GOOGLE SHEETS'TEN VERİLERİ HER YENİLEMEDE ÇEKME ---
-# Fiyatlar için ilk açılış kontrolü
 if "prices_df" not in st.session_state:
     st.session_state.prices_df = pd.DataFrame([
         {"Kategori": "Ana Albüm", "Secenek": "30 x 60 Mat Albüm", "Fiyat": 3500},
@@ -40,7 +39,6 @@ if "prices_df" not in st.session_state:
         {"Kategori": "Dış Çekim Klibi", "Secenek": "Hayır", "Fiyat": 0}
     ])
 
-# Kapalı ve kampanyalı tarihleri her yenilemede tablodan güncel olarak çekelim:
 st.session_state.closed_dates = []
 st.session_state.campaign_dates = {}
 
@@ -67,19 +65,36 @@ try:
                 except:
                     pass
 
-    # 3. Kampanyalı Tarihler
+    # 3. Kampanyalı Tarihler (Hatasız Çözümleme)
     if "kampanyalar" in data and data["kampanyalar"]:
-        for t_str, oran in data["kampanyalar"].items():
-            if t_str:
-                try:
-                    t_temiz = str(t_str).split("T")[0].strip()
-                    if "-" in t_temiz:
-                        dt = datetime.strptime(t_temiz, "%Y-%m-%d").date()
-                    else:
-                        dt = datetime.strptime(t_temiz, "%d.%m.%Y").date()
-                    st.session_state.campaign_dates[dt] = int(oran)
-                except:
-                    pass
+        kampanya_veri = data["kampanyalar"]
+        # Eğer sözlük (dict) olarak geldiyse
+        if isinstance(kampanya_veri, dict):
+            for t_str, oran in kampanya_veri.items():
+                if t_str:
+                    try:
+                        t_temiz = str(t_str).split("T")[0].strip()
+                        if "-" in t_temiz:
+                            dt = datetime.strptime(t_temiz, "%Y-%m-%d").date()
+                        else:
+                            dt = datetime.strptime(t_temiz, "%d.%m.%Y").date()
+                        st.session_state.campaign_dates[dt] = int(oran)
+                    except:
+                        pass
+        # Eğer liste (list) olarak geldiyse
+        elif isinstance(kampanya_veri, list):
+            for k in kampanya_veri:
+                if isinstance(k, dict) and "tarih" in k:
+                    try:
+                        t_str = str(k["tarih"]).split("T")[0].strip()
+                        oran = int(k["oran"])
+                        if "-" in t_str:
+                            dt = datetime.strptime(t_str, "%Y-%m-%d").date()
+                        else:
+                            dt = datetime.strptime(t_str, "%d.%m.%Y").date()
+                        st.session_state.campaign_dates[dt] = oran
+                    except:
+                        pass
 except Exception as ex:
     print(f"Veri çekme hatası: {ex}")
 
@@ -270,10 +285,10 @@ elif menu == "Yönetici Paneli (Fiyat & Takvim)":
 
         with tab2:
             st.subheader("Çekime Kapalı / Dolu Tarih Ayarları")
-            kapatma_turu = st.radio("Kapatma Yöntemi Seçin", ["Tek Gün Kapat", "Tarih Aralığı Kapat"])
+            kapatma_turu = st.radio("Kapatma Yöntemi Seçin", ["Tek Gün Kapat", "Tarih Aralığı Kapat"], key="kapali_tur_sec")
             
             if kapatma_turu == "Tek Gün Kapat":
-                tek_tarih = st.date_input("Kapatılacak Tarih", value=date.today(), min_value=date.today())
+                tek_tarih = st.date_input("Kapatılacak Tarih", value=date.today(), min_value=date.today(), key="tek_kapali_input")
                 if st.button("Seçilen Günü Kapat ve Kaydet"):
                     if tek_tarih not in st.session_state.closed_dates:
                         st.session_state.closed_dates.append(tek_tarih)
@@ -313,7 +328,7 @@ elif menu == "Yönetici Paneli (Fiyat & Takvim)":
                     with c1:
                         st.write(f"📌 {d.strftime('%d.%m.%Y')}")
                     with c2:
-                        if st.button("Aç / Kaldır", key=str(d)):
+                        if st.button("Aç / Kaldır", key=f"kapali_sil_{d}"):
                             st.session_state.closed_dates.remove(d)
                             google_kapali_guncelle()
                             st.rerun()
@@ -323,12 +338,12 @@ elif menu == "Yönetici Paneli (Fiyat & Takvim)":
         with tab3:
             st.subheader("🎉 Kampanyalı Tarih ve İndirim Oranı Belirleme")
             kampanya_turu = st.radio("Kampanya Ekleme Yöntemi", ["Tek Gün Kampanya", "Tarih Aralığı Kampanya"], key="kamp_tur_sec")
-            indirim_orani = st.number_input("İndirim Oranı (%)", min_value=1, max_value=99, value=10, step=1)
+            indirim_orani = st.number_input("İndirim Oranı (%)", min_value=1, max_value=99, value=10, step=1, key="kamp_indirim_input")
             
             if kampanya_turu == "Tek Gün Kampanya":
                 k_tek_tarih = st.date_input("Kampanyalı Tarih Seçin", value=date.today(), min_value=date.today(), key="kamp_tek")
-                if st.button("Kampanya Ekle ve Kaydet"):
-                    st.session_state.campaign_dates[k_tek_tarih] = indirim_orani
+                if st.button("Kampanya Ekle ve Kaydet", key="kamp_tek_btn"):
+                    st.session_state.campaign_dates[k_tek_tarih] = int(indirim_orani)
                     google_kampanya_guncelle()
                     st.success(f"{k_tek_tarih.strftime('%d.%m.%Y')} için %{indirim_orani} indirim kaydedildi!")
                     st.rerun()
@@ -339,14 +354,14 @@ elif menu == "Yönetici Paneli (Fiyat & Takvim)":
                 with col_k2:
                     k_bit = st.date_input("Bitiş Tarihi", value=date.today(), min_value=date.today(), key="kamp_bit")
                 
-                if st.button("Kampanya Aralığı Ekle ve Kaydet"):
+                if st.button("Kampanya Aralığı Ekle ve Kaydet", key="kamp_aralik_btn"):
                     if k_bas > k_bit:
                         st.error("Başlangıç tarihi bitiş tarihinden sonra olamaz!")
                     else:
                         sayac = 0
                         curr = k_bas
                         while curr <= k_bit:
-                            st.session_state.campaign_dates[curr] = indirim_orani
+                            st.session_state.campaign_dates[curr] = int(indirim_orani)
                             sayac += 1
                             curr += timedelta(days=1)
                         google_kampanya_guncelle()
@@ -362,7 +377,8 @@ elif menu == "Yönetici Paneli (Fiyat & Takvim)":
                         st.write(f"🎉 **{d.strftime('%d.%m.%Y')}** ➔ **%{oran} İndirim**")
                     with kc2:
                         if st.button("Kaldır", key=f"kampanya_sil_{d}"):
-                            del st.session_state.campaign_dates[d]
+                            if d in st.session_state.campaign_dates:
+                                del st.session_state.campaign_dates[d]
                             google_kampanya_guncelle()
                             st.rerun()
             else:
