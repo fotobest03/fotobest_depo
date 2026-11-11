@@ -26,10 +26,9 @@ GOOGLE_SCRIPT_URL = " https://script.google.com/macros/s/AKfycbwTK9tqIZqOOyjR9Dm
 GMAIL_KULLANICI = "afotobest@gmail.com"
 GMAIL_SIFRE = "byyewfosgesogdft"
 
-# --- GOOGLE SHEETS'TEN VERİLERİ ANLIK ÇEKEN FONKSİYON ---
-def verileri_sheets_ten_getir():
-    # Varsayılan fiyatlar
-    fiyat_df = pd.DataFrame([
+# --- GOOGLE SHEETS'TEN VERİLERİ İLK AÇILIŞTA ÇEKME (Çakışma Önleyici Sistem) ---
+if "data_loaded" not in st.session_state:
+    st.session_state.prices_df = pd.DataFrame([
         {"Kategori": "Ana Albüm", "Secenek": "30 x 60 Mat Albüm", "Fiyat": 3500},
         {"Kategori": "Ana Albüm", "Secenek": "30 x 76 Mat Albüm", "Fiyat": 4500},
         {"Kategori": "Aile Albümü", "Secenek": "2'li Albüm", "Fiyat": 1500},
@@ -39,16 +38,16 @@ def verileri_sheets_ten_getir():
         {"Kategori": "Dış Çekim Klibi", "Secenek": "Evet", "Fiyat": 3000},
         {"Kategori": "Dış Çekim Klibi", "Secenek": "Hayır", "Fiyat": 0}
     ])
-    kapali_liste = []
-    kampanya_sozluk = {}
+    st.session_state.closed_dates = []
+    st.session_state.campaign_dates = {}
 
     try:
-        response = requests.get(GOOGLE_SCRIPT_URL, timeout=10)
+        response = requests.get(GOOGLE_SCRIPT_URL)
         data = response.json()
         
         # 1. Fiyatlar
         if "fiyatlar" in data and data["fiyatlar"]:
-            fiyat_df = pd.DataFrame(data["fiyatlar"])
+            st.session_state.prices_df = pd.DataFrame(data["fiyatlar"])
 
         # 2. Kapalı Tarihler
         if "kapali_tarihler" in data and data["kapali_tarihler"]:
@@ -60,12 +59,12 @@ def verileri_sheets_ten_getir():
                             dt = datetime.strptime(t_temiz, "%Y-%m-%d").date()
                         else:
                             dt = datetime.strptime(t_temiz, "%d.%m.%Y").date()
-                        if dt not in kapali_liste:
-                            kapali_liste.append(dt)
+                        if dt not in st.session_state.closed_dates:
+                            st.session_state.closed_dates.append(dt)
                     except:
                         pass
 
-        # 3. Kampanyalar
+        # 3. Kampanyalı Tarihler
         if "kampanyalar" in data and data["kampanyalar"]:
             kampanya_veri = data["kampanyalar"]
             if isinstance(kampanya_veri, dict):
@@ -77,7 +76,7 @@ def verileri_sheets_ten_getir():
                                 dt = datetime.strptime(t_temiz, "%Y-%m-%d").date()
                             else:
                                 dt = datetime.strptime(t_temiz, "%d.%m.%Y").date()
-                            kampanya_sozluk[dt] = int(oran)
+                            st.session_state.campaign_dates[dt] = int(oran)
                         except:
                             pass
             elif isinstance(kampanya_veri, list):
@@ -90,20 +89,13 @@ def verileri_sheets_ten_getir():
                                 dt = datetime.strptime(t_str, "%Y-%m-%d").date()
                             else:
                                 dt = datetime.strptime(t_str, "%d.%m.%Y").date()
-                            kampanya_sozluk[dt] = oran
+                            st.session_state.campaign_dates[dt] = oran
                         except:
                             pass
     except Exception as ex:
         print(f"Veri çekme hatası: {ex}")
-
-    return fiyat_df, kapali_liste, kampanya_sozluk
-
-# --- SESSION STATE BAŞLATMA VE GÜNCELLEME ---
-if "prices_df" not in st.session_state or "closed_dates" not in st.session_state or "campaign_dates" not in st.session_state:
-    f_df, k_list, k_dict = verileri_sheets_ten_getir()
-    st.session_state.prices_df = f_df
-    st.session_state.closed_dates = k_list
-    st.session_state.campaign_dates = k_dict
+    
+    st.session_state.data_loaded = True
 
 # --- E-POSTA GÖNDERME FONKSİYONU ---
 def mail_gonder(alici_eposta, ad_soyad, telefon, email, tarih_str, detaylar, toplam_tutar):
@@ -274,12 +266,6 @@ elif menu == "Yönetici Paneli (Fiyat & Takvim)":
     
     if password == "12345":
         st.success("Giriş Başarılı!")
-        
-        # Yönetici paneline girildiği an tablodaki verileri tazeleyelim
-        f_df, k_list, k_dict = verileri_sheets_ten_getir()
-        st.session_state.prices_df = f_df
-        st.session_state.closed_dates = k_list
-        st.session_state.campaign_dates = k_dict
         
         tab1, tab2, tab3 = st.tabs(["💰 Fiyat Yönetimi", "📅 Kapalı Tarihler", "🎉 Kampanyalı Tarihler"])
         
