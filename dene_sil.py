@@ -65,10 +65,9 @@ try:
                 except:
                     pass
 
-    # 3. Kampanyalı Tarihler (Hatasız Çözümleme)
+    # 3. Kampanyalı Tarihler
     if "kampanyalar" in data and data["kampanyalar"]:
         kampanya_veri = data["kampanyalar"]
-        # Eğer sözlük (dict) olarak geldiyse
         if isinstance(kampanya_veri, dict):
             for t_str, oran in kampanya_veri.items():
                 if t_str:
@@ -81,7 +80,6 @@ try:
                         st.session_state.campaign_dates[dt] = int(oran)
                     except:
                         pass
-        # Eğer liste (list) olarak geldiyse
         elif isinstance(kampanya_veri, list):
             for k in kampanya_veri:
                 if isinstance(k, dict) and "tarih" in k:
@@ -343,6 +341,7 @@ elif menu == "Yönetici Paneli (Fiyat & Takvim)":
             if kampanya_turu == "Tek Gün Kampanya":
                 k_tek_tarih = st.date_input("Kampanyalı Tarih Seçin", value=date.today(), min_value=date.today(), key="kamp_tek")
                 if st.button("Kampanya Ekle ve Kaydet", key="kamp_tek_btn"):
+                    # Mevcut sözlüğe yenisini ekliyoruz
                     st.session_state.campaign_dates[k_tek_tarih] = int(indirim_orani)
                     google_kampanya_guncelle()
                     st.success(f"{k_tek_tarih.strftime('%d.%m.%Y')} için %{indirim_orani} indirim kaydedildi!")
@@ -355,18 +354,15 @@ elif menu == "Yönetici Paneli (Fiyat & Takvim)":
                     k_bit = st.date_input("Bitiş Tarihi", value=date.today(), min_value=date.today(), key="kamp_bit")
                 
                 if st.button("Kampanya Aralığı Ekle ve Kaydet", key="kamp_aralik_btn"):
-                    if k_bas > k_bit:
-                        st.error("Başlangıç tarihi bitiş tarihinden sonra olamaz!")
-                    else:
-                        sayac = 0
-                        curr = k_bas
-                        while curr <= k_bit:
-                            st.session_state.campaign_dates[curr] = int(indirim_orani)
-                            sayac += 1
-                            curr += timedelta(days=1)
-                        google_kampanya_guncelle()
-                        st.success(f"Aralıktaki {sayac} gün için %{indirim_orani} indirim kaydedildi!")
-                        st.rerun()
+                    sayac = 0
+                    curr = k_bas
+                    while curr <= k_bit:
+                        st.session_state.campaign_dates[curr] = int(indirim_orani)
+                        sayac += 1
+                        curr += timedelta(days=1)
+                    google_kampanya_guncelle()
+                    st.success(f"Aralıktaki {sayac} gün için %{indirim_orani} indirim kaydedildi!")
+                    st.rerun()
 
             st.write("---")
             st.markdown("### 🏷️ Aktif Kampanyalı Tarihler ve İndirim Oranları:")
