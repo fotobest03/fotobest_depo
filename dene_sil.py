@@ -22,34 +22,34 @@ hide_streamlit_style = """
 st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 
 # --- AYARLAR VE GİZLİ BİLGİLER ---
-GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwTK9tqIZqOOyjR9DmjWKqL-FfzY8KU245tCF-6t0E89uTsX81ojYLGNP6gOppKvvqS/exec"
+GOOGLE_SCRIPT_URL = " https://script.google.com/macros/s/AKfycbyfOC5dGqFqAVt_f30xIfLfCUmiFIUypVmvN5u0_qwi2WA6FxHRNo1ogg8at2ihy8Y8/exec"
 GMAIL_KULLANICI = "afotobest@gmail.com"
 GMAIL_SIFRE = "byyewfosgesogdft"
 
-# --- GOOGLE SHEETS'TEN VERİLERİ YÜKLEME FONKSİYONU ---
+# --- GOOGLE SHEETS'TEN VERİLERİ ÇEKEN FONKSİYON ---
 def verileri_google_tablodan_yukle():
-    """Google E-Tablodaki Fiyatlar, Kapalı Tarihler ve Kampanyaları çeker ve session_state'e yazar."""
+    fiyat_df = pd.DataFrame([
+        {"Kategori": "Ana Albüm", "Secenek": "30 x 60 Mat Albüm", "Fiyat": 3500},
+        {"Kategori": "Ana Albüm", "Secenek": "30 x 76 Mat Albüm", "Fiyat": 4500},
+        {"Kategori": "Aile Albümü", "Secenek": "2'li Albüm", "Fiyat": 1500},
+        {"Kategori": "Tablo Seçimi", "Secenek": "30 x 40 Çerçeveli", "Fiyat": 2000},
+        {"Kategori": "Poz Sayısı", "Secenek": "40", "Fiyat": 1000},
+        {"Kategori": "Çekim Mekanı", "Secenek": "Ayazin", "Fiyat": 2500},
+        {"Kategori": "Dış Çekim Klibi", "Secenek": "Evet", "Fiyat": 3000},
+        {"Kategori": "Dış Çekim Klibi", "Secenek": "Hayır", "Fiyat": 0}
+    ])
+    kapali_liste = []
+    kampanya_sozluk = {}
+
     try:
         response = requests.get(GOOGLE_SCRIPT_URL, timeout=10)
         data = response.json()
         
         # 1. Fiyatlar
         if "fiyatlar" in data and data["fiyatlar"]:
-            st.session_state.prices_df = pd.DataFrame(data["fiyatlar"])
-        elif "prices_df" not in st.session_state:
-            st.session_state.prices_df = pd.DataFrame([
-                {"Kategori": "Ana Albüm", "Secenek": "30 x 60 Mat Albüm", "Fiyat": 3500},
-                {"Kategori": "Ana Albüm", "Secenek": "30 x 76 Mat Albüm", "Fiyat": 4500},
-                {"Kategori": "Aile Albümü", "Secenek": "2'li Albüm", "Fiyat": 1500},
-                {"Kategori": "Tablo Seçimi", "Secenek": "30 x 40 Çerçeveli", "Fiyat": 2000},
-                {"Kategori": "Poz Sayısı", "Secenek": "40", "Fiyat": 1000},
-                {"Kategori": "Çekim Mekanı", "Secenek": "Ayazin", "Fiyat": 2500},
-                {"Kategori": "Dış Çekim Klibi", "Secenek": "Evet", "Fiyat": 3000},
-                {"Kategori": "Dış Çekim Klibi", "Secenek": "Hayır", "Fiyat": 0}
-            ])
+            fiyat_df = pd.DataFrame(data["fiyatlar"])
 
         # 2. Kapalı Tarihler
-        st.session_state.closed_dates = []
         if "kapali_tarihler" in data and data["kapali_tarihler"]:
             for t_str in data["kapali_tarihler"]:
                 if t_str:
@@ -59,28 +59,15 @@ def verileri_google_tablodan_yukle():
                             dt = datetime.strptime(t_temiz, "%Y-%m-%d").date()
                         else:
                             dt = datetime.strptime(t_temiz, "%d.%m.%Y").date()
-                        if dt not in st.session_state.closed_dates:
-                            st.session_state.closed_dates.append(dt)
+                        if dt not in kapali_liste:
+                            kapali_liste.append(dt)
                     except:
                         pass
 
-        # 3. Kampanyalı Tarihler
-        st.session_state.campaign_dates = {}
+        # 3. Kampanyalı Tarihler (Liste formatı desteği)
         if "kampanyalar" in data and data["kampanyalar"]:
             kampanya_veri = data["kampanyalar"]
-            if isinstance(kampanya_veri, dict):
-                for t_str, oran in kampanya_veri.items():
-                    if t_str:
-                        try:
-                            t_temiz = str(t_str).split("T")[0].strip()
-                            if "-" in t_temiz:
-                                dt = datetime.strptime(t_temiz, "%Y-%m-%d").date()
-                            else:
-                                dt = datetime.strptime(t_temiz, "%d.%m.%Y").date()
-                            st.session_state.campaign_dates[dt] = int(oran)
-                        except:
-                            pass
-            elif isinstance(kampanya_veri, list):
+            if isinstance(kampanya_veri, list):
                 for k in kampanya_veri:
                     if isinstance(k, dict) and "tarih" in k:
                         try:
@@ -90,16 +77,28 @@ def verileri_google_tablodan_yukle():
                                 dt = datetime.strptime(t_str, "%Y-%m-%d").date()
                             else:
                                 dt = datetime.strptime(t_str, "%d.%m.%Y").date()
-                            st.session_state.campaign_dates[dt] = oran
+                            kampanya_sozluk[dt] = oran
                         except:
                             pass
+            elif isinstance(kampanya_veri, dict):
+                for t_str, oran in kampanya_veri.items():
+                    try:
+                        t_temiz = str(t_str).split("T")[0].strip()
+                        dt = datetime.strptime(t_temiz, "%Y-%m-%d").date()
+                        kampanya_sozluk[dt] = int(oran)
+                    except:
+                        pass
     except Exception as ex:
         print(f"Veri çekme hatası: {ex}")
 
-# İlk yükleme yapılmadıysa bir kez çalıştır
-if "data_loaded" not in st.session_state:
-    verileri_google_tablodan_yukle()
-    st.session_state.data_loaded = True
+    return fiyat_df, kapali_liste, kampanya_sozluk
+
+# Oturum başlatma
+if "prices_df" not in st.session_state or "closed_dates" not in st.session_state or "campaign_dates" not in st.session_state:
+    f_df, k_list, k_dict = verileri_google_tablodan_yukle()
+    st.session_state.prices_df = f_df
+    st.session_state.closed_dates = k_list
+    st.session_state.campaign_dates = k_dict
 
 # --- E-POSTA GÖNDERME FONKSİYONU ---
 def mail_gonder(alici_eposta, ad_soyad, telefon, email, tarih_str, detaylar, toplam_tutar):
@@ -271,15 +270,18 @@ elif menu == "Yönetici Paneli (Fiyat & Takvim)":
     if password == "12345":
         st.success("Giriş Başarılı!")
         
-        # Yönetici Paneline her girildiğinde E-Tablodaki güncel verileri zorunlu olarak çekiyoruz:
-        if "admin_loaded" not in st.session_state:
-            verileri_google_tablodan_yukle()
-            st.session_state.admin_loaded = True
-            
-        # Yönetici panelinde manuel veri tazeleme butonu
+        # Yönetici Paneline girildiğinde verileri tablodan tazeleyelim
+        f_df, k_list, k_dict = verileri_google_tablodan_yukle()
+        st.session_state.prices_df = f_df
+        st.session_state.closed_dates = k_list
+        st.session_state.campaign_dates = k_dict
+        
         if st.button("🔄 Verileri E-Tablodan Şimdi Yenile"):
-            verileri_google_tablodan_yukle()
-            st.success("Veriler Google E-Tablodan güncellendi!")
+            f_df, k_list, k_dict = verileri_google_tablodan_yukle()
+            st.session_state.prices_df = f_df
+            st.session_state.closed_dates = k_list
+            st.session_state.campaign_dates = k_dict
+            st.success("Veriler Google E-Tablodan başarıyla güncellendi!")
             st.rerun()
 
         tab1, tab2, tab3 = st.tabs(["💰 Fiyat Yönetimi", "📅 Kapalı Tarihler", "🎉 Kampanyalı Tarihler"])
