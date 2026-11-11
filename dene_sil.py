@@ -22,12 +22,12 @@ hide_streamlit_style = """
 st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 
 # --- AYARLAR VE GİZLİ BİLGİLER ---
-GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwTK9tqIZqOOyjR9DmjWKqL-FfzY8KU245tCF-6t0E89uTsX81ojYLGNP6gOppKvvqS/exec"
+GOOGLE_SCRIPT_URL = " https://script.google.com/macros/s/AKfycbwTK9tqIZqOOyjR9DmjWKqL-FfzY8KU245tCF-6t0E89uTsX81ojYLGNP6gOppKvvqS/exec"
 GMAIL_KULLANICI = "afotobest@gmail.com"
 GMAIL_SIFRE = "byyewfosgesogdft"
 
-# --- GOOGLE SHEETS'TEN VERİLERİ HER YENİLEMEDE ÇEKME ---
-if "prices_df" not in st.session_state:
+# --- GOOGLE SHEETS'TEN VERİLERİ İLK AÇILIŞTA ÇEKME (Çakışma Önleyici Sistem) ---
+if "data_loaded" not in st.session_state:
     st.session_state.prices_df = pd.DataFrame([
         {"Kategori": "Ana Albüm", "Secenek": "30 x 60 Mat Albüm", "Fiyat": 3500},
         {"Kategori": "Ana Albüm", "Secenek": "30 x 76 Mat Albüm", "Fiyat": 4500},
@@ -38,38 +38,20 @@ if "prices_df" not in st.session_state:
         {"Kategori": "Dış Çekim Klibi", "Secenek": "Evet", "Fiyat": 3000},
         {"Kategori": "Dış Çekim Klibi", "Secenek": "Hayır", "Fiyat": 0}
     ])
+    st.session_state.closed_dates = []
+    st.session_state.campaign_dates = {}
 
-st.session_state.closed_dates = []
-st.session_state.campaign_dates = {}
+    try:
+        response = requests.get(GOOGLE_SCRIPT_URL)
+        data = response.json()
+        
+        # 1. Fiyatlar
+        if "fiyatlar" in data and data["fiyatlar"]:
+            st.session_state.prices_df = pd.DataFrame(data["fiyatlar"])
 
-try:
-    response = requests.get(GOOGLE_SCRIPT_URL)
-    data = response.json()
-    
-    # 1. Fiyatlar
-    if "fiyatlar" in data and data["fiyatlar"]:
-        st.session_state.prices_df = pd.DataFrame(data["fiyatlar"])
-
-    # 2. Kapalı Tarihler
-    if "kapali_tarihler" in data and data["kapali_tarihler"]:
-        for t_str in data["kapali_tarihler"]:
-            if t_str:
-                try:
-                    t_temiz = str(t_str).split("T")[0].strip()
-                    if "-" in t_temiz:
-                        dt = datetime.strptime(t_temiz, "%Y-%m-%d").date()
-                    else:
-                        dt = datetime.strptime(t_temiz, "%d.%m.%Y").date()
-                    if dt not in st.session_state.closed_dates:
-                        st.session_state.closed_dates.append(dt)
-                except:
-                    pass
-
-    # 3. Kampanyalı Tarihler
-    if "kampanyalar" in data and data["kampanyalar"]:
-        kampanya_veri = data["kampanyalar"]
-        if isinstance(kampanya_veri, dict):
-            for t_str, oran in kampanya_veri.items():
+        # 2. Kapalı Tarihler
+        if "kapali_tarihler" in data and data["kapali_tarihler"]:
+            for t_str in data["kapali_tarihler"]:
                 if t_str:
                     try:
                         t_temiz = str(t_str).split("T")[0].strip()
@@ -77,24 +59,43 @@ try:
                             dt = datetime.strptime(t_temiz, "%Y-%m-%d").date()
                         else:
                             dt = datetime.strptime(t_temiz, "%d.%m.%Y").date()
-                        st.session_state.campaign_dates[dt] = int(oran)
+                        if dt not in st.session_state.closed_dates:
+                            st.session_state.closed_dates.append(dt)
                     except:
                         pass
-        elif isinstance(kampanya_veri, list):
-            for k in kampanya_veri:
-                if isinstance(k, dict) and "tarih" in k:
-                    try:
-                        t_str = str(k["tarih"]).split("T")[0].strip()
-                        oran = int(k["oran"])
-                        if "-" in t_str:
-                            dt = datetime.strptime(t_str, "%Y-%m-%d").date()
-                        else:
-                            dt = datetime.strptime(t_str, "%d.%m.%Y").date()
-                        st.session_state.campaign_dates[dt] = oran
-                    except:
-                        pass
-except Exception as ex:
-    print(f"Veri çekme hatası: {ex}")
+
+        # 3. Kampanyalı Tarihler
+        if "kampanyalar" in data and data["kampanyalar"]:
+            kampanya_veri = data["kampanyalar"]
+            if isinstance(kampanya_veri, dict):
+                for t_str, oran in kampanya_veri.items():
+                    if t_str:
+                        try:
+                            t_temiz = str(t_str).split("T")[0].strip()
+                            if "-" in t_temiz:
+                                dt = datetime.strptime(t_temiz, "%Y-%m-%d").date()
+                            else:
+                                dt = datetime.strptime(t_temiz, "%d.%m.%Y").date()
+                            st.session_state.campaign_dates[dt] = int(oran)
+                        except:
+                            pass
+            elif isinstance(kampanya_veri, list):
+                for k in kampanya_veri:
+                    if isinstance(k, dict) and "tarih" in k:
+                        try:
+                            t_str = str(k["tarih"]).split("T")[0].strip()
+                            oran = int(k["oran"])
+                            if "-" in t_str:
+                                dt = datetime.strptime(t_str, "%Y-%m-%d").date()
+                            else:
+                                dt = datetime.strptime(t_str, "%d.%m.%Y").date()
+                            st.session_state.campaign_dates[dt] = oran
+                        except:
+                            pass
+    except Exception as ex:
+        print(f"Veri çekme hatası: {ex}")
+    
+    st.session_state.data_loaded = True
 
 # --- E-POSTA GÖNDERME FONKSİYONU ---
 def mail_gonder(alici_eposta, ad_soyad, telefon, email, tarih_str, detaylar, toplam_tutar):
@@ -341,7 +342,6 @@ elif menu == "Yönetici Paneli (Fiyat & Takvim)":
             if kampanya_turu == "Tek Gün Kampanya":
                 k_tek_tarih = st.date_input("Kampanyalı Tarih Seçin", value=date.today(), min_value=date.today(), key="kamp_tek")
                 if st.button("Kampanya Ekle ve Kaydet", key="kamp_tek_btn"):
-                    # Mevcut sözlüğe yenisini ekliyoruz
                     st.session_state.campaign_dates[k_tek_tarih] = int(indirim_orani)
                     google_kampanya_guncelle()
                     st.success(f"{k_tek_tarih.strftime('%d.%m.%Y')} için %{indirim_orani} indirim kaydedildi!")
