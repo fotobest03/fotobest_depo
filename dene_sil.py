@@ -22,34 +22,34 @@ hide_streamlit_style = """
 st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 
 # --- AYARLAR VE GİZLİ BİLGİLER ---
-GOOGLE_SCRIPT_URL = " https://script.google.com/macros/s/AKfycbwTK9tqIZqOOyjR9DmjWKqL-FfzY8KU245tCF-6t0E89uTsX81ojYLGNP6gOppKvvqS/exec"
+GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwTK9tqIZqOOyjR9DmjWKqL-FfzY8KU245tCF-6t0E89uTsX81ojYLGNP6gOppKvvqS/exec"
 GMAIL_KULLANICI = "afotobest@gmail.com"
 GMAIL_SIFRE = "byyewfosgesogdft"
 
-# --- GOOGLE SHEETS'TEN VERİLERİ İLK AÇILIŞTA ÇEKME (Çakışma Önleyici Sistem) ---
-if "data_loaded" not in st.session_state:
-    st.session_state.prices_df = pd.DataFrame([
-        {"Kategori": "Ana Albüm", "Secenek": "30 x 60 Mat Albüm", "Fiyat": 3500},
-        {"Kategori": "Ana Albüm", "Secenek": "30 x 76 Mat Albüm", "Fiyat": 4500},
-        {"Kategori": "Aile Albümü", "Secenek": "2'li Albüm", "Fiyat": 1500},
-        {"Kategori": "Tablo Seçimi", "Secenek": "30 x 40 Çerçeveli", "Fiyat": 2000},
-        {"Kategori": "Poz Sayısı", "Secenek": "40", "Fiyat": 1000},
-        {"Kategori": "Çekim Mekanı", "Secenek": "Ayazin", "Fiyat": 2500},
-        {"Kategori": "Dış Çekim Klibi", "Secenek": "Evet", "Fiyat": 3000},
-        {"Kategori": "Dış Çekim Klibi", "Secenek": "Hayır", "Fiyat": 0}
-    ])
-    st.session_state.closed_dates = []
-    st.session_state.campaign_dates = {}
-
+# --- GOOGLE SHEETS'TEN VERİLERİ YÜKLEME FONKSİYONU ---
+def verileri_google_tablodan_yukle():
+    """Google E-Tablodaki Fiyatlar, Kapalı Tarihler ve Kampanyaları çeker ve session_state'e yazar."""
     try:
-        response = requests.get(GOOGLE_SCRIPT_URL)
+        response = requests.get(GOOGLE_SCRIPT_URL, timeout=10)
         data = response.json()
         
         # 1. Fiyatlar
         if "fiyatlar" in data and data["fiyatlar"]:
             st.session_state.prices_df = pd.DataFrame(data["fiyatlar"])
+        elif "prices_df" not in st.session_state:
+            st.session_state.prices_df = pd.DataFrame([
+                {"Kategori": "Ana Albüm", "Secenek": "30 x 60 Mat Albüm", "Fiyat": 3500},
+                {"Kategori": "Ana Albüm", "Secenek": "30 x 76 Mat Albüm", "Fiyat": 4500},
+                {"Kategori": "Aile Albümü", "Secenek": "2'li Albüm", "Fiyat": 1500},
+                {"Kategori": "Tablo Seçimi", "Secenek": "30 x 40 Çerçeveli", "Fiyat": 2000},
+                {"Kategori": "Poz Sayısı", "Secenek": "40", "Fiyat": 1000},
+                {"Kategori": "Çekim Mekanı", "Secenek": "Ayazin", "Fiyat": 2500},
+                {"Kategori": "Dış Çekim Klibi", "Secenek": "Evet", "Fiyat": 3000},
+                {"Kategori": "Dış Çekim Klibi", "Secenek": "Hayır", "Fiyat": 0}
+            ])
 
         # 2. Kapalı Tarihler
+        st.session_state.closed_dates = []
         if "kapali_tarihler" in data and data["kapali_tarihler"]:
             for t_str in data["kapali_tarihler"]:
                 if t_str:
@@ -65,6 +65,7 @@ if "data_loaded" not in st.session_state:
                         pass
 
         # 3. Kampanyalı Tarihler
+        st.session_state.campaign_dates = {}
         if "kampanyalar" in data and data["kampanyalar"]:
             kampanya_veri = data["kampanyalar"]
             if isinstance(kampanya_veri, dict):
@@ -94,7 +95,10 @@ if "data_loaded" not in st.session_state:
                             pass
     except Exception as ex:
         print(f"Veri çekme hatası: {ex}")
-    
+
+# İlk yükleme yapılmadıysa bir kez çalıştır
+if "data_loaded" not in st.session_state:
+    verileri_google_tablodan_yukle()
     st.session_state.data_loaded = True
 
 # --- E-POSTA GÖNDERME FONKSİYONU ---
@@ -267,6 +271,17 @@ elif menu == "Yönetici Paneli (Fiyat & Takvim)":
     if password == "12345":
         st.success("Giriş Başarılı!")
         
+        # Yönetici Paneline her girildiğinde E-Tablodaki güncel verileri zorunlu olarak çekiyoruz:
+        if "admin_loaded" not in st.session_state:
+            verileri_google_tablodan_yukle()
+            st.session_state.admin_loaded = True
+            
+        # Yönetici panelinde manuel veri tazeleme butonu
+        if st.button("🔄 Verileri E-Tablodan Şimdi Yenile"):
+            verileri_google_tablodan_yukle()
+            st.success("Veriler Google E-Tablodan güncellendi!")
+            st.rerun()
+
         tab1, tab2, tab3 = st.tabs(["💰 Fiyat Yönetimi", "📅 Kapalı Tarihler", "🎉 Kampanyalı Tarihler"])
         
         with tab1:
