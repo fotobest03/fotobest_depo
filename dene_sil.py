@@ -26,14 +26,12 @@ def tarihi_duzenle(tarih_str):
         if len(s) >= 10 and s[4] == '-' and s[7] == '-':
             return s[:10]
         
-        # 'Sat Nov 21 2026 00:00:00 GMT...' formatını parse etmek için
-        # İçindeki ay isimlerini İngilizce olarak yakalayıp datetime'a çeviriyoruz
-        temiz_parca = " ".join(s.split()[:4]) # "Sat Nov 21 2026" kısmını alır
+        # 'Sat Nov 21 2026 00:00:00 GMT...' formatını parse etme
+        temiz_parca = " ".join(s.split()[:4]) 
         dt = datetime.strptime(temiz_parca, "%a %b %d %Y")
         return dt.strftime("%Y-%m-%d")
     except:
         try:
-            # Pandas fallback
             dt = pd.to_datetime(s)
             return dt.strftime("%Y-%m-%d")
         except:
@@ -58,11 +56,9 @@ def verileri_tablodan_getir():
         res = requests.get(GOOGLE_SCRIPT_URL, timeout=10)
         data = res.json()
         
-        # 1. Fiyatlar
         if "fiyatlar" in data and data["fiyatlar"]:
             fiyat_df = pd.DataFrame(data["fiyatlar"])
             
-        # 2. Kapalı Tarihler
         if "kapali_tarihler" in data and data["kapali_tarihler"]:
             temiz_kapali = []
             for t in data["kapali_tarihler"]:
@@ -72,7 +68,6 @@ def verileri_tablodan_getir():
             if temiz_kapali:
                 kapali_df = pd.DataFrame(temiz_kapali)
                 
-        # 3. Kampanyalar
         if "kampanyalar" in data and data["kampanyalar"]:
             temiz_kampanya = []
             for k in data["kampanyalar"]:
@@ -85,7 +80,6 @@ def verileri_tablodan_getir():
                         })
             if temiz_kampanya:
                 kampanya_df = pd.DataFrame(temiz_kampanya)
-                
     except Exception as e:
         print(f"Veri çekme hatası: {e}")
         
@@ -292,19 +286,23 @@ elif menu == "Yönetici Paneli (Fiyat & Takvim)":
                 else:
                     st.warning("Bu tarih zaten listede var.")
 
-            st.markdown("### 🚫 Şu An Kapalı Olan Tarihler (Tablo Yönetimi):")
+            st.markdown("### Şu An Kapalı Olan Tarihler (Tablo Yönetimi):")
             edited_kapali_df = st.data_editor(st.session_state.kapali_df, num_rows="dynamic", use_container_width=True, key="editor_kapali")
             
             if st.button("Kapalı Tarihleri Tablodan Güncelle / Kaydet"):
                 st.session_state.kapali_df = edited_kapali_df
                 takvim_verilerini_kaydet()
-                st.success("Kapalı tarihler tablodan güncellendi ve E-Tabloya kaydedildi!")
+                # İşlemden sonra e-tablodan güncel verileri tekrar çekiyoruz
+                _, f_k_df, _ = verileri_tablodan_getir()
+                st.session_state.kapali_df = f_k_df
+                st.success("Kapalı tarihler tablodan güncellendi ve E-Tablodan veriler yenilendi!")
                 st.rerun()
 
         with tab3:
             st.subheader("Kampanya Ayarları")
             indirim = st.number_input("İndirim Oranı (%)", min_value=1, max_value=99, value=10, key="kamp_ind")
             k_tarih = st.date_input("Kampanya Tarihi", value=date.today(), min_value=date.today(), key="kamp_tarih_sec")
+            
             if st.button("Kampanya Ekle ve Kaydet"):
                 t_str = k_tarih.strftime('%Y-%m-%d')
                 yeni_satir = pd.DataFrame([{"Tarih": t_str, "Indirim": int(indirim)}])
@@ -313,7 +311,7 @@ elif menu == "Yönetici Paneli (Fiyat & Takvim)":
                 st.success("Kampanya kaydedildi ve E-Tabloya işlendi!")
                 st.rerun()
 
-            st.markdown("### 🏷️ Aktif Zamlı Tarihler ve Zam Oranları (Tablo Yönetimi):")
+            st.markdown("### Aktif Kampanyalı Tarihler ve İndirim Oranları (Tablo Yönetimi):")
             if "kampanya_df" not in st.session_state or st.session_state.kampanya_df.empty:
                 st.session_state.kampanya_df = pd.DataFrame(columns=["Tarih", "Indirim"])
                 
@@ -322,7 +320,10 @@ elif menu == "Yönetici Paneli (Fiyat & Takvim)":
             if st.button("Kampanyaları Tablodan Güncelle / Kaydet"):
                 st.session_state.kampanya_df = edited_kampanya_df
                 takvim_verilerini_kaydet()
-                st.success("Zamlar tablodan güncellendi ve E-Tabloya kaydedildi!")
+                # İşlemden sonra e-tablodan güncel verileri tekrar çekiyoruz
+                _, _, f_kam_df = verileri_tablodan_getir()
+                st.session_state.kampanya_df = f_kam_df
+                st.success("Kampanyalar tablodan güncellendi ve E-Tablodan veriler yenilendi!")
                 st.rerun()
                 
     elif password != "":
