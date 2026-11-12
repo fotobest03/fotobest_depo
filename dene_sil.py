@@ -293,12 +293,12 @@ elif menu == "Yönetici Paneli (Fiyat & Takvim)":
             st.subheader("Kampanya Ayarları")
             indirim = st.number_input("İndirim Oranı (%)", min_value=1, max_value=99, value=10, key="kamp_ind")
             k_tarih = st.date_input("Kampanya Tarihi", value=date.today(), min_value=date.today(), key="kamp_tarih_sec")
-            if st.button("Kampanya Ekle ve Kaydet"):
+            if st.button("Kampanya Ekle"):
                 t_str = k_tarih.strftime('%Y-%m-%d')
                 yeni_satir = pd.DataFrame([{"Tarih": t_str, "Indirim": int(indirim)}])
-                st.session_state.kampanya_df = pd.concat([st.session_state.kampanya_df, yeni_satir], ignore_index=True)
-                takvim_verilerini_kaydet()
-                st.success("Kampanya kaydedildi ve E-Tabloya işlendi!")
+                #st.session_state.kampanya_df = pd.concat([st.session_state.kampanya_df, yeni_satir], ignore_index=True)
+                #takvim_verilerini_kaydet()
+                st.success("Kampanya kaydedildi!")
                 st.rerun()
 
             st.markdown("### 🏷️ Aktif Zamlı Tarihler ve Zam Oranları (Tablo Yönetimi):")
