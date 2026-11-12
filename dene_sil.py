@@ -22,7 +22,7 @@ hide_streamlit_style = """
 st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 
 # --- AYARLAR VE GİZLİ BİLGİLER ---
-GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyrMurKT10oeosNvxyI0SzRjKgBKz_Cf41vzHfq6FSEyrCOsGY4UDKcB9y28XZZVtyq/exec"
+GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz4Pw8PTrPkLC37UnB8mxQzlbt_iW8Bd1G_v1MrLcVESN4ErU0voIgGUqGZx3igT7fp/exec"
 GMAIL_KULLANICI = "afotobest@gmail.com"
 GMAIL_SIFRE = "byyewfosgesogdft"
 
@@ -165,10 +165,10 @@ if menu == "Müşteri Teklif Formu":
     closed_lst = get_closed_dates_list()
 
     if kampanya_dict:
-        kampanya_metni = "✨ **İndirimli Kampanyalı Günlerimiz:**\n"
+        kampanya_metni = "✨ **Fiyatlarımızın Yüksek Olduğu Günler:**\n"
         for d, oran in sorted(kampanya_dict.items()):
             if d >= date.today():
-                kampanya_metni += f"- 📅 **{d.strftime('%d.%m.%Y')}** tarihine özel **%{oran} İndirim!**\n"
+                kampanya_metni += f"- 📅 **{d.strftime('%d.%m.%Y')}** tarihde **%{oran} zamlı fiyat!**\n"
         st.info(kampanya_metni)
 
     rezervasyon_tarihi = st.date_input("Çekim Tarihi Seçiniz", value=date.today(), min_value=date.today())
@@ -208,7 +208,7 @@ if menu == "Müşteri Teklif Formu":
 
     if kampanya_orani > 0:
         toplam_tutar = ham_tutar * (1+kampanya_orani / 100)
-        st.success(f"Bu tarihe özel **%{kampanya_orani} zam** uygulandı!")
+        st.success(f"Bu tarihte **%{kampanya_orani} daha yüksek** fiyat!")
 
     st.markdown(f"### **Toplam Tutar: {toplam_tutar:,.2f} TL**")
 
