@@ -12,7 +12,7 @@ st.set_page_config(page_title="Teklif ve Fiyat Yönetimi", page_icon="📸", lay
 
 
 # --- AYARLAR VE GİZLİ BİLGİLER ---
-GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz4Pw8PTrPkLC37UnB8mxQzlbt_iW8Bd1G_v1MrLcVESN4ErU0voIgGUqGZx3igT7fp/exec"
+GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxS1SiFZJfl8LbhnE4Fl2WsLOuJlR-exQMjNOrLq_2rSOpXyNIYJ13X4Y1nny0KTbc/exec"
 GMAIL_KULLANICI = "afotobest@gmail.com"
 GMAIL_SIFRE = "byyewfosgesogdft"
 
@@ -28,35 +28,34 @@ def verileri_tablodan_getir():
         {"Kategori": "Dış Çekim Klibi", "Secenek": "Evet", "Fiyat": 3000},
         {"Kategori": "Dış Çekim Klibi", "Secenek": "Hayır", "Fiyat": 0}
     ])
-    
     kapali_df = pd.DataFrame(columns=["Tarih"])
-    kampanya_df = pd.DataFrame(columns=["Tarih", "Zam"])
-
+    kampanya_df = pd.DataFrame(columns=["Tarih", "Indirim"])
+    
     try:
         res = requests.get(GOOGLE_SCRIPT_URL, timeout=10)
         data = res.json()
         
-        # 1. Fiyatlar
         if "fiyatlar" in data and data["fiyatlar"]:
             fiyat_df = pd.DataFrame(data["fiyatlar"])
             
-        # 2. Kapalı Tarihler
         if "kapali_tarihler" in data and data["kapali_tarihler"]:
             temiz_kapali = [{"Tarih": str(t).split("T")[0].strip()} for t in data["kapali_tarihler"] if t]
             if temiz_kapali:
                 kapali_df = pd.DataFrame(temiz_kapali)
                 
-        # 3. Kampanyalar
         if "kampanyalar" in data and data["kampanyalar"]:
             temiz_kampanya = []
             for k in data["kampanyalar"]:
                 if isinstance(k, dict) and "tarih" in k:
-                    temiz_kampanya.append({"Tarih": str(k["tarih"]).split("T")[0].strip(), "Indirim": k["oran"]})
+                    temiz_kampanya.append({
+                        "Tarih": str(k["tarih"]).split("T")[0].strip(), 
+                        "Indirim": k.get("oran", 0)
+                    })
             if temiz_kampanya:
                 kampanya_df = pd.DataFrame(temiz_kampanya)
     except Exception as e:
         print(f"Veri çekme hatası: {e}")
-
+        
     return fiyat_df, kapali_df, kampanya_df
 
 # Oturum başlatma
@@ -66,7 +65,6 @@ if "prices_df" not in st.session_state:
     st.session_state.kapali_df = k_df
     st.session_state.kampanya_df = kam_df
 
-# Yardımcı Fonksiyonlar
 def get_closed_dates_list():
     lst = []
     if "kapali_df" in st.session_state and not st.session_state.kapali_df.empty:
@@ -91,7 +89,6 @@ def get_campaign_dict():
                 except: pass
     return dct
 
-# Toplu Kaydetme Fonksiyonu (Hem Kapalı hem Kampanyayı Tek İstekte Kayder)
 def takvim_verilerini_kaydet():
     kapali_listesi = []
     if not st.session_state.kapali_df.empty:
@@ -107,8 +104,10 @@ def takvim_verilerini_kaydet():
             t_val = row["Tarih"]
             o_val = row["Indirim"]
             if t_val:
-                kampanya_listesi.append({"tarih": str(t_val).split("T")[0].strip(), "oran": o_val})
-                
+                kampanya_listesi.append({
+                    "tarih": str(t_val).split("T")[0].strip(), 
+                    "oran": o_val
+                })
     try:
         requests.post(GOOGLE_SCRIPT_URL, json={
             "islem": "takvim_guncelle",
