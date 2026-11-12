@@ -244,7 +244,7 @@ elif menu == "Yönetici Paneli (Fiyat & Takvim)":
             st.success("Tüm veriler Google E-Tablodan başarıyla çekildi ve güncellendi!")
             st.rerun()
 
-        tab1, tab2, tab3 = st.tabs(["💰 Fiyat Yönetimi", "📅 Kapalı Tarihler", "🎉 Kampanyalı Tarihler"])
+        tab1, tab2, tab3 = st.tabs(["💰 Fiyat Yönetimi", "📅 Kapalı Tarihler", "🎉 Zamlı Tarihler"])
         
         with tab1:
             edited_df = st.data_editor(st.session_state.prices_df, num_rows="dynamic", use_container_width=True)
@@ -280,27 +280,27 @@ elif menu == "Yönetici Paneli (Fiyat & Takvim)":
                 st.rerun()
 
         with tab3:
-            st.subheader("Kampanya Ayarları")
-            indirim = st.number_input("İndirim Oranı (%)", min_value=1, max_value=99, value=10, key="kamp_ind")
-            k_tarih = st.date_input("Kampanya Tarihi", value=date.today(), min_value=date.today(), key="kamp_tarih_sec")
-            if st.button("Kampanya Ekle ve Kaydet"):
+            st.subheader("Zam Ayarları")
+            indirim = st.number_input("Zam Oranı (%)", min_value=1, max_value=99, value=10, key="kamp_ind")
+            k_tarih = st.date_input("Fiyat Tarihi", value=date.today(), min_value=date.today(), key="kamp_tarih_sec")
+            if st.button("Zam Ekle ve Kaydet"):
                 t_str = k_tarih.strftime('%Y-%m-%d')
                 yeni_satir = pd.DataFrame([{"Tarih": t_str, "Indirim": int(indirim)}])
                 st.session_state.kampanya_df = pd.concat([st.session_state.kampanya_df, yeni_satir], ignore_index=True)
                 takvim_verilerini_kaydet()
-                st.success("Kampanya kaydedildi ve E-Tabloya işlendi!")
+                st.success("Kaydedildi ve E-Tabloya işlendi!")
                 st.rerun()
 
-            st.markdown("### 🏷️ Aktif Kampanyalı Tarihler ve İndirim Oranları (Tablo Yönetimi):")
+            st.markdown("### 🏷️ Aktif Zamlı Tarihler ve Zam Oranları (Tablo Yönetimi):")
             if "kampanya_df" not in st.session_state or st.session_state.kampanya_df.empty:
                 st.session_state.kampanya_df = pd.DataFrame(columns=["Tarih", "Indirim"])
                 
             edited_kampanya_df = st.data_editor(st.session_state.kampanya_df, num_rows="dynamic", use_container_width=True, key="editor_kampanya")
             
-            if st.button("Kampanyaları Tablodan Güncelle / Kaydet"):
+            if st.button("Zamları Tablodan Güncelle / Kaydet"):
                 st.session_state.kampanya_df = edited_kampanya_df
                 takvim_verilerini_kaydet()
-                st.success("Kampanyalar tablodan güncellendi ve E-Tabloya kaydedildi!")
+                st.success("Zamlar tablodan güncellendi ve E-Tabloya kaydedildi!")
                 st.rerun()
                 
     elif password != "":
