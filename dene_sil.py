@@ -10,16 +10,6 @@ from email.mime.multipart import MIMEMultipart
 # --- SAYFA YAPILANDIRMASI VE GÖRÜNÜM AYARI ---
 st.set_page_config(page_title="Teklif ve Fiyat Yönetimi", page_icon="📸", layout="centered")
 
-hide_streamlit_style = """
-    <style>
-    #MainMenu {visibility: hidden;}
-    footer {visibility: hidden;}
-    header {visibility: hidden;}
-    .stAppDeployButton {display:none;}
-    [data-testid="stStatusWidget"] {visibility: hidden;}
-    </style>
-"""
-st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 
 # --- AYARLAR VE GİZLİ BİLGİLER ---
 GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz4Pw8PTrPkLC37UnB8mxQzlbt_iW8Bd1G_v1MrLcVESN4ErU0voIgGUqGZx3igT7fp/exec"
