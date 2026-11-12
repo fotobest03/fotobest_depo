@@ -40,7 +40,7 @@ def verileri_tablodan_getir():
     ])
     
     kapali_df = pd.DataFrame(columns=["Tarih"])
-    kampanya_df = pd.DataFrame(columns=["Tarih", "Indirim"])
+    kampanya_df = pd.DataFrame(columns=["Tarih", "Zam"])
 
     try:
         res = requests.get(GOOGLE_SCRIPT_URL, timeout=10)
@@ -208,7 +208,7 @@ if menu == "Müşteri Teklif Formu":
 
     if kampanya_orani > 0:
         toplam_tutar = ham_tutar * (1+kampanya_orani / 100)
-        st.success(f"🎉 Bu tarihe özel **%{kampanya_orani} indirim** uygulandı!")
+        st.success(f"Bu tarihe özel **%{kampanya_orani} zam** uygulandı!")
 
     st.markdown(f"### **Toplam Tutar: {toplam_tutar:,.2f} TL**")
 
@@ -291,7 +291,7 @@ elif menu == "Yönetici Paneli (Fiyat & Takvim)":
                 st.success("Kampanya kaydedildi ve E-Tabloya işlendi!")
                 st.rerun()
 
-            st.markdown("### 🏷️ Aktif Kampanyalı Tarihler ve İndirim Oranları (Tablo Yönetimi):")
+            st.markdown("### 🏷️ Aktif Zamlı Tarihler ve Zam Oranları (Tablo Yönetimi):")
             if "kampanya_df" not in st.session_state or st.session_state.kampanya_df.empty:
                 st.session_state.kampanya_df = pd.DataFrame(columns=["Tarih", "Indirim"])
                 
@@ -300,7 +300,7 @@ elif menu == "Yönetici Paneli (Fiyat & Takvim)":
             if st.button("Kampanyaları Tablodan Güncelle / Kaydet"):
                 st.session_state.kampanya_df = edited_kampanya_df
                 takvim_verilerini_kaydet()
-                st.success("Kampanyalar tablodan güncellendi ve E-Tabloya kaydedildi!")
+                st.success("Zamlar tablodan güncellendi ve E-Tabloya kaydedildi!")
                 st.rerun()
                 
     elif password != "":
