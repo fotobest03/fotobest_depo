@@ -207,7 +207,7 @@ if menu == "Müşteri Teklif Formu":
     toplam_tutar = ham_tutar
 
     if kampanya_orani > 0:
-        toplam_tutar = ham_tutar * (1 - kampanya_orani / 100)
+        toplam_tutar = ham_tutar * (1+kampanya_orani / 100)
         st.success(f"🎉 Bu tarihe özel **%{kampanya_orani} indirim** uygulandı!")
 
     st.markdown(f"### **Toplam Tutar: {toplam_tutar:,.2f} TL**")
