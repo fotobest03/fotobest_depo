@@ -35,24 +35,45 @@ def verileri_tablodan_getir():
         res = requests.get(GOOGLE_SCRIPT_URL, timeout=10)
         data = res.json()
         
+        # 1. Fiyatlar
         if "fiyatlar" in data and data["fiyatlar"]:
             fiyat_df = pd.DataFrame(data["fiyatlar"])
             
+        # 2. Kapalı Tarihler (Format Düzeltme)
         if "kapali_tarihler" in data and data["kapali_tarihler"]:
-            temiz_kapali = [{"Tarih": str(t).split("T")[0].strip()} for t in data["kapali_tarihler"] if t]
+            temiz_kapali = []
+            for t in data["kapali_tarihler"]:
+                if t:
+                    try:
+                        # Gelen farklı formatlardaki tarihleri datetime nesnesine çevirip YYYY-MM-DD formatına sabitliyoruz
+                        dt_val = pd.to_datetime(t).strftime('%Y-%m-%d')
+                        temiz_kapali.append({"Tarih": dt_val})
+                    except:
+                        # Hata durumunda doğrudan string bölme fallback yöntemi
+                        temiz_kapali.append({"Tarih": str(t).split("T")[0].strip()})
             if temiz_kapali:
                 kapali_df = pd.DataFrame(temiz_kapali)
                 
+        # 3. Kampanyalar (Format Düzeltme)
         if "kampanyalar" in data and data["kampanyalar"]:
             temiz_kampanya = []
             for k in data["kampanyalar"]:
                 if isinstance(k, dict) and "tarih" in k:
-                    temiz_kampanya.append({
-                        "Tarih": str(k["tarih"]).split("T")[0].strip(), 
-                        "Indirim": k.get("oran", 0)
-                    })
+                    t_val = k["tarih"]
+                    try:
+                        dt_val = pd.to_datetime(t_val).strftime('%Y-%m-%d')
+                        temiz_kampanya.append({
+                            "Tarih": dt_val, 
+                            "Indirim": k.get("oran", 0)
+                        })
+                    except:
+                        temiz_kampanya.append({
+                            "Tarih": str(t_val).split("T")[0].strip(), 
+                            "Indirim": k.get("oran", 0)
+                        })
             if temiz_kampanya:
                 kampanya_df = pd.DataFrame(temiz_kampanya)
+                
     except Exception as e:
         print(f"Veri çekme hatası: {e}")
         
