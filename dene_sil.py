@@ -285,7 +285,7 @@ elif menu == "Yönetici Paneli (Fiyat & Takvim)":
             k_tarih = st.date_input("Fiyat Tarihi", value=date.today(), min_value=date.today(), key="kamp_tarih_sec")
             if st.button("Zam Ekle ve Kaydet"):
                 t_str = k_tarih.strftime('%Y-%m-%d')
-                yeni_satir = pd.DataFrame([{"Tarih": t_str, "Indirim": int(indirim)}])
+                yeni_satir = pd.DataFrame([{"Tarih": t_str, "Zam": int(indirim)}])
                 st.session_state.kampanya_df = pd.concat([st.session_state.kampanya_df, yeni_satir], ignore_index=True)
                 takvim_verilerini_kaydet()
                 st.success("Kaydedildi ve E-Tabloya işlendi!")
@@ -293,7 +293,7 @@ elif menu == "Yönetici Paneli (Fiyat & Takvim)":
 
             st.markdown("### 🏷️ Aktif Zamlı Tarihler ve Zam Oranları (Tablo Yönetimi):")
             if "kampanya_df" not in st.session_state or st.session_state.kampanya_df.empty:
-                st.session_state.kampanya_df = pd.DataFrame(columns=["Tarih", "Indirim"])
+                st.session_state.kampanya_df = pd.DataFrame(columns=["Tarih", "Zam"])
                 
             edited_kampanya_df = st.data_editor(st.session_state.kampanya_df, num_rows="dynamic", use_container_width=True, key="editor_kampanya")
             
