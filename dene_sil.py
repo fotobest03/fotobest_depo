@@ -12,30 +12,9 @@ st.set_page_config(page_title="Teklif ve Fiyat Yönetimi", page_icon="📸", lay
 
 
 # --- AYARLAR VE GİZLİ BİLGİLER ---
-GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzNDPq45JOAu54DUmaoWl3BYCGcVrQFi600hden_ET2dPDphMxSOUjLI8vlxdeoUkpA/exec"
+GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzqmR_aKmPpS-_O-FsZXFNah1bjzZ2IcrySbCzKJNfgQKOeftMFP27g_zWXmPJ7LYky/exec"
 GMAIL_KULLANICI = "afotobest@gmail.com"
 GMAIL_SIFRE = "byyewfosgesogdft"
-
-# --- YARDIMCI TARİH DÖNÜŞTÜRÜCÜ ---
-def tarihi_duzenle(tarih_str):
-    if not tarih_str:
-        return ""
-    s = str(tarih_str).strip()
-    try:
-        # Eğer zaten YYYY-MM-DD formatındaysa
-        if len(s) >= 10 and s[4] == '-' and s[7] == '-':
-            return s[:10]
-        
-        # 'Sat Nov 21 2026 00:00:00 GMT...' formatını parse etme
-        temiz_parca = " ".join(s.split()[:4]) 
-        dt = datetime.strptime(temiz_parca, "%a %b %d %Y")
-        return dt.strftime("%Y-%m-%d")
-    except:
-        try:
-            dt = pd.to_datetime(s)
-            return dt.strftime("%Y-%m-%d")
-        except:
-            return s.split("T")[0].strip()
 
 # --- GOOGLE E-TABLODAN VERİ ÇEKME ---
 def verileri_tablodan_getir():
@@ -56,30 +35,45 @@ def verileri_tablodan_getir():
         res = requests.get(GOOGLE_SCRIPT_URL, timeout=10)
         data = res.json()
         
+        # 1. Fiyatlar
         if "fiyatlar" in data and data["fiyatlar"]:
             fiyat_df = pd.DataFrame(data["fiyatlar"])
             
+        # 2. Kapalı Tarihler (Format Düzeltme)
         if "kapali_tarihler" in data and data["kapali_tarihler"]:
             temiz_kapali = []
             for t in data["kapali_tarihler"]:
-                formatli_tarih = tarihi_duzenle(t)
-                if formatli_tarih:
-                    temiz_kapali.append({"Tarih": formatli_tarih})
+                if t:
+                    try:
+                        # Gelen farklı formatlardaki tarihleri datetime nesnesine çevirip YYYY-MM-DD formatına sabitliyoruz
+                        dt_val = pd.to_datetime(t).strftime('%Y-%m-%d')
+                        temiz_kapali.append({"Tarih": dt_val})
+                    except:
+                        # Hata durumunda doğrudan string bölme fallback yöntemi
+                        temiz_kapali.append({"Tarih": str(t).split("T")[0].strip()})
             if temiz_kapali:
                 kapali_df = pd.DataFrame(temiz_kapali)
                 
+        # 3. Kampanyalar (Format Düzeltme)
         if "kampanyalar" in data and data["kampanyalar"]:
             temiz_kampanya = []
             for k in data["kampanyalar"]:
                 if isinstance(k, dict) and "tarih" in k:
-                    formatli_tarih = tarihi_duzenle(k["tarih"])
-                    if formatli_tarih:
+                    t_val = k["tarih"]
+                    try:
+                        dt_val = pd.to_datetime(t_val).strftime('%Y-%m-%d')
                         temiz_kampanya.append({
-                            "Tarih": formatli_tarih, 
+                            "Tarih": dt_val, 
+                            "Indirim": k.get("oran", 0)
+                        })
+                    except:
+                        temiz_kampanya.append({
+                            "Tarih": str(t_val).split("T")[0].strip(), 
                             "Indirim": k.get("oran", 0)
                         })
             if temiz_kampanya:
                 kampanya_df = pd.DataFrame(temiz_kampanya)
+                
     except Exception as e:
         print(f"Veri çekme hatası: {e}")
         
@@ -286,23 +280,19 @@ elif menu == "Yönetici Paneli (Fiyat & Takvim)":
                 else:
                     st.warning("Bu tarih zaten listede var.")
 
-            st.markdown("### Şu An Kapalı Olan Tarihler (Tablo Yönetimi):")
+            st.markdown("### 🚫 Şu An Kapalı Olan Tarihler (Tablo Yönetimi):")
             edited_kapali_df = st.data_editor(st.session_state.kapali_df, num_rows="dynamic", use_container_width=True, key="editor_kapali")
             
             if st.button("Kapalı Tarihleri Tablodan Güncelle / Kaydet"):
                 st.session_state.kapali_df = edited_kapali_df
                 takvim_verilerini_kaydet()
-                # İşlemden sonra e-tablodan güncel verileri tekrar çekiyoruz
-                _, f_k_df, _ = verileri_tablodan_getir()
-                st.session_state.kapali_df = f_k_df
-                st.success("Kapalı tarihler tablodan güncellendi ve E-Tablodan veriler yenilendi!")
+                st.success("Kapalı tarihler tablodan güncellendi ve E-Tabloya kaydedildi!")
                 st.rerun()
 
         with tab3:
             st.subheader("Kampanya Ayarları")
             indirim = st.number_input("İndirim Oranı (%)", min_value=1, max_value=99, value=10, key="kamp_ind")
             k_tarih = st.date_input("Kampanya Tarihi", value=date.today(), min_value=date.today(), key="kamp_tarih_sec")
-            
             if st.button("Kampanya Ekle ve Kaydet"):
                 t_str = k_tarih.strftime('%Y-%m-%d')
                 yeni_satir = pd.DataFrame([{"Tarih": t_str, "Indirim": int(indirim)}])
@@ -311,7 +301,7 @@ elif menu == "Yönetici Paneli (Fiyat & Takvim)":
                 st.success("Kampanya kaydedildi ve E-Tabloya işlendi!")
                 st.rerun()
 
-            st.markdown("### Aktif Kampanyalı Tarihler ve İndirim Oranları (Tablo Yönetimi):")
+            st.markdown("### 🏷️ Aktif Zamlı Tarihler ve Zam Oranları (Tablo Yönetimi):")
             if "kampanya_df" not in st.session_state or st.session_state.kampanya_df.empty:
                 st.session_state.kampanya_df = pd.DataFrame(columns=["Tarih", "Indirim"])
                 
@@ -320,10 +310,7 @@ elif menu == "Yönetici Paneli (Fiyat & Takvim)":
             if st.button("Kampanyaları Tablodan Güncelle / Kaydet"):
                 st.session_state.kampanya_df = edited_kampanya_df
                 takvim_verilerini_kaydet()
-                # İşlemden sonra e-tablodan güncel verileri tekrar çekiyoruz
-                _, _, f_kam_df = verileri_tablodan_getir()
-                st.session_state.kampanya_df = f_kam_df
-                st.success("Kampanyalar tablodan güncellendi ve E-Tablodan veriler yenilendi!")
+                st.success("Zamlar tablodan güncellendi ve E-Tabloya kaydedildi!")
                 st.rerun()
                 
     elif password != "":
