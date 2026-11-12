@@ -12,7 +12,7 @@ st.set_page_config(page_title="Teklif ve Fiyat Yönetimi", page_icon="📸", lay
 
 
 # --- AYARLAR VE GİZLİ BİLGİLER ---
-GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzqmR_aKmPpS-_O-FsZXFNah1bjzZ2IcrySbCzKJNfgQKOeftMFP27g_zWXmPJ7LYky/exec"
+GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxwIYMSLwn9Jg_f13RDGeaoZFoCSJ4fOCTcLlMqQ3RtQvu4bmoDofBe3ZtFk7UfNps6/exec"
 GMAIL_KULLANICI = "afotobest@gmail.com"
 GMAIL_SIFRE = "byyewfosgesogdft"
 
@@ -111,24 +111,38 @@ def get_campaign_dict():
     return dct
 
 def takvim_verilerini_kaydet():
+    # Streamlit tablosundaki mükerrer (aynı) tarihleri temizle
+    if not st.session_state.kapali_df.empty:
+        st.session_state.kapali_df['Tarih'] = st.session_state.kapali_df['Tarih'].astype(str).str.split("T").str[0].str.strip()
+        st.session_state.kapali_df = st.session_state.kapali_df.drop_duplicates(subset=["Tarih"]).reset_index(drop=True)
+
+    if not st.session_state.kampanya_df.empty:
+        st.session_state.kampanya_df['Tarih'] = st.session_state.kampanya_df['Tarih'].astype(str).str.split("T").str[0].str.strip()
+        st.session_state.kampanya_df = st.session_state.kampanya_df.drop_duplicates(subset=["Tarih"]).reset_index(drop=True)
+
     kapali_listesi = []
     if not st.session_state.kapali_df.empty:
         for val in st.session_state.kapali_df["Tarih"]:
-            if val:
+            if val and val != "nan":
                 t_str = str(val).split("T")[0].strip()
                 if t_str and t_str not in kapali_listesi:
                     kapali_listesi.append(t_str)
                     
     kampanya_listesi = []
+    eklenen_kampanya_tarihleri = set()
     if not st.session_state.kampanya_df.empty:
         for index, row in st.session_state.kampanya_df.iterrows():
             t_val = row["Tarih"]
             o_val = row["Indirim"]
-            if t_val:
-                kampanya_listesi.append({
-                    "tarih": str(t_val).split("T")[0].strip(), 
-                    "oran": o_val
-                })
+            if t_val and str(t_val) != "nan":
+                t_str = str(t_val).split("T")[0].strip()
+                # Aynı kampanya tarihinden birden fazla varsa sadece ilkini al
+                if t_str and t_str not in eklenen_kampanya_tarihleri:
+                    eklenen_kampanya_tarihleri.add(t_str)
+                    kampanya_listesi.append({
+                        "tarih": t_str, 
+                        "oran": o_val
+                    })
     try:
         requests.post(GOOGLE_SCRIPT_URL, json={
             "islem": "takvim_guncelle",
