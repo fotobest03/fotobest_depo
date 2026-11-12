@@ -165,10 +165,10 @@ if menu == "Müşteri Teklif Formu":
     closed_lst = get_closed_dates_list()
 
     if kampanya_dict:
-        kampanya_metni = "✨ **İndirimli Kampanyalı Günlerimiz:**\n"
+        kampanya_metni = "✨ **Hafta sonu tarifesi olan günlerimiz**\n"
         for d, oran in sorted(kampanya_dict.items()):
             if d >= date.today():
-                kampanya_metni += f"- 📅 **{d.strftime('%d.%m.%Y')}** tarihine özel **%{oran} İndirim!**\n"
+                kampanya_metni += f"- 📅 **{d.strftime('%d.%m.%Y')}** tarihinede **%{oran} fiyat uygulanır!**\n"
         st.info(kampanya_metni)
 
     rezervasyon_tarihi = st.date_input("Çekim Tarihi Seçiniz", value=date.today(), min_value=date.today())
@@ -208,7 +208,7 @@ if menu == "Müşteri Teklif Formu":
 
     if kampanya_orani > 0:
         toplam_tutar = ham_tutar * (1+kampanya_orani / 100)
-        st.success(f"🎉 Bu tarihe özel **%{kampanya_orani} indirim** uygulandı!")
+        st.success(f"Diğer tarihlerde daha uygun fiyatlar mevcut!")
 
     st.markdown(f"### **Toplam Tutar: {toplam_tutar:,.2f} TL**")
 
