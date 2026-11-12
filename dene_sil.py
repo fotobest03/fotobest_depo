@@ -40,7 +40,7 @@ def verileri_tablodan_getir():
     ])
     
     kapali_df = pd.DataFrame(columns=["Tarih"])
-    kampanya_df = pd.DataFrame(columns=["Tarih", "Indirim"])
+    kampanya_df = pd.DataFrame(columns=["Tarih", "Zam"])
 
     try:
         res = requests.get(GOOGLE_SCRIPT_URL, timeout=10)
@@ -61,7 +61,7 @@ def verileri_tablodan_getir():
             temiz_kampanya = []
             for k in data["kampanyalar"]:
                 if isinstance(k, dict) and "tarih" in k:
-                    temiz_kampanya.append({"Tarih": str(k["tarih"]).split("T")[0].strip(), "Indirim": k["oran"]})
+                    temiz_kampanya.append({"Tarih": str(k["tarih"]).split("T")[0].strip(), "Zam": k["oran"]})
             if temiz_kampanya:
                 kampanya_df = pd.DataFrame(temiz_kampanya)
     except Exception as e:
@@ -300,7 +300,7 @@ elif menu == "Yönetici Paneli (Fiyat & Takvim)":
             if st.button("Zamları Tablodan Güncelle / Kaydet"):
                 st.session_state.kampanya_df = edited_kampanya_df
                 takvim_verilerini_kaydet()
-                st.success("Zamlar tablodan güncellendi ve E-Tabloya kaydedildi!")
+                st.success("Kampanyalar tablodan güncellendi ve E-Tabloya kaydedildi!")
                 st.rerun()
                 
     elif password != "":
