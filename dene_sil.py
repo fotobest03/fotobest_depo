@@ -280,38 +280,45 @@ elif menu == "Yönetici Paneli (Fiyat & Takvim)":
                 else:
                     st.warning("Bu tarih zaten listede var.")
 
-            st.markdown("### 🚫 Şu An Kapalı Olan Tarihler (Tablo Yönetimi):")
+            st.markdown("### Şu An Kapalı Olan Tarihler (Tablo Yönetimi):")
             edited_kapali_df = st.data_editor(st.session_state.kapali_df, num_rows="dynamic", use_container_width=True, key="editor_kapali")
             
-            if st.button("Kapalı Tarihleri Tablodan Güncelle / Kaydet"):
+            # Fiyat Yönetimi ile birebir aynı çalışma mantığı
+            if st.button("Kapalı Tarihleri Güncelle"):
                 st.session_state.kapali_df = edited_kapali_df
-                takvim_verilerini_kaydet()
-                st.success("Kapalı tarihler tablodan güncellendi ve E-Tabloya kaydedildi!")
-                st.rerun()
+                try:
+                    takvim_verilerini_kaydet()
+                    st.success("Kapalı tarihler güncellendi!")
+                except Exception as ex:
+                    st.error(f"Hata: {ex}")
 
         with tab3:
             st.subheader("Kampanya Ayarları")
             indirim = st.number_input("İndirim Oranı (%)", min_value=1, max_value=99, value=10, key="kamp_ind")
             k_tarih = st.date_input("Kampanya Tarihi", value=date.today(), min_value=date.today(), key="kamp_tarih_sec")
-            if st.button("Kampanya Ekle"):
+            
+            if st.button("Kampanya Ekle ve Kaydet"):
                 t_str = k_tarih.strftime('%Y-%m-%d')
                 yeni_satir = pd.DataFrame([{"Tarih": t_str, "Indirim": int(indirim)}])
                 st.session_state.kampanya_df = pd.concat([st.session_state.kampanya_df, yeni_satir], ignore_index=True)
-                #takvim_verilerini_kaydet()
-                st.success("Kampanya kaydedildi!")
+                takvim_verilerini_kaydet()
+                st.success("Kampanya kaydedildi ve E-Tabloya işlendi!")
                 st.rerun()
 
-            st.markdown("### 🏷️ Aktif Zamlı Tarihler ve Zam Oranları (Tablo Yönetimi):")
+            st.markdown("### Aktif Kampanyalı Tarihler ve İndirim Oranları (Tablo Yönetimi):")
             if "kampanya_df" not in st.session_state or st.session_state.kampanya_df.empty:
                 st.session_state.kampanya_df = pd.DataFrame(columns=["Tarih", "Indirim"])
                 
             edited_kampanya_df = st.data_editor(st.session_state.kampanya_df, num_rows="dynamic", use_container_width=True, key="editor_kampanya")
             
-            if st.button("Kampanyaları Tablodan Güncelle / Kaydet"):
+            # Fiyat Yönetimi ile birebir aynı çalışma mantığı
+            if st.button("Kampanyaları Güncelle"):
                 st.session_state.kampanya_df = edited_kampanya_df
-                takvim_verilerini_kaydet()
-                st.success("Zamlar tablodan güncellendi ve E-Tabloya kaydedildi!")
-                st.rerun()
+                try:
+                    takvim_verilerini_kaydet()
+                    st.success("Kampanyalar güncellendi!")
+                except Exception as ex:
+                    st.error(f"Hata: {ex}")
                 
     elif password != "":
         st.error("Hatalı Şifre!")
