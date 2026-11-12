@@ -296,7 +296,7 @@ elif menu == "Yönetici Paneli (Fiyat & Takvim)":
             if st.button("Kampanya Ekle"):
                 t_str = k_tarih.strftime('%Y-%m-%d')
                 yeni_satir = pd.DataFrame([{"Tarih": t_str, "Indirim": int(indirim)}])
-                #st.session_state.kampanya_df = pd.concat([st.session_state.kampanya_df, yeni_satir], ignore_index=True)
+                st.session_state.kampanya_df = pd.concat([st.session_state.kampanya_df, yeni_satir], ignore_index=True)
                 #takvim_verilerini_kaydet()
                 st.success("Kampanya kaydedildi!")
                 st.rerun()
