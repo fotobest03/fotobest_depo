@@ -22,11 +22,11 @@ hide_streamlit_style = """
 st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 
 # --- AYARLAR VE GİZLİ BİLGİLER ---
-GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwTK9tqIZqOOyjR9DmjWKqL-FfzY8KU245tCF-6t0E89uTsX81ojYLGNP6gOppKvvqS/exec"
+GOOGLE_SCRIPT_URL = " https://script.google.com/macros/s/AKfycbxxsIG69qFhdx-OGLZELeepDw7f2VP4jfrfvnzWkbfgQScMHVzr7CGtF7Zl2Dfb9ipA/exec "
 GMAIL_KULLANICI = "afotobest@gmail.com"
 GMAIL_SIFRE = "byyewfosgesogdft"
 
-# --- GOOGLE E-TABLODAN VERİ ÇEKME (Fiyat Mantığıyla %100 Uyumlu) ---
+# --- GOOGLE E-TABLODAN VERİ ÇEKME ---
 def verileri_tablodan_getir():
     fiyat_df = pd.DataFrame([
         {"Kategori": "Ana Albüm", "Secenek": "30 x 60 Mat Albüm", "Fiyat": 3500},
@@ -50,24 +50,18 @@ def verileri_tablodan_getir():
         if "fiyatlar" in data and data["fiyatlar"]:
             fiyat_df = pd.DataFrame(data["fiyatlar"])
             
-        # 2. Kapalı Tarihler (Doğrudan DataFrame)
+        # 2. Kapalı Tarihler
         if "kapali_tarihler" in data and data["kapali_tarihler"]:
-            temiz_kapali = []
-            for t in data["kapali_tarihler"]:
-                if t:
-                    t_str = str(t).split("T")[0].strip()
-                    temiz_kapali.append({"Tarih": t_str})
+            temiz_kapali = [{"Tarih": str(t).split("T")[0].strip()} for t in data["kapali_tarihler"] if t]
             if temiz_kapali:
                 kapali_df = pd.DataFrame(temiz_kapali)
                 
-        # 3. Kampanyalar (Doğrudan DataFrame)
+        # 3. Kampanyalar
         if "kampanyalar" in data and data["kampanyalar"]:
             temiz_kampanya = []
             for k in data["kampanyalar"]:
                 if isinstance(k, dict) and "tarih" in k:
-                    t_str = str(k["tarih"]).split("T")[0].strip()
-                    oran = k["oran"]
-                    temiz_kampanya.append({"Tarih": t_str, "Indirim": oran})
+                    temiz_kampanya.append({"Tarih": str(k["tarih"]).split("T")[0].strip(), "Indirim": k["oran"]})
             if temiz_kampanya:
                 kampanya_df = pd.DataFrame(temiz_kampanya)
     except Exception as e:
@@ -82,7 +76,7 @@ if "prices_df" not in st.session_state:
     st.session_state.kapali_df = k_df
     st.session_state.kampanya_df = kam_df
 
-# Müşteri tarafı için tarih listesi ve sözlük üreten yardımcı fonksiyonlar
+# Yardımcı Fonksiyonlar
 def get_closed_dates_list():
     lst = []
     if "kapali_df" in st.session_state and not st.session_state.kapali_df.empty:
@@ -107,6 +101,32 @@ def get_campaign_dict():
                 except: pass
     return dct
 
+# Toplu Kaydetme Fonksiyonu (Hem Kapalı hem Kampanyayı Tek İstekte Kayder)
+def takvim_verilerini_kaydet():
+    kapali_listesi = []
+    if not st.session_state.kapali_df.empty:
+        for val in st.session_state.kapali_df["Tarih"]:
+            if val:
+                t_str = str(val).split("T")[0].strip()
+                if t_str and t_str not in kapali_listesi:
+                    kapali_listesi.append(t_str)
+                    
+    kampanya_listesi = []
+    if not st.session_state.kampanya_df.empty:
+        for index, row in st.session_state.kampanya_df.iterrows():
+            t_val = row["Tarih"]
+            o_val = row["Indirim"]
+            if t_val:
+                kampanya_listesi.append({"tarih": str(t_val).split("T")[0].strip(), "oran": o_val})
+                
+    try:
+        requests.post(GOOGLE_SCRIPT_URL, json={
+            "islem": "takvim_guncelle",
+            "kapali_tarihler": kapali_listesi,
+            "kampanyalar": kampanya_listesi
+        })
+    except: pass
+
 # --- E-POSTA GÖNDERME ---
 def mail_gonder(alici_eposta, ad_soyad, telefon, email, tarih_str, detaylar, toplam_tutar):
     try:
@@ -124,31 +144,6 @@ def mail_gonder(alici_eposta, ad_soyad, telefon, email, tarih_str, detaylar, top
         return True
     except:
         return False
-
-# --- E-TABLOYA GÜNCELLEME GÖNDERME FONKSİYONLARI ---
-def google_kapali_guncelle_df():
-    tarih_listesi = []
-    if not st.session_state.kapali_df.empty:
-        for val in st.session_state.kapali_df["Tarih"]:
-            if val:
-                t_str = str(val).split("T")[0].strip()
-                if t_str and t_str not in tarih_listesi:
-                    tarih_listesi.append(t_str)
-    try:
-        requests.post(GOOGLE_SCRIPT_URL, json={"islem": "kapali_tarih_guncelle", "tarihler": tarih_listesi})
-    except: pass
-
-def google_kampanya_guncelle_df():
-    kampanya_listesi = []
-    if not st.session_state.kampanya_df.empty:
-        for index, row in st.session_state.kampanya_df.iterrows():
-            t_val = row["Tarih"]
-            o_val = row["Indirim"]
-            if t_val:
-                kampanya_listesi.append({"tarih": str(t_val).split("T")[0].strip(), "oran": o_val})
-    try:
-        requests.post(GOOGLE_SCRIPT_URL, json={"islem": "kampanya_guncelle", "kampanyalar": kampanya_listesi})
-    except: pass
 
 # --- MENÜ ---
 menu = st.sidebar.radio("Sayfa Seçin", ["Müşteri Teklif Formu", "Yönetici Paneli (Fiyat & Takvim)"])
@@ -269,7 +264,7 @@ elif menu == "Yönetici Paneli (Fiyat & Takvim)":
                 if t_str not in st.session_state.kapali_df["Tarih"].values:
                     yeni_satir = pd.DataFrame([{"Tarih": t_str}])
                     st.session_state.kapali_df = pd.concat([st.session_state.kapali_df, yeni_satir], ignore_index=True)
-                    google_kapali_guncelle_df()
+                    takvim_verilerini_kaydet()
                     st.success("Kapatıldı ve E-Tabloya kaydedildi!")
                     st.rerun()
                 else:
@@ -280,7 +275,7 @@ elif menu == "Yönetici Paneli (Fiyat & Takvim)":
             
             if st.button("Kapalı Tarihleri Tablodan Güncelle / Kaydet"):
                 st.session_state.kapali_df = edited_kapali_df
-                google_kapali_guncelle_df()
+                takvim_verilerini_kaydet()
                 st.success("Kapalı tarihler tablodan güncellendi ve E-Tabloya kaydedildi!")
                 st.rerun()
 
@@ -292,7 +287,7 @@ elif menu == "Yönetici Paneli (Fiyat & Takvim)":
                 t_str = k_tarih.strftime('%Y-%m-%d')
                 yeni_satir = pd.DataFrame([{"Tarih": t_str, "Indirim": int(indirim)}])
                 st.session_state.kampanya_df = pd.concat([st.session_state.kampanya_df, yeni_satir], ignore_index=True)
-                google_kampanya_guncelle_df()
+                takvim_verilerini_kaydet()
                 st.success("Kampanya kaydedildi ve E-Tabloya işlendi!")
                 st.rerun()
 
@@ -304,7 +299,7 @@ elif menu == "Yönetici Paneli (Fiyat & Takvim)":
             
             if st.button("Kampanyaları Tablodan Güncelle / Kaydet"):
                 st.session_state.kampanya_df = edited_kampanya_df
-                google_kampanya_guncelle_df()
+                takvim_verilerini_kaydet()
                 st.success("Kampanyalar tablodan güncellendi ve E-Tabloya kaydedildi!")
                 st.rerun()
                 
