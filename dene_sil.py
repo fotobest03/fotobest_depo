@@ -40,7 +40,7 @@ def verileri_tablodan_getir():
     ])
     
     kapali_df = pd.DataFrame(columns=["Tarih"])
-    kampanya_df = pd.DataFrame(columns=["Tarih", "Zam"])
+    kampanya_df = pd.DataFrame(columns=["Tarih", "Indirim"])
 
     try:
         res = requests.get(GOOGLE_SCRIPT_URL, timeout=10)
@@ -61,7 +61,7 @@ def verileri_tablodan_getir():
             temiz_kampanya = []
             for k in data["kampanyalar"]:
                 if isinstance(k, dict) and "tarih" in k:
-                    temiz_kampanya.append({"Tarih": str(k["tarih"]).split("T")[0].strip(), "Zam": k["oran"]})
+                    temiz_kampanya.append({"Tarih": str(k["tarih"]).split("T")[0].strip(), "Indirim": k["oran"]})
             if temiz_kampanya:
                 kampanya_df = pd.DataFrame(temiz_kampanya)
     except Exception as e:
@@ -165,10 +165,10 @@ if menu == "Müşteri Teklif Formu":
     closed_lst = get_closed_dates_list()
 
     if kampanya_dict:
-        kampanya_metni = "✨ **Hafta sonu tarifesi olan günlerimiz**\n"
+        kampanya_metni = "✨ **İndirimli Kampanyalı Günlerimiz:**\n"
         for d, oran in sorted(kampanya_dict.items()):
             if d >= date.today():
-                kampanya_metni += f"- 📅 **{d.strftime('%d.%m.%Y')}** tarihinede **%{oran} fiyat uygulanır!**\n"
+                kampanya_metni += f"- 📅 **{d.strftime('%d.%m.%Y')}** tarihine özel **%{oran} İndirim!**\n"
         st.info(kampanya_metni)
 
     rezervasyon_tarihi = st.date_input("Çekim Tarihi Seçiniz", value=date.today(), min_value=date.today())
@@ -208,7 +208,7 @@ if menu == "Müşteri Teklif Formu":
 
     if kampanya_orani > 0:
         toplam_tutar = ham_tutar * (1+kampanya_orani / 100)
-        st.success(f"Diğer tarihlerde daha uygun fiyatlar mevcut!")
+        st.success(f"🎉 Bu tarihe özel **%{kampanya_orani} indirim** uygulandı!")
 
     st.markdown(f"### **Toplam Tutar: {toplam_tutar:,.2f} TL**")
 
@@ -244,7 +244,7 @@ elif menu == "Yönetici Paneli (Fiyat & Takvim)":
             st.success("Tüm veriler Google E-Tablodan başarıyla çekildi ve güncellendi!")
             st.rerun()
 
-        tab1, tab2, tab3 = st.tabs(["💰 Fiyat Yönetimi", "📅 Kapalı Tarihler", "🎉 Zamlı Tarihler"])
+        tab1, tab2, tab3 = st.tabs(["💰 Fiyat Yönetimi", "📅 Kapalı Tarihler", "🎉 Kampanyalı Tarihler"])
         
         with tab1:
             edited_df = st.data_editor(st.session_state.prices_df, num_rows="dynamic", use_container_width=True)
@@ -280,24 +280,24 @@ elif menu == "Yönetici Paneli (Fiyat & Takvim)":
                 st.rerun()
 
         with tab3:
-            st.subheader("Zam Ayarları")
-            indirim = st.number_input("Zam Oranı (%)", min_value=1, max_value=99, value=10, key="kamp_ind")
-            k_tarih = st.date_input("Fiyat Tarihi", value=date.today(), min_value=date.today(), key="kamp_tarih_sec")
-            if st.button("Zam Ekle ve Kaydet"):
+            st.subheader("Kampanya Ayarları")
+            indirim = st.number_input("İndirim Oranı (%)", min_value=1, max_value=99, value=10, key="kamp_ind")
+            k_tarih = st.date_input("Kampanya Tarihi", value=date.today(), min_value=date.today(), key="kamp_tarih_sec")
+            if st.button("Kampanya Ekle ve Kaydet"):
                 t_str = k_tarih.strftime('%Y-%m-%d')
-                yeni_satir = pd.DataFrame([{"Tarih": t_str, "Zam": int(indirim)}])
+                yeni_satir = pd.DataFrame([{"Tarih": t_str, "Indirim": int(indirim)}])
                 st.session_state.kampanya_df = pd.concat([st.session_state.kampanya_df, yeni_satir], ignore_index=True)
                 takvim_verilerini_kaydet()
-                st.success("Kaydedildi ve E-Tabloya işlendi!")
+                st.success("Kampanya kaydedildi ve E-Tabloya işlendi!")
                 st.rerun()
 
-            st.markdown("### 🏷️ Aktif Zamlı Tarihler ve Zam Oranları (Tablo Yönetimi):")
+            st.markdown("### 🏷️ Aktif Kampanyalı Tarihler ve İndirim Oranları (Tablo Yönetimi):")
             if "kampanya_df" not in st.session_state or st.session_state.kampanya_df.empty:
-                st.session_state.kampanya_df = pd.DataFrame(columns=["Tarih", "Zam"])
+                st.session_state.kampanya_df = pd.DataFrame(columns=["Tarih", "Indirim"])
                 
             edited_kampanya_df = st.data_editor(st.session_state.kampanya_df, num_rows="dynamic", use_container_width=True, key="editor_kampanya")
             
-            if st.button("Zamları Tablodan Güncelle / Kaydet"):
+            if st.button("Kampanyaları Tablodan Güncelle / Kaydet"):
                 st.session_state.kampanya_df = edited_kampanya_df
                 takvim_verilerini_kaydet()
                 st.success("Kampanyalar tablodan güncellendi ve E-Tabloya kaydedildi!")
