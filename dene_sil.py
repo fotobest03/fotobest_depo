@@ -350,12 +350,12 @@ elif menu == "Yönetici Paneli (Fiyat & Takvim)":
 
         with tab3:
             st.subheader("Kampanya Ayarları")
-            indirim = st.number_input("İndirim Oranı (%)", min_value=1, max_value=99, value=10, key="kamp_ind")
+            indirim = st.number_input("Yüksek Fiyat Oranı (%)", min_value=1, max_value=99, value=10, key="kamp_ind")
             
             # Kampanya için de tarih aralığı seçimi ekliyoruz
-            kampanya_aralik = st.date_input("Kampanya Tarih Aralığı Seçiniz", value=(date.today(), date.today()), min_value=date.today(), key="kamp_aralik_sec")
+            kampanya_aralik = st.date_input("Yüksek Fiyat Tarih Aralığı Seçiniz", value=(date.today(), date.today()), min_value=date.today(), key="kamp_aralik_sec")
             
-            if st.button("Kampanya Aralığı Ekle ve Kaydet"):
+            if st.button("Yüksek Fiyat Aralığı Ekle ve Kaydet"):
                 if isinstance(kampanya_aralik, tuple) and len(kampanya_aralik) == 2:
                     baslangic, bitis = kampanya_aralik
                 else:
@@ -382,7 +382,7 @@ elif menu == "Yönetici Paneli (Fiyat & Takvim)":
                 else:
                     st.warning("Seçilen tarih(ler) için kampanya zaten tanımlı.")
 
-            st.markdown("### Aktif Kampanyalı Tarihler ve İndirim Oranları (Tablo Yönetimi):")
+            st.markdown("### Yüksek Fiyatlı Tarihler ve Oranları (Tablo Yönetimi):")
             if "kampanya_df" not in st.session_state or st.session_state.kampanya_df.empty:
                 st.session_state.kampanya_df = pd.DataFrame(columns=["Tarih", "Indirim"])
             else:
