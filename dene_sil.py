@@ -340,6 +340,27 @@ if menu == "Müşteri Teklif Formu":
             st.success(f"🎉 Bu tarihte **%{kampanya_orani} daha yüksek** fiyat!")
 
         # --- ŞIK TOPLAM TUTAR KARTI ---
+        st.markdown("""
+            <style>
+                div[data-testid="stCheckbox"] label p {
+                    font-size: 16px !important;
+                    font-weight: 600 !important;
+                    color: #2c3e50 !important;
+                }
+            </style>
+        """, unsafe_allow_html=True)
+        
+        sosyal_medya_paylasimi = st.checkbox("📱 Sosyal medya paylaşımı istiyorum (İzin veriyorum)")
+
+        # Toplam tutar hesaplaması
+        ham_tutar = fiyat_dijital if dijital_paket_secildi else (f_ana_album + f_album + f_tablo + f_poz + f_mekan + f_klip + fiyat_ek_mekan)
+        toplam_tutar = ham_tutar
+
+        if kampanya_orani > 0:
+            toplam_tutar = ham_tutar * (1 + kampanya_orani / 100)
+            st.success(f"🎉 Bu tarihte **%{kampanya_orani} daha yüksek** fiyat!")
+
+        # --- ŞIK TOPLAM TUTAR KARTI ---
         st.markdown(f"""
             <div style="background-color: #e8f8f5; padding: 15px; border-radius: 10px; border: 1px solid #2ecc71; text-align: center; margin: 20px 0;">
                 <span style="color: #27ae60; font-size: 18px; font-weight: bold;">Hesaplanan Toplam Tutar</span>
@@ -355,11 +376,13 @@ if menu == "Müşteri Teklif Formu":
             else:
                 t_str = rezervasyon_tarihi.strftime('%d.%m.%Y')
                 
+                sm_durumu = "Sosyal Medya Paylaşımı: Evet" if sosyal_medya_paylasimi else "Sosyal Medya Paylaşımı: Hayır"
+                
                 if dijital_paket_secildi:
-                    detaylar = secilen_mekan
+                    detaylar = f"{secilen_mekan} | {sm_durumu}"
                 else:
                     mekan_detay = f"{secilen_mekan} (+ Merkez Çekimi)" if ilave_mekan_secildi else secilen_mekan
-                    detaylar = f"{secilen_ana_album} | {secilen_album} | {secilen_tablo} | Mekan: {mekan_detay}"
+                    detaylar = f"{secilen_ana_album} | {secilen_album} | {secilen_tablo} | Mekan: {mekan_detay} | {sm_durumu}"
                 
                 veri = {
                     "tarih": t_str, 
