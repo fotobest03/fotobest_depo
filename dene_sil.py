@@ -384,7 +384,7 @@ elif menu == "Yönetici Paneli (Fiyat & Takvim)":
 
             st.markdown("### Yüksek Fiyatlı Tarihler ve Oranları (Tablo Yönetimi):")
             if "kampanya_df" not in st.session_state or st.session_state.kampanya_df.empty:
-                st.session_state.kampanya_df = pd.DataFrame(columns=["Tarih", "Indirim"])
+                st.session_state.kampanya_df = pd.DataFrame(columns=["Tarih", "Fiyat Oranı"])
             else:
                 st.session_state.kampanya_df['Tarih'] = st.session_state.kampanya_df['Tarih'].apply(tarihi_duzelt)
                 
