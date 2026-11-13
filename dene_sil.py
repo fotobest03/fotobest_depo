@@ -288,7 +288,7 @@ elif menu == "Yönetici Paneli (Fiyat & Takvim)":
             st.success("Tüm veriler Google E-Tablodan başarıyla çekildi ve güncellendi!")
             st.rerun()
 
-        tab1, tab2, tab3 = st.tabs(["💰 Fiyat Yönetimi", "📅 Kapalı Tarihler", "🎉 Kampanyalı Tarihler"])
+        tab1, tab2, tab3 = st.tabs(["💰 Fiyat Yönetimi", "📅 Kapalı Tarihler", "🎉 Yüksek Fiyatlı Tarihler"])
         
         with tab1:
             edited_df = st.data_editor(st.session_state.prices_df, num_rows="dynamic", use_container_width=True)
@@ -349,7 +349,7 @@ elif menu == "Yönetici Paneli (Fiyat & Takvim)":
                     st.error(f"Hata: {ex}")
 
         with tab3:
-            st.subheader("Kampanya Ayarları")
+            st.subheader("Fiyat Ayarları")
             indirim = st.number_input("Yüksek Fiyat Oranı (%)", min_value=1, max_value=99, value=10, key="kamp_ind")
             
             # Kampanya için de tarih aralığı seçimi ekliyoruz
@@ -371,7 +371,7 @@ elif menu == "Yönetici Paneli (Fiyat & Takvim)":
                     # Eğer bu tarih tabloda yoksa veya güncellenecekse ekle
                     mevcut_dizi = st.session_state.kampanya_df["Tarih"].values if not st.session_state.kampanya_df.empty else []
                     if t_str not in mevcut_dizi:
-                        yeni_satir = pd.DataFrame([{"Tarih": t_str, "Indirim": int(indirim)}])
+                        yeni_satir = pd.DataFrame([{"Tarih": t_str, "Tarife Oranı": int(indirim)}])
                         st.session_state.kampanya_df = pd.concat([st.session_state.kampanya_df, yeni_satir], ignore_index=True)
                         eklenen_sayisi += 1
                 
@@ -384,7 +384,7 @@ elif menu == "Yönetici Paneli (Fiyat & Takvim)":
 
             st.markdown("### Yüksek Fiyatlı Tarihler ve Oranları (Tablo Yönetimi):")
             if "kampanya_df" not in st.session_state or st.session_state.kampanya_df.empty:
-                st.session_state.kampanya_df = pd.DataFrame(columns=["Tarih", "Fiyat Oranı"])
+                st.session_state.kampanya_df = pd.DataFrame(columns=["Tarih", "Indirim"])
             else:
                 st.session_state.kampanya_df['Tarih'] = st.session_state.kampanya_df['Tarih'].apply(tarihi_duzelt)
                 
