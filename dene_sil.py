@@ -12,7 +12,7 @@ st.set_page_config(page_title="Teklif ve Fiyat Yönetimi", page_icon="📸", lay
 
 
 # --- AYARLAR VE GİZLİ BİLGİLER ---
-GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbybDpmUtSORnrSJZ6IYCe5MWS2F03ngy_qBy26azCWxgbxMSNdRcx5xqDgdOebL7sLh/exec"
+GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwlofZdB_-xL0ywiI1vDidE8FEOSCz6wvWKplryVFaXfUj_gu3mKl0P_GS5YymNhaIu/exec"
 GMAIL_KULLANICI = "afotobest@gmail.com"
 GMAIL_SIFRE = "byyewfosgesogdft"
 
@@ -39,36 +39,37 @@ def verileri_tablodan_getir():
         if "fiyatlar" in data and data["fiyatlar"]:
             fiyat_df = pd.DataFrame(data["fiyatlar"])
             
-        # 2. Kapalı Tarihler (Doğrudan Pandas ile Kesin Formatlama)
+        # 2. Kapalı Tarihler (Format Düzeltme)
         if "kapali_tarihler" in data and data["kapali_tarihler"]:
             temiz_kapali = []
             for t in data["kapali_tarihler"]:
                 if t:
                     try:
-                        # Uzun GMT veya farklı formatları doğrudan YYYY-MM-DD formatına çevirir
-                        t_str = pd.to_datetime(t).strftime('%Y-%m-%d')
-                        temiz_kapali.append({"Tarih": t_str})
+                        # Gelen farklı formatlardaki tarihleri datetime nesnesine çevirip YYYY-MM-DD formatına sabitliyoruz
+                        dt_val = pd.to_datetime(t).strftime('%Y-%m-%d')
+                        temiz_kapali.append({"Tarih": dt_val})
                     except:
+                        # Hata durumunda doğrudan string bölme fallback yöntemi
                         temiz_kapali.append({"Tarih": str(t).split("T")[0].strip()})
             if temiz_kapali:
                 kapali_df = pd.DataFrame(temiz_kapali)
                 
-        # 3. Kampanyalar (Doğrudan Pandas ile Kesin Formatlama)
+        # 3. Kampanyalar (Format Düzeltme)
         if "kampanyalar" in data and data["kampanyalar"]:
             temiz_kampanya = []
             for k in data["kampanyalar"]:
                 if isinstance(k, dict) and "tarih" in k:
                     t_val = k["tarih"]
-                    oran = k.get("oran", 0)
-                    if t_val:
-                        try:
-                            t_str = pd.to_datetime(t_val).strftime('%Y-%m-%d')
-                        except:
-                            t_str = str(t_val).split("T")[0].strip()
-                            
+                    try:
+                        dt_val = pd.to_datetime(t_val).strftime('%Y-%m-%d')
                         temiz_kampanya.append({
-                            "Tarih": t_str, 
-                            "Indirim": int(oran) if oran != "" and not pd.isna(oran) else 0
+                            "Tarih": dt_val, 
+                            "Indirim": k.get("oran", 0)
+                        })
+                    except:
+                        temiz_kampanya.append({
+                            "Tarih": str(t_val).split("T")[0].strip(), 
+                            "Indirim": k.get("oran", 0)
                         })
             if temiz_kampanya:
                 kampanya_df = pd.DataFrame(temiz_kampanya)
