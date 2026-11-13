@@ -222,14 +222,20 @@ if menu == "Müşteri Teklif Formu":
         # --- GÖRSEL OLARAK ZENGİNLEŞTİRİLMİŞ DİJİTAL ÇEKİM PAKETİ ALANI ---
         # --- MAVİ ALANIN İÇİNDEKİ DİJİTAL ÇEKİM SEÇENEĞİ ---
         st.markdown("""
-            <div style="background-color: #eef6ff; padding: 16px; border-radius: 10px; border-left: 5px solid #0066cc; margin-bottom: 15px;">
+            <div style="background-color: #eef6ff; padding: 16px 16px 8px 16px; border-radius: 10px 10px 0 0; border-left: 5px solid #0066cc; border-top: 1px solid #d0e3ff; border-right: 1px solid #d0e3ff;">
                 <h4 style="color: #004080; margin: 0 0 8px 0; font-size: 18px;">✨ Özel Dijital Çekim Seçeneği</h4>
-                <p style="color: #333333; margin: 0 0 12px 0; font-size: 14px;">Albüm istemiyorsanız sadece dijital çekim paketimizi tercih edebilirsiniz.</p>
+                <p style="color: #333333; margin: 0 0 5px 0; font-size: 14px;">Albüm istemiyorsanız sadece dijital çekim paketimizi tercih edebilirsiniz.</p>
             </div>
         """, unsafe_allow_html=True)
         
-        # Onay kutusunu doğrudan kart yapısının altında kusursuz hizalıyoruz
+        # Kutucuğu mavi kartın hemen altında, aradaki boşluğu kapatarak konumlandırıyoruz
+        st.markdown("""
+            <div style="background-color: #eef6ff; padding: 0 16px 16px 16px; border-radius: 0 0 10px 10px; border-left: 5px solid #0066cc; border-bottom: 1px solid #d0e3ff; border-right: 1px solid #d0e3ff; margin-bottom: 15px;">
+        """, unsafe_allow_html=True)
+        
         dijital_paket_secildi = st.checkbox("📸 Bu Paketi Seçmek İçin İşaretleyin (Dijital Çekim Paketi)")
+        
+        st.markdown("</div>", unsafe_allow_html=True)
         
         secilen_mekan = ""
         fiyat_dijital = 0.0
