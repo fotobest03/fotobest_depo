@@ -328,22 +328,27 @@ elif menu == "Yönetici Paneli (Fiyat & Takvim)":
         with tab2:
             st.subheader("Kapalı Tarih Ayarları")
             
-            # --- YENİ: HIZLI AY/YIL ATLAMA YARDIMCISI ---
             col_a, col_b = st.columns(2)
+            aylar_dict = {"Ocak": 1, "Şubat": 2, "Mart": 3, "Nisan": 4, "Mayıs": 5, "Haziran": 6, 
+                          "Temmuz": 7, "Ağustos": 8, "Eylül": 9, "Ekim": 10, "Kasım": 11, "Aralık": 12}
+            
             with col_a:
                 secilen_yil = st.selectbox("Yıl Seç", [2026, 2027, 2028], index=0, key="kap_yil")
             with col_b:
-                aylar_dict = {"Ocak": 1, "Şubat": 2, "Mart": 3, "Nisan": 4, "Mayıs": 5, "Haziran": 6, 
-                              "Temmuz": 7, "Ağustos": 8, "Eylül": 9, "Ekim": 10, "Kasım": 11, "Aralık": 12}
-                secilen_ay_adi = st.selectbox("Ay Seç", list(aylar_dict.keys()), index=10, key="kap_ay") # Varsayılan Kasım
+                secilen_ay_adi = st.selectbox("Ay Seç", list(aylar_dict.keys()), index=10, key="kap_ay")
             
-            # Seçilen ayın ilk gününü hesaplıyoruz ki takvim o aya yönlendirilebilsin
-            hedef_baslangic = date(secilen_yil, aylar_dict[secilen_ay_adi], 1)
+            # Seçilen yıl ve aya göre hedef tarihi belirliyoruz
+            hedef_tarih = date(secilen_yil, aylar_dict[secilen_ay_adi], 1)
             
-            # Tarih aralığı seçimi (Aralık özelliği korundu)
+            # Eğer kullanıcı yukarıdan ay/yıl değiştirdiyse takvimin odak noktasını güncelliyoruz
+            if "kap_secilen_tarih" not in st.session_state or st.session_state.get("son_kap_yil") != secilen_yil or st.session_state.get("son_kap_ay") != secilen_ay_adi:
+                st.session_state.kap_secilen_tarih = (hedef_tarih, hedef_tarih)
+                st.session_state.son_kap_yil = secilen_yil
+                st.session_state.son_kap_ay = secilen_ay_adi
+
             kapali_aralik = st.date_input(
                 "Kapatılacak Tarih Aralığı Seçiniz", 
-                value=(hedef_baslangic, hedef_baslangic), 
+                value=st.session_state.kap_secilen_tarih, 
                 min_value=date(2026, 1, 1), 
                 key="kap_aralik_sec"
             )
@@ -371,7 +376,7 @@ elif menu == "Yönetici Paneli (Fiyat & Takvim)":
                     st.success(f"{eklenen_sayisi} gün başarıyla kapatıldı ve E-Tabloya kaydedildi!")
                     st.rerun()
                 else:
-                    st.warning("Seçilen tarih(ler) zaten kapali tarihler listesinde mevcut.")
+                    st.warning("Seçilen tarih(ler) zaten kapalı tarihler listesinde mevcut.")
 
             st.markdown("### Şu An Kapalı Olan Tarihler (Tablo Yönetimi):")
             if "kapali_df" not in st.session_state or st.session_state.kapali_df.empty:
@@ -393,19 +398,22 @@ elif menu == "Yönetici Paneli (Fiyat & Takvim)":
             st.subheader("Fiyat Ayarları")
             indirim = st.number_input("Yüksek Fiyat Oranı (%)", min_value=1, max_value=99, value=10, key="kamp_ind")
             
-            # --- YENİ: HIZLI AY/YIL ATLAMA YARDIMCISI ---
             col_c, col_d = st.columns(2)
             with col_c:
                 secilen_yil_k = st.selectbox("Yıl Seç ", [2026, 2027, 2028], index=0, key="kamp_yil")
             with col_d:
                 secilen_ay_adi_k = st.selectbox("Ay Seç ", list(aylar_dict.keys()), index=10, key="kamp_ay")
             
-            hedef_baslangic_k = date(secilen_yil_k, aylar_dict[secilen_ay_adi_k], 1)
+            hedef_tarih_k = date(secilen_yil_k, aylar_dict[secilen_ay_adi_k], 1)
             
-            # Tarih aralığı seçimi (Aralık özelliği korundu)
+            if "kamp_secilen_tarih" not in st.session_state or st.session_state.get("son_kamp_yil") != secilen_yil_k or st.session_state.get("son_kamp_ay") != secilen_ay_adi_k:
+                st.session_state.kamp_secilen_tarih = (hedef_tarih_k, hedef_tarih_k)
+                st.session_state.son_kamp_yil = secilen_yil_k
+                st.session_state.son_kamp_ay = secilen_ay_adi_k
+
             kampanya_aralik = st.date_input(
                 "Yüksek Fiyat Tarih Aralığı Seçiniz", 
-                value=(hedef_baslangic_k, hedef_baslangic_k), 
+                value=st.session_state.kamp_secilen_tarih, 
                 min_value=date(2026, 1, 1), 
                 key="kamp_aralik_sec"
             )
