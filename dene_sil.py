@@ -328,36 +328,38 @@ elif menu == "Yönetici Paneli (Fiyat & Takvim)":
         with tab2:
             st.subheader("Kapalı Tarih Ayarları")
             
-            # İki ayrı tekli takvim: Bu sayede üstteki ay/yıl seçme menüleri her zaman tam çalışır ve görünür
-            col_b1, col_b2 = st.columns(2)
-            with col_b1:
-                baslangic_tarihi = st.date_input("Başlangıç Tarihi", value=date.today(), min_value=date.today(), key="kap_bas_tarih")
-            with col_b2:
-                bitis_tarihi = st.date_input("Bitiş Tarihi", value=date.today(), min_value=baslangic_tarihi, key="kap_bit_tarih")
+            # Tek bir bileşende güvenli aralık seçimi (Hata riskini sıfırlar)
+            kapali_aralik = st.date_input(
+                "Kapatılacak Tarih Aralığı Seçiniz", 
+                value=(date.today(), date.today()), 
+                min_value=date(2026, 1, 1), 
+                key="kap_aralik_sec"
+            )
             
             if st.button("Seçilen Tarih Aralığını Kapat"):
-                if bitis_tarihi < baslangic_tarihi:
-                    st.error("Bitiş tarihi başlangıç tarihinden küçük olamaz!")
+                if isinstance(kapali_aralik, tuple) and len(kapali_aralik) == 2:
+                    baslangic, bitis = kapali_aralik
                 else:
-                    delta = bitis_tarihi - baslangic_tarihi
-                    eklenen_sayisi = 0
+                    baslangic = bitis = kapali_aralik
+                
+                delta = bitis - baslangic
+                eklenen_sayisi = 0
+                
+                for i in range(delta.days + 1):
+                    gun = baslangic + timedelta(days=i)
+                    t_str = gun.strftime('%Y-%m-%d')
                     
-                    # Başlangıç ve bitiş arasındaki tüm günleri döngüye alıyoruz
-                    for i in range(delta.days + 1):
-                        gun = baslangic_tarihi + timedelta(days=i)
-                        t_str = gun.strftime('%Y-%m-%d')
-                        
-                        if t_str not in st.session_state.kapali_df["Tarih"].values:
-                            yeni_satir = pd.DataFrame([{"Tarih": t_str}])
-                            st.session_state.kapali_df = pd.concat([st.session_state.kapali_df, yeni_satir], ignore_index=True)
-                            eklenen_sayisi += 1
-                    
-                    if eklenen_sayisi > 0:
-                        takvim_verilerini_kaydet()
-                        st.success(f"{eklenen_sayisi} gün başarıyla kapatıldı ve E-Tabloya kaydedildi!")
-                        st.rerun()
-                    else:
-                        st.warning("Seçilen tarih(ler) zaten kapalı tarihler listesinde mevcut.")
+                    if t_str not in st.session_state.kapali_df["Tarih"].values:
+                        yeni_satir = pd.DataFrame([{"Tarih": t_str}])
+                        st.session_state.kapali_df = pd.concat([st.session_state.kapali_df, yeni_satir], ignore_index=True)
+                        eklenen_sayisi += 1
+                
+                if eklenen_sayisi > 0:
+                    takvim_verilerini_kaydet()
+                    st.success(f"{eklenen_sayisi} gün başarıyla kapatıldı ve E-Tabloya kaydedildi!")
+                    st.rerun()
+                else:
+                    st.warning("Seçilen tarih(ler) zaten kapalı tarihler listesinde mevcut.")
 
             st.markdown("### Şu An Kapalı Olan Tarihler (Tablo Yönetimi):")
             if "kapali_df" not in st.session_state or st.session_state.kapali_df.empty:
@@ -379,36 +381,39 @@ elif menu == "Yönetici Paneli (Fiyat & Takvim)":
             st.subheader("Fiyat Ayarları")
             indirim = st.number_input("Yüksek Fiyat Oranı (%)", min_value=1, max_value=99, value=10, key="kamp_ind")
             
-            # İki ayrı tekli takvim: Yüksek fiyat aralığı için
-            col_k1, col_k2 = st.columns(2)
-            with col_k1:
-                kampanya_bas = st.date_input("Başlangıç Tarihi ", value=date.today(), min_value=date.today(), key="kamp_bas_tarih")
-            with col_k2:
-                kampanya_bit = st.date_input("Bitiş Tarihi ", value=date.today(), min_value=kampanya_bas, key="kamp_bit_tarih")
+            # Tek bir bileşende güvenli yüksek fiyat aralığı seçimi
+            kampanya_aralik = st.date_input(
+                "Yüksek Fiyat Tarih Aralığı Seçiniz", 
+                value=(date.today(), date.today()), 
+                min_value=date(2026, 1, 1), 
+                key="kamp_aralik_sec"
+            )
 
             if st.button("Yüksek Fiyat Aralığı Ekle ve Kaydet"):
-                if kampanya_bit < kampanya_bas:
-                    st.error("Bitiş tarihi başlangıç tarihinden küçük olamaz!")
+                if isinstance(kampanya_aralik, tuple) and len(kampanya_aralik) == 2:
+                    baslangic, bitis = kampanya_aralik
                 else:
-                    delta = kampanya_bit - kampanya_bas
-                    eklenen_sayisi = 0
+                    baslangic = bitis = kampanya_aralik
+                
+                delta = bitis - baslangic
+                eklenen_sayisi = 0
+                
+                for i in range(delta.days + 1):
+                    gun = baslangic + timedelta(days=i)
+                    t_str = gun.strftime('%Y-%m-%d')
                     
-                    for i in range(delta.days + 1):
-                        gun = kampanya_bas + timedelta(days=i)
-                        t_str = gun.strftime('%Y-%m-%d')
-                        
-                        mevcut_dizi = st.session_state.kampanya_df["Tarih"].values if not st.session_state.kampanya_df.empty else []
-                        if t_str not in mevcut_dizi:
-                            yeni_satir = pd.DataFrame([{"Tarih": t_str, "Indirim": int(indirim)}])
-                            st.session_state.kampanya_df = pd.concat([st.session_state.kampanya_df, yeni_satir], ignore_index=True)
-                            eklenen_sayisi += 1
-                    
-                    if eklenen_sayisi > 0:
-                        takvim_verilerini_kaydet()
-                        st.success(f"{eklenen_sayisi} günlük yüksek fiyat aralığı kaydedildi ve E-Tabloya işlendi!")
-                        st.rerun()
-                    else:
-                        st.warning("Seçilen tarih(ler) için zaten tanımlı.")
+                    mevcut_dizi = st.session_state.kampanya_df["Tarih"].values if not st.session_state.kampanya_df.empty else []
+                    if t_str not in mevcut_dizi:
+                        yeni_satir = pd.DataFrame([{"Tarih": t_str, "Indirim": int(indirim)}])
+                        st.session_state.kampanya_df = pd.concat([st.session_state.kampanya_df, yeni_satir], ignore_index=True)
+                        eklenen_sayisi += 1
+                
+                if eklenen_sayisi > 0:
+                    takvim_verilerini_kaydet()
+                    st.success(f"{eklenen_sayisi} günlük yüksek fiyat aralığı kaydedildi ve E-Tabloya işlendi!")
+                    st.rerun()
+                else:
+                    st.warning("Seçilen tarih(ler) için zaten tanımlı.")
 
             st.markdown("### Yüksek Fiyatlı Tarihler ve Oranları (Tablo Yönetimi):")
             if "kampanya_df" not in st.session_state or st.session_state.kampanya_df.empty:
