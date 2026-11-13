@@ -16,6 +16,38 @@ GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwlofZdB_-xL0ywiI1v
 GMAIL_KULLANICI = "afotobest@gmail.com"
 GMAIL_SIFRE = "byyewfosgesogdft"
 
+# --- GÜVENLİ TARİH DÜZENLEME FONKSİYONU ---
+def tarihi_duzelt(val):
+    if not val or pd.isna(val):
+        return ""
+    s = str(val).strip()
+    # Eğer zaten YYYY-MM-DD formatındaysa
+    if len(s) >= 10 and s[4] == '-' and s[7] == '-':
+        return s[:10]
+    
+    # 'Fri Nov 13 2026 00:00:00 GMT...' formatını yerel ayar hatasına takılmadan ayıklar
+    parcalar = s.split()
+    aylar = {'Jan': '01', 'Feb': '02', 'Mar': '03', 'Apr': '04', 'May': '05', 'Jun': '06', 
+             'Jul': '07', 'Aug': '08', 'Sep': '09', 'Oct': '10', 'Nov': '11', 'Dec': '12'}
+    
+    if len(parcalar) >= 4 and parcalar[1] in aylar:
+        try:
+            gun = parcalar[2].zfill(2)
+            ay = aylar[parcalar[1]]
+            yil = parcalar[3]
+            return f"{yil}-{ay}-{gun}"
+        except:
+            pass
+            
+    try:
+        dt = pd.to_datetime(s, errors='coerce')
+        if pd.notnull(dt):
+            return dt.strftime('%Y-%m-%d')
+    except:
+        pass
+        
+    return s.split("T")[0].strip()
+
 # --- GOOGLE E-TABLODAN VERİ ÇEKME ---
 def verileri_tablodan_getir():
     fiyat_df = pd.DataFrame([
@@ -39,38 +71,26 @@ def verileri_tablodan_getir():
         if "fiyatlar" in data and data["fiyatlar"]:
             fiyat_df = pd.DataFrame(data["fiyatlar"])
             
-        # 2. Kapalı Tarihler (Format Düzeltme)
+        # 2. Kapalı Tarihler
         if "kapali_tarihler" in data and data["kapali_tarihler"]:
             temiz_kapali = []
             for t in data["kapali_tarihler"]:
                 if t:
-                    try:
-                        # Gelen farklı formatlardaki tarihleri datetime nesnesine çevirip YYYY-MM-DD formatına sabitliyoruz
-                        dt_val = pd.to_datetime(t).strftime('%Y-%m-%d')
-                        temiz_kapali.append({"Tarih": dt_val})
-                    except:
-                        # Hata durumunda doğrudan string bölme fallback yöntemi
-                        temiz_kapali.append({"Tarih": str(t).split("T")[0].strip()})
+                    temiz_kapali.append({"Tarih": tarihi_duzelt(t)})
             if temiz_kapali:
                 kapali_df = pd.DataFrame(temiz_kapali)
                 
-        # 3. Kampanyalar (Format Düzeltme)
+        # 3. Kampanyalar
         if "kampanyalar" in data and data["kampanyalar"]:
             temiz_kampanya = []
             for k in data["kampanyalar"]:
                 if isinstance(k, dict) and "tarih" in k:
                     t_val = k["tarih"]
-                    try:
-                        dt_val = pd.to_datetime(t_val).strftime('%Y-%m-%d')
-                        temiz_kampanya.append({
-                            "Tarih": dt_val, 
-                            "Indirim": k.get("oran", 0)
-                        })
-                    except:
-                        temiz_kampanya.append({
-                            "Tarih": str(t_val).split("T")[0].strip(), 
-                            "Indirim": k.get("oran", 0)
-                        })
+                    oran = k.get("oran", 0)
+                    temiz_kampanya.append({
+                        "Tarih": tarihi_duzelt(t_val), 
+                        "Indirim": int(oran) if oran != "" and not pd.isna(oran) else 0
+                    })
             if temiz_kampanya:
                 kampanya_df = pd.DataFrame(temiz_kampanya)
                 
@@ -281,6 +301,8 @@ elif menu == "Yönetici Paneli (Fiyat & Takvim)":
                     st.error(f"Hata: {ex}")
 
         with tab2:
+            if not st.session_state.kapali_df.empty:
+                st.session_state.kapali_df['Tarih'] = st.session_state.kapali_df['Tarih'].apply(tarihi_duzelt)
             st.subheader("Kapalı Tarih Ayarları")
             tek_tarih = st.date_input("Kapatılacak Tarih", value=date.today(), min_value=date.today(), key="kap_tek_gun")
             if st.button("Seçilen Günü Kapat"):
@@ -307,6 +329,8 @@ elif menu == "Yönetici Paneli (Fiyat & Takvim)":
                     st.error(f"Hata: {ex}")
 
         with tab3:
+            if not st.session_state.kampanya_df.empty:
+                st.session_state.kampanya_df['Tarih'] = st.session_state.kampanya_df['Tarih'].apply(tarihi_duzelt)
             st.subheader("Kampanya Ayarları")
             indirim = st.number_input("İndirim Oranı (%)", min_value=1, max_value=99, value=10, key="kamp_ind")
             k_tarih = st.date_input("Kampanya Tarihi", value=date.today(), min_value=date.today(), key="kamp_tarih_sec")
