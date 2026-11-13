@@ -12,30 +12,9 @@ st.set_page_config(page_title="Teklif ve Fiyat Yönetimi", page_icon="📸", lay
 
 
 # --- AYARLAR VE GİZLİ BİLGİLER ---
-GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxPWHCbD7cE9beiKjX5dmZTAzu-ZcErHpjLOhwbWy3lLIM77aXZcrLm8eqs8oB136oL/exec"
+GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwlofZdB_-xL0ywiI1vDidE8FEOSCz6wvWKplryVFaXfUj_gu3mKl0P_GS5YymNhaIu/exec"
 GMAIL_KULLANICI = "afotobest@gmail.com"
 GMAIL_SIFRE = "byyewfosgesogdft"
-
-# --- YARDIMCI TARİH DÖNÜŞTÜRÜCÜ FONKSİYON ---
-def tarihi_duzenle(tarih_str):
-    if not tarih_str:
-        return ""
-    s = str(tarih_str).strip()
-    try:
-        # Eğer zaten YYYY-MM-DD formatındaysa
-        if len(s) >= 10 and s[4] == '-' and s[7] == '-':
-            return s[:10]
-        
-        # 'Fri Nov 20 2026 00:00:00 GMT...' formatını parse etme
-        temiz_parca = " ".join(s.split()[:4]) 
-        dt = datetime.strptime(temiz_parca, "%a %b %d %Y")
-        return dt.strftime("%Y-%m-%d")
-    except:
-        try:
-            dt = pd.to_datetime(s)
-            return dt.strftime("%Y-%m-%d")
-        except:
-            return s.split("T")[0].strip()
 
 # --- GOOGLE E-TABLODAN VERİ ÇEKME ---
 def verileri_tablodan_getir():
@@ -60,26 +39,37 @@ def verileri_tablodan_getir():
         if "fiyatlar" in data and data["fiyatlar"]:
             fiyat_df = pd.DataFrame(data["fiyatlar"])
             
-        # 2. Kapalı Tarihler
+        # 2. Kapalı Tarihler (Format Düzeltme)
         if "kapali_tarihler" in data and data["kapali_tarihler"]:
             temiz_kapali = []
             for t in data["kapali_tarihler"]:
-                formatli_tarih = tarihi_duzenle(t)
-                if formatli_tarih:
-                    temiz_kapali.append({"Tarih": formatli_tarih})
+                if t:
+                    try:
+                        # Gelen farklı formatlardaki tarihleri datetime nesnesine çevirip YYYY-MM-DD formatına sabitliyoruz
+                        dt_val = pd.to_datetime(t).strftime('%Y-%m-%d')
+                        temiz_kapali.append({"Tarih": dt_val})
+                    except:
+                        # Hata durumunda doğrudan string bölme fallback yöntemi
+                        temiz_kapali.append({"Tarih": str(t).split("T")[0].strip()})
             if temiz_kapali:
                 kapali_df = pd.DataFrame(temiz_kapali)
                 
-        # 3. Kampanyalar
+        # 3. Kampanyalar (Format Düzeltme)
         if "kampanyalar" in data and data["kampanyalar"]:
             temiz_kampanya = []
             for k in data["kampanyalar"]:
                 if isinstance(k, dict) and "tarih" in k:
-                    formatli_tarih = tarihi_duzenle(k["tarih"])
-                    if formatli_tarih:
+                    t_val = k["tarih"]
+                    try:
+                        dt_val = pd.to_datetime(t_val).strftime('%Y-%m-%d')
                         temiz_kampanya.append({
-                            "Tarih": formatli_tarih, 
-                            "Indirim": int(k.get("oran", 0))
+                            "Tarih": dt_val, 
+                            "Indirim": k.get("oran", 0)
+                        })
+                    except:
+                        temiz_kampanya.append({
+                            "Tarih": str(t_val).split("T")[0].strip(), 
+                            "Indirim": k.get("oran", 0)
                         })
             if temiz_kampanya:
                 kampanya_df = pd.DataFrame(temiz_kampanya)
@@ -160,7 +150,7 @@ def takvim_verilerini_kaydet():
             "kampanyalar": kampanya_listesi
         })
     except: pass
-
+    
 # --- E-POSTA GÖNDERME ---
 def mail_gonder(alici_eposta, ad_soyad, telefon, email, tarih_str, detaylar, toplam_tutar):
     try:
