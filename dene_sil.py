@@ -220,22 +220,33 @@ if menu == "Müşteri Teklif Formu":
 
         # --- YENİ: DİJİTAL ÇEKİM PAKETİ SEÇENEĞİ ---
         # --- GÖRSEL OLARAK ZENGİNLEŞTİRİLMİŞ DİJİTAL ÇEKİM PAKETİ ALANI ---
-        # --- MAVİ ALANIN İÇİNDEKİ DİJİTAL ÇEKİM SEÇENEĞİ ---
         st.markdown("""
-            <div style="background-color: #eef6ff; padding: 16px 16px 8px 16px; border-radius: 10px 10px 0 0; border-left: 5px solid #0066cc; border-top: 1px solid #d0e3ff; border-right: 1px solid #d0e3ff;">
-                <h4 style="color: #004080; margin: 0 0 8px 0; font-size: 18px;">✨ Özel Dijital Çekim Seçeneği</h4>
-                <p style="color: #333333; margin: 0 0 5px 0; font-size: 14px;">Albüm istemiyorsanız sadece dijital çekim paketimizi tercih edebilirsiniz.</p>
+            <div style="background-color: #eef6ff; padding: 18px; border-radius: 10px; border-left: 6px solid #0066cc; border-top: 1px solid #d0e3ff; border-right: 1px solid #d0e3ff; border-bottom: 1px solid #d0e3ff; margin-bottom: 8px;">
+                <h4 style="color: #004080; margin: 0 0 8px 0; font-size: 19px;">✨ Özel Dijital Çekim Seçeneği</h4>
+                <p style="color: #2c3e50; margin: 0; font-size: 15px; font-weight: 500;">Albüm istemiyorsanız sadece dijital çekim paketimizi tercih edebilirsiniz.</p>
             </div>
         """, unsafe_allow_html=True)
         
-        # Kutucuğu mavi kartın hemen altında, aradaki boşluğu kapatarak konumlandırıyoruz
+        # --- KUTUCUĞU DAHA BÜYÜK VE BELİRGİN YAPAN ÖZEL CSS/HTML ---
         st.markdown("""
-            <div style="background-color: #eef6ff; padding: 0 16px 16px 16px; border-radius: 0 0 10px 10px; border-left: 5px solid #0066cc; border-bottom: 1px solid #d0e3ff; border-right: 1px solid #d0e3ff; margin-bottom: 15px;">
+            <style>
+                /* Streamlit checkbox yazı boyutunu ve kutucuğunu büyütme */
+                div[data-testid="stCheckbox"] label p {
+                    font-size: 17px !important;
+                    font-weight: 700 !important;
+                    color: #003366 !important;
+                }
+                div[data-testid="stCheckbox"] {
+                    background-color: #f0f7ff;
+                    padding: 10px 15px;
+                    border-radius: 8px;
+                    border: 2px dashed #0066cc;
+                    margin-bottom: 15px;
+                }
+            </style>
         """, unsafe_allow_html=True)
-        
-        dijital_paket_secildi = st.checkbox("📸 Bu Paketi Seçmek İçin İşaretleyin (Dijital Çekim Paketi)")
-        
-        st.markdown("</div>", unsafe_allow_html=True)
+
+        dijital_paket_secildi = st.checkbox("📸 BU PAKETİ SEÇMEK İÇİN İŞARETLEYİN (Dijital Çekim Paketi)")
         
         secilen_mekan = ""
         fiyat_dijital = 0.0
