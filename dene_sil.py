@@ -260,6 +260,8 @@ if menu == "Müşteri Teklif Formu":
         secilen_ana_album = ""
         secilen_album = ""
         secilen_tablo = ""
+        secilen_mekan = ""
+        fiyat_ek_mekan = 0.0
         ham_tutar = fiyat_dijital
 
         if not dijital_paket_secildi:
@@ -275,7 +277,17 @@ if menu == "Müşteri Teklif Formu":
             secilen_album = st.selectbox("Aile Albümü", album_opts['Secenek'].tolist()) if not album_opts.empty else ""
             secilen_tablo = st.selectbox("Tablo Seçimi", tablo_opts['Secenek'].tolist()) if not tablo_opts.empty else ""
             secilen_poz = st.selectbox("Albüm İçi Poz Sayısı", poz_opts['Secenek'].tolist()) if not poz_opts.empty else ""
-            secilen_mekan = st.selectbox("Çekim Mekanı", mekan_opts['Secenek'].tolist()) if not mekan_opts.empty else ""
+            
+            # --- ÇEKİM MEKANI SEÇİMİ ---
+            secilen_mekan = st.selectbox("Çekim Mekanı", ["Seçiniz..."] + mekan_opts['Secenek'].tolist()) if not mekan_opts.empty else "Seçiniz..."
+            
+            # --- YENİ: MERKEZ ÇEKİMİ İSTİYORUM (İLAVE MEKAN) KUTUCUĞU ---
+            ilave_mekan_secildi = False
+            if secilen_mekan != "Seçiniz...":
+                ilave_mekan_secildi = st.checkbox("Merkez Çekimi istiyorum (İlave Mekan)")
+                if ilave_mekan_secildi:
+                    fiyat_ek_mekan = 1500.0
+
             secilen_klip = st.radio("Dış Çekim Klibi İstiyorum", klip_opts['Secenek'].tolist()) if not klip_opts.empty else ""
 
             try:
@@ -283,12 +295,12 @@ if menu == "Müşteri Teklif Formu":
                 f_album = float(album_opts[album_opts['Secenek'] == secilen_album]['Fiyat'].values[0]) if secilen_album else 0.0
                 f_tablo = float(tablo_opts[tablo_opts['Secenek'] == secilen_tablo]['Fiyat'].values[0]) if secilen_tablo else 0.0
                 f_poz = float(poz_opts[poz_opts['Secenek'] == secilen_poz]['Fiyat'].values[0]) if secilen_poz else 0.0
-                f_mekan = float(mekan_opts[mekan_opts['Secenek'] == secilen_mekan]['Fiyat'].values[0]) if secilen_mekan else 0.0
+                f_mekan = float(mekan_opts[mekan_opts['Secenek'] == secilen_mekan]['Fiyat'].values[0]) if secilen_mekan != "Seçiniz..." else 0.0
                 f_klip = float(klip_opts[klip_opts['Secenek'] == secilen_klip]['Fiyat'].values[0]) if secilen_klip else 0.0
             except:
                 f_ana_album = f_album = f_tablo = f_poz = f_mekan = f_klip = 0.0
 
-            ham_tutar = f_ana_album + f_album + f_tablo + f_poz + f_mekan + f_klip
+            ham_tutar = f_ana_album + f_album + f_tablo + f_poz + f_mekan + f_klip + fiyat_ek_mekan
 
         toplam_tutar = ham_tutar
 
@@ -301,13 +313,16 @@ if menu == "Müşteri Teklif Formu":
         if st.button("Teklifi Gönder ve Kaydet"):
             if tarih_kapali_mi:
                 st.error("Kapalı tarih!")
+            elif not dijital_paket_secildi and secilen_mekan == "Seçiniz...":
+                st.warning("Lütfen bir Çekim Mekanı seçiniz.")
             else:
                 t_str = rezervasyon_tarihi.strftime('%d.%m.%Y')
                 
                 if dijital_paket_secildi:
                     detaylar = secilen_mekan
                 else:
-                    detaylar = f"{secilen_ana_album} | {secilen_album} | {secilen_tablo}"
+                    mekan_detay = f"{secilen_mekan} (+ Merkez Çekimi)" if ilave_mekan_secildi else secilen_mekan
+                    detaylar = f"{secilen_ana_album} | {secilen_album} | {secilen_tablo} | Mekan: {mekan_detay}"
                 
                 veri = {
                     "tarih": t_str, 
