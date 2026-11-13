@@ -39,24 +39,21 @@ def verileri_tablodan_getir():
         if "fiyatlar" in data and data["fiyatlar"]:
             fiyat_df = pd.DataFrame(data["fiyatlar"])
             
-        # 2. Kapalı Tarihler (Format Düzeltme)
+        # 2. Kapalı Tarihler (Doğrudan Pandas ile Kesin Formatlama)
         if "kapali_tarihler" in data and data["kapali_tarihler"]:
             temiz_kapali = []
             for t in data["kapali_tarihler"]:
                 if t:
-                    s = str(t).strip()
                     try:
-                        dt_val = pd.to_datetime(s, errors='coerce')
-                        if pd.notnull(dt_val):
-                            temiz_kapali.append({"Tarih": dt_val.strftime('%Y-%m-%d')})
-                        else:
-                            temiz_kapali.append({"Tarih": s.split("T")[0].strip()})
+                        # Uzun GMT veya farklı formatları doğrudan YYYY-MM-DD formatına çevirir
+                        t_str = pd.to_datetime(t).strftime('%Y-%m-%d')
+                        temiz_kapali.append({"Tarih": t_str})
                     except:
-                        temiz_kapali.append({"Tarih": s.split("T")[0].strip()})
+                        temiz_kapali.append({"Tarih": str(t).split("T")[0].strip()})
             if temiz_kapali:
                 kapali_df = pd.DataFrame(temiz_kapali)
                 
-        # 3. Kampanyalar (Format Düzeltme)
+        # 3. Kampanyalar (Doğrudan Pandas ile Kesin Formatlama)
         if "kampanyalar" in data and data["kampanyalar"]:
             temiz_kampanya = []
             for k in data["kampanyalar"]:
@@ -64,18 +61,13 @@ def verileri_tablodan_getir():
                     t_val = k["tarih"]
                     oran = k.get("oran", 0)
                     if t_val:
-                        s = str(t_val).strip()
                         try:
-                            dt_val = pd.to_datetime(s, errors='coerce')
-                            if pd.notnull(dt_val):
-                                formatli_tarih = dt_val.strftime('%Y-%m-%d')
-                            else:
-                                formatli_tarih = s.split("T")[0].strip()
+                            t_str = pd.to_datetime(t_val).strftime('%Y-%m-%d')
                         except:
-                            formatli_tarih = s.split("T")[0].strip()
-                        
+                            t_str = str(t_val).split("T")[0].strip()
+                            
                         temiz_kampanya.append({
-                            "Tarih": formatli_tarih, 
+                            "Tarih": t_str, 
                             "Indirim": int(oran) if oran != "" and not pd.isna(oran) else 0
                         })
             if temiz_kampanya:
