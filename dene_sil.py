@@ -371,7 +371,7 @@ elif menu == "Yönetici Paneli (Fiyat & Takvim)":
                     # Eğer bu tarih tabloda yoksa veya güncellenecekse ekle
                     mevcut_dizi = st.session_state.kampanya_df["Tarih"].values if not st.session_state.kampanya_df.empty else []
                     if t_str not in mevcut_dizi:
-                        yeni_satir = pd.DataFrame([{"Tarih": t_str, "Tarife Oranı": int(indirim)}])
+                        yeni_satir = pd.DataFrame([{"Tarih": t_str, "Indirim": int(indirim)}])
                         st.session_state.kampanya_df = pd.concat([st.session_state.kampanya_df, yeni_satir], ignore_index=True)
                         eklenen_sayisi += 1
                 
