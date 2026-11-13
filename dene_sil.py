@@ -219,7 +219,15 @@ if menu == "Müşteri Teklif Formu":
         st.markdown("---")
 
         # --- YENİ: DİJİTAL ÇEKİM PAKETİ SEÇENEĞİ ---
-        dijital_paket_secildi = st.checkbox("Dijital Çekim Paketi")
+        # --- GÖRSEL OLARAK ZENGİNLEŞTİRİLMİŞ DİJİTAL ÇEKİM PAKETİ ALANI ---
+        st.markdown("""
+            <div style="background-color: #eef6ff; padding: 16px; border-radius: 10px; border-left: 5px solid #0066cc; margin-bottom: 15px;">
+                <h4 style="color: #004080; margin: 0 0 8px 0; font-size: 18px;">✨ Özel Dijital Çekim Seçeneği</h4>
+                <p style="color: #333333; margin: 0; font-size: 14px;">Albüm istemiyorsanız sadece dijital çekim paketimizi tercih edebilirsiniz.</p>
+            </div>
+        """, unsafe_allow_html=True)
+        
+        dijital_paket_secildi = st.checkbox("📸 Dijital Çekim Paketi (Seçmek için işaretleyin)")
         
         secilen_mekan = ""
         fiyat_dijital = 0.0
@@ -265,6 +273,12 @@ if menu == "Müşteri Teklif Formu":
         ham_tutar = fiyat_dijital
 
         if not dijital_paket_secildi:
+            st.markdown("""
+                <div style="background-color: #f8f9fa; padding: 12px; border-radius: 8px; border: 1px solid #e0e0e0; margin: 15px 0 10px 0;">
+                    <span style="color: #2c3e50; font-weight: bold; font-size: 15px;">📦 Albüm ve Paket Kombinasyonları</span>
+                </div>
+            """, unsafe_allow_html=True)
+
             df_prices = st.session_state.prices_df
             ana_album_opts = df_prices[df_prices['Kategori'] == 'Ana Albüm']
             album_opts = df_prices[df_prices['Kategori'] == 'Aile Albümü']
@@ -278,13 +292,11 @@ if menu == "Müşteri Teklif Formu":
             secilen_tablo = st.selectbox("Tablo Seçimi", tablo_opts['Secenek'].tolist()) if not tablo_opts.empty else ""
             secilen_poz = st.selectbox("Albüm İçi Poz Sayısı", poz_opts['Secenek'].tolist()) if not poz_opts.empty else ""
             
-            # --- ÇEKİM MEKANI SEÇİMİ ---
             secilen_mekan = st.selectbox("Çekim Mekanı", ["Seçiniz..."] + mekan_opts['Secenek'].tolist()) if not mekan_opts.empty else "Seçiniz..."
             
-            # --- YENİ: MERKEZ ÇEKİMİ İSTİYORUM (İLAVE MEKAN) KUTUCUĞU ---
             ilave_mekan_secildi = False
             if secilen_mekan != "Seçiniz...":
-                ilave_mekan_secildi = st.checkbox("Merkez Çekimi istiyorum (İlave Mekan)")
+                ilave_mekan_secildi = st.checkbox("Merkez Çekimi istiyorum (İlave Mekan - +1.500 TL)")
                 if ilave_mekan_secildi:
                     fiyat_ek_mekan = 1500.0
 
@@ -308,7 +320,13 @@ if menu == "Müşteri Teklif Formu":
             toplam_tutar = ham_tutar * (1 + kampanya_orani / 100)
             st.success(f"🎉 Bu tarihte **%{kampanya_orani} daha yüksek** fiyat!")
 
-        st.markdown(f"### **Toplam Tutar: {toplam_tutar:,.2f} TL**")
+        # --- ŞIK TOPLAM TUTAR KARTI ---
+        st.markdown(f"""
+            <div style="background-color: #e8f8f5; padding: 15px; border-radius: 10px; border: 1px solid #2ecc71; text-align: center; margin: 20px 0;">
+                <span style="color: #27ae60; font-size: 18px; font-weight: bold;">Hesaplanan Toplam Tutar</span>
+                <h2 style="color: #16a085; margin: 5px 0 0 0;">{toplam_tutar:,.2f} TL</h2>
+            </div>
+        """, unsafe_allow_html=True)
 
         if st.button("Teklifi Gönder ve Kaydet"):
             if tarih_kapali_mi:
