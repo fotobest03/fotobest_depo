@@ -220,14 +220,16 @@ if menu == "Müşteri Teklif Formu":
 
         # --- YENİ: DİJİTAL ÇEKİM PAKETİ SEÇENEĞİ ---
         # --- GÖRSEL OLARAK ZENGİNLEŞTİRİLMİŞ DİJİTAL ÇEKİM PAKETİ ALANI ---
+        # --- MAVİ ALANIN İÇİNDEKİ DİJİTAL ÇEKİM SEÇENEĞİ ---
         st.markdown("""
             <div style="background-color: #eef6ff; padding: 16px; border-radius: 10px; border-left: 5px solid #0066cc; margin-bottom: 15px;">
                 <h4 style="color: #004080; margin: 0 0 8px 0; font-size: 18px;">✨ Özel Dijital Çekim Seçeneği</h4>
-                <p style="color: #333333; margin: 0; font-size: 14px;">Albüm istemiyorsanız sadece dijital çekim paketimizi tercih edebilirsiniz.</p>
+                <p style="color: #333333; margin: 0 0 12px 0; font-size: 14px;">Albüm istemiyorsanız sadece dijital çekim paketimizi tercih edebilirsiniz.</p>
             </div>
         """, unsafe_allow_html=True)
         
-        dijital_paket_secildi = st.checkbox("📸 Dijital Çekim Paketi (Seçmek için işaretleyin)")
+        # Onay kutusunu doğrudan kart yapısının altında kusursuz hizalıyoruz
+        dijital_paket_secildi = st.checkbox("📸 Bu Paketi Seçmek İçin İşaretleyin (Dijital Çekim Paketi)")
         
         secilen_mekan = ""
         fiyat_dijital = 0.0
