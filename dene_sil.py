@@ -263,13 +263,6 @@ if menu == "Müşteri Teklif Formu":
         kampanya_dict = get_campaign_dict()
         closed_lst = get_closed_dates_list()
 
-        if kampanya_dict:
-            kampanya_metni = "✨ **Fiyatlarımızın Yüksek Olduğu Günler:**\n"
-            for d, oran in sorted(kampanya_dict.items()):
-                if d >= date.today():
-                    kampanya_metni += f"- 📅 **{d.strftime('%d.%m.%Y')}** tarihte **%{oran} zamlı fiyat!**\n"
-            st.info(kampanya_metni)
-
         rezervasyon_tarihi = st.date_input("Çekim Tarihi Seçiniz", value=date.today(), min_value=date.today())
         
         cekim_saati = st.selectbox(
