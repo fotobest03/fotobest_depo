@@ -328,23 +328,24 @@ elif menu == "Yönetici Paneli (Fiyat & Takvim)":
         with tab2:
             st.subheader("Kapalı Tarih Ayarları")
             
-            col_a, col_b = st.columns(2)
             aylar_dict = {"Ocak": 1, "Şubat": 2, "Mart": 3, "Nisan": 4, "Mayıs": 5, "Haziran": 6, 
                           "Temmuz": 7, "Ağustos": 8, "Eylül": 9, "Ekim": 10, "Kasım": 11, "Aralık": 12}
             
+            col_a, col_b = st.columns(2)
             with col_a:
                 secilen_yil = st.selectbox("Yıl Seç", [2026, 2027, 2028], index=0, key="kap_yil")
             with col_b:
                 secilen_ay_adi = st.selectbox("Ay Seç", list(aylar_dict.keys()), index=10, key="kap_ay")
             
-            # Seçilen yıl ve aya göre hedef tarihi belirliyoruz
+            # Seçilen yıl ve aya göre hedef tarihi güncelliyoruz
             hedef_tarih = date(secilen_yil, aylar_dict[secilen_ay_adi], 1)
             
-            # Eğer kullanıcı yukarıdan ay/yıl değiştirdiyse takvimin odak noktasını güncelliyoruz
+            # Session state içinde tarih takibi ve değiştiğinde rerun tetikleme
             if "kap_secilen_tarih" not in st.session_state or st.session_state.get("son_kap_yil") != secilen_yil or st.session_state.get("son_kap_ay") != secilen_ay_adi:
                 st.session_state.kap_secilen_tarih = (hedef_tarih, hedef_tarih)
                 st.session_state.son_kap_yil = secilen_yil
                 st.session_state.son_kap_ay = secilen_ay_adi
+                st.rerun()
 
             kapali_aralik = st.date_input(
                 "Kapatılacak Tarih Aralığı Seçiniz", 
@@ -410,6 +411,7 @@ elif menu == "Yönetici Paneli (Fiyat & Takvim)":
                 st.session_state.kamp_secilen_tarih = (hedef_tarih_k, hedef_tarih_k)
                 st.session_state.son_kamp_yil = secilen_yil_k
                 st.session_state.son_kamp_ay = secilen_ay_adi_k
+                st.rerun()
 
             kampanya_aralik = st.date_input(
                 "Yüksek Fiyat Tarih Aralığı Seçiniz", 
