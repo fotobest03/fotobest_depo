@@ -7,12 +7,22 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
-# --- SAYFA YAPILANDIRMASI VE GÖRÜNÜM AYARI ---
-st.set_page_config(page_title="Teklif ve Fiyat Yönetimi", page_icon="📸", layout="centered")
+#--- SAYFA YAPILANDIRMASI VE GÖRÜNÜM AYARI ---
+st.set_page_config(page_title="Teklif ve Fiyat Yönetimi", page_icon="", layout="centered")
 
+hide_streamlit_style = """
+<style>
+#MainMenu {visibility: hidden;}
+footer {visibility: hidden;}
+header {visibility: hidden;}
+.stAppDeployButton {display:none;}
+[data-testid="stStatusWidget"] {visibility: hidden;}
+</style>
+"""
+st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 
-# --- AYARLAR VE GİZLİ BİLGİLER ---
-GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxmRwc9IlJ9yoaMhgl2xLbRdEGgQejV_Z9cKwddtN8Pgixi8X3GkLDYpjBPlw01mjJf/exec"
+#--- AYARLAR VE GİZLİ BİLGİLER ---
+GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwi2hGL8hYkypt8-YD3yJWeQn8_1pbN-2R41ivDm60EIq43XAyaXXTCZVnvziwK-n_1/exec"
 GMAIL_KULLANICI = "afotobest@gmail.com"
 GMAIL_SIFRE = "byyewfosgesogdft"
 
@@ -21,11 +31,9 @@ def tarihi_duzelt(val):
     if not val or pd.isna(val):
         return ""
     s = str(val).strip()
-    # Eğer zaten YYYY-MM-DD formatındaysa
     if len(s) >= 10 and s[4] == '-' and s[7] == '-':
         return s[:10]
     
-    # 'Fri Nov 13 2026 00:00:00 GMT...' formatını yerel ayar hatasına takılmadan ayıklar
     parcalar = s.split()
     aylar = {'Jan': '01', 'Feb': '02', 'Mar': '03', 'Apr': '04', 'May': '05', 'Jun': '06', 
              'Jul': '07', 'Aug': '08', 'Sep': '09', 'Oct': '10', 'Nov': '11', 'Dec': '12'}
@@ -130,20 +138,22 @@ def get_campaign_dict():
                 except: pass
     return dct
 
+# Toplu Kaydetme Fonksiyonu (Silinenleri e-tablodan da uçuran, mükerrerleri önleyen yapı)
 def takvim_verilerini_kaydet():
-    # Streamlit tablosundaki mükerrer (aynı) tarihleri temizle
     if not st.session_state.kapali_df.empty:
-        st.session_state.kapali_df['Tarih'] = st.session_state.kapali_df['Tarih'].astype(str).str.split("T").str[0].str.strip()
+        st.session_state.kapali_df['Tarih'] = st.session_state.kapali_df['Tarih'].apply(tarihi_duzelt)
+        st.session_state.kapali_df = st.session_state.kapali_df[st.session_state.kapali_df['Tarih'] != ""]
         st.session_state.kapali_df = st.session_state.kapali_df.drop_duplicates(subset=["Tarih"]).reset_index(drop=True)
 
     if not st.session_state.kampanya_df.empty:
-        st.session_state.kampanya_df['Tarih'] = st.session_state.kampanya_df['Tarih'].astype(str).str.split("T").str[0].str.strip()
+        st.session_state.kampanya_df['Tarih'] = st.session_state.kampanya_df['Tarih'].apply(tarihi_duzelt)
+        st.session_state.kampanya_df = st.session_state.kampanya_df[st.session_state.kampanya_df['Tarih'] != ""]
         st.session_state.kampanya_df = st.session_state.kampanya_df.drop_duplicates(subset=["Tarih"]).reset_index(drop=True)
 
     kapali_listesi = []
     if not st.session_state.kapali_df.empty:
         for val in st.session_state.kapali_df["Tarih"]:
-            if val and val != "nan":
+            if val:
                 t_str = str(val).split("T")[0].strip()
                 if t_str and t_str not in kapali_listesi:
                     kapali_listesi.append(t_str)
@@ -154,13 +164,12 @@ def takvim_verilerini_kaydet():
         for index, row in st.session_state.kampanya_df.iterrows():
             t_val = row["Tarih"]
             o_val = row["Indirim"]
-            if t_val and str(t_val) != "nan":
+            if t_val:
                 t_str = str(t_val).split("T")[0].strip()
-                # Aynı kampanya tarihinden birden fazla varsa sadece ilkini al
                 if t_str and t_str not in eklenen_kampanya_tarihleri:
                     eklenen_kampanya_tarihleri.add(t_str)
                     kampanya_listesi.append({
-                        "tarih": t_str, 
+                        "tarih": t_str,
                         "oran": o_val
                     })
     try:
@@ -170,15 +179,15 @@ def takvim_verilerini_kaydet():
             "kampanyalar": kampanya_listesi
         })
     except: pass
-    
-# --- E-POSTA GÖNDERME ---
+
+#--- E-POSTA GÖNDERME ---
 def mail_gonder(alici_eposta, ad_soyad, telefon, email, tarih_str, detaylar, toplam_tutar):
     try:
         msg = MIMEMultipart()
         msg['From'] = GMAIL_KULLANICI
-        msg['To'] = GMAIL_KULLANICI 
-        msg['Subject'] = f"📷 Yeni Rezervasyon Talebi: {ad_soyad}"
-        govde = f"Yeni Rezervasyon:\nAd Soyad: {ad_soyad}\nTelefon: {telefon}\nTarih: {tarih_str}\nDetaylar: {detaylar}\nTutar: {toplam_tutar:,.2f} TL"
+        msg['To'] = GMAIL_KULLANICI
+        msg['Subject'] = f"Yeni Rezervasyon Talebi: {ad_soyad}"
+        govde = f"Yeni Rezervasyon:\nAd Soyad: {ad_soyad}\nTelefon: {telefon}\nTarih & Saat: {tarih_str}\nDetaylar: {detaylar}\nTutar: {toplam_tutar:,.2f} TL"
         msg.attach(MIMEText(govde, 'plain', 'utf-8'))
         server = smtplib.SMTP('smtp.gmail.com', 587)
         server.starttls()
@@ -199,35 +208,35 @@ if menu == "Müşteri Teklif Formu":
         st.image("kapak_foto.jpg", use_container_width=True)
     except:
         pass
-        
+
     ad_soyad = st.text_input("Ad Soyad *")
     telefon = st.text_input("Telefon *")
     email = st.text_input("E-Posta Adresi *")
-    
+
     kampanya_dict = get_campaign_dict()
     closed_lst = get_closed_dates_list()
-    
+
     if kampanya_dict:
         kampanya_metni = "✨ **Fiyatlarımızın Yüksek Olduğu Günler:**\n"
         for d, oran in sorted(kampanya_dict.items()):
             if d >= date.today():
                 kampanya_metni += f"- 📅 **{d.strftime('%d.%m.%Y')}** tarihte **%{oran} zamlı fiyat!**\n"
         st.info(kampanya_metni)
-        
+
     rezervasyon_tarihi = st.date_input("Çekim Tarihi Seçiniz", value=date.today(), min_value=date.today())
     
-    # --- ÇEKİM SAATİ SEÇİMİ (YENİ EKLENEN) ---
+    # Çekim Saati Seçimi
     cekim_saati = st.selectbox(
         "Çekim Saati Seçiniz *",
         ["10.00-12.00", "12.00-14.00", "14.00-16.00", "16.00-18.00"]
     )
-    
+
     tarih_kapali_mi = rezervasyon_tarihi in closed_lst
     kampanya_orani = kampanya_dict.get(rezervasyon_tarihi, 0)
-    
+
     if tarih_kapali_mi:
         st.error(f"⚠️ Seçtiğiniz tarih ({rezervasyon_tarihi.strftime('%d.%m.%Y')}) doludur.")
-        
+
     df_prices = st.session_state.prices_df
     ana_album_opts = df_prices[df_prices['Kategori'] == 'Ana Albüm']
     album_opts = df_prices[df_prices['Kategori'] == 'Aile Albümü']
@@ -235,14 +244,14 @@ if menu == "Müşteri Teklif Formu":
     poz_opts = df_prices[df_prices['Kategori'] == 'Poz Sayısı']
     mekan_opts = df_prices[df_prices['Kategori'] == 'Çekim Mekanı']
     klip_opts = df_prices[df_prices['Kategori'] == 'Dış Çekim Klibi']
-    
+
     secilen_ana_album = st.selectbox("Ana Albüm", ana_album_opts['Secenek'].tolist()) if not ana_album_opts.empty else ""
     secilen_album = st.selectbox("Aile Albümü", album_opts['Secenek'].tolist()) if not album_opts.empty else ""
     secilen_tablo = st.selectbox("Tablo Seçimi", tablo_opts['Secenek'].tolist()) if not tablo_opts.empty else ""
     secilen_poz = st.selectbox("Albüm İçi Poz Sayısı", poz_opts['Secenek'].tolist()) if not poz_opts.empty else ""
     secilen_mekan = st.selectbox("Çekim Mekanı", mekan_opts['Secenek'].tolist()) if not mekan_opts.empty else ""
     secilen_klip = st.radio("Dış Çekim Klibi İstiyorum", klip_opts['Secenek'].tolist()) if not klip_opts.empty else ""
-    
+
     try:
         f_ana_album = float(ana_album_opts[ana_album_opts['Secenek'] == secilen_ana_album]['Fiyat'].values[0]) if secilen_ana_album else 0.0
         f_album = float(album_opts[album_opts['Secenek'] == secilen_album]['Fiyat'].values[0]) if secilen_album else 0.0
@@ -252,16 +261,16 @@ if menu == "Müşteri Teklif Formu":
         f_klip = float(klip_opts[klip_opts['Secenek'] == secilen_klip]['Fiyat'].values[0]) if secilen_klip else 0.0
     except:
         f_ana_album = f_album = f_tablo = f_poz = f_mekan = f_klip = 0.0
-        
+
     ham_tutar = f_ana_album + f_album + f_tablo + f_poz + f_mekan + f_klip
     toplam_tutar = ham_tutar
-    
+
     if kampanya_orani > 0:
         toplam_tutar = ham_tutar * (1 + kampanya_orani / 100)
         st.success(f"🎉 Bu tarihte **%{kampanya_orani} daha yüksek** fiyat!")
-        
+
     st.markdown(f"### **Toplam Tutar: {toplam_tutar:,.2f} TL**")
-    
+
     if st.button("Teklifi Gönder ve Kaydet"):
         if tarih_kapali_mi:
             st.error("Kapalı tarih!")
@@ -271,7 +280,6 @@ if menu == "Müşteri Teklif Formu":
             t_str = rezervasyon_tarihi.strftime('%d.%m.%Y')
             detaylar = f"{secilen_ana_album} | {secilen_album} | {secilen_tablo}"
             
-            # E-tabloya gönderilecek verilere saat eklendi
             veri = {
                 "tarih": t_str, 
                 "saat": cekim_saati, 
@@ -284,22 +292,20 @@ if menu == "Müşteri Teklif Formu":
             
             try:
                 requests.post(GOOGLE_SCRIPT_URL, json=veri)
-            except: 
-                pass
-                
+            except: pass
+            
             mail_gonder(email, ad_soyad, telefon, email, f"{t_str} (Saat: {cekim_saati})", detaylar, toplam_tutar)
             st.success("Rezervasyon alındı!")
             st.balloons()
 
 # ================= YÖNETİCİ PANELİ =================
 elif menu == "Yönetici Paneli (Fiyat & Takvim)":
-    st.title("🔒 Yönetici Paneli")
+    st.title("🔑 Yönetici Paneli")
     password = st.text_input("Yönetici Şifresi", type="password")
-    
+
     if password == "12345":
         st.success("Giriş Başarılı!")
-        
-        if st.button("🔄 E-Tablodan Verileri Al / Yenile"):
+        if st.button("E-Tablodan Verileri Al / Yenile"):
             f_df, k_df, kam_df = verileri_tablodan_getir()
             st.session_state.prices_df = f_df
             st.session_state.kapali_df = k_df
@@ -308,7 +314,7 @@ elif menu == "Yönetici Paneli (Fiyat & Takvim)":
             st.rerun()
 
         tab1, tab2, tab3 = st.tabs(["💰 Fiyat Yönetimi", "📅 Kapalı Tarihler", "🎉 Yüksek Fiyatlı Tarihler"])
-        
+
         with tab1:
             edited_df = st.data_editor(st.session_state.prices_df, num_rows="dynamic", use_container_width=True)
             if st.button("Fiyatları Güncelle"):
@@ -321,11 +327,9 @@ elif menu == "Yönetici Paneli (Fiyat & Takvim)":
 
         with tab2:
             st.subheader("Kapalı Tarih Ayarları")
-            # Tarih aralığı seçimi için başlangıç ve bitiş tuple veriyoruz
             kapali_aralik = st.date_input("Kapatılacak Tarih Aralığı Seçiniz", value=(date.today(), date.today()), min_value=date.today(), key="kap_aralik_sec")
             
             if st.button("Seçilen Tarih Aralığını Kapat"):
-                # Kullanıcı tek gün veya aralık seçmiş olabilir, her iki durumu da yönetiyoruz
                 if isinstance(kapali_aralik, tuple) and len(kapali_aralik) == 2:
                     baslangic, bitis = kapali_aralik
                 else:
@@ -334,7 +338,6 @@ elif menu == "Yönetici Paneli (Fiyat & Takvim)":
                 delta = bitis - baslangic
                 eklenen_sayisi = 0
                 
-                # Başlangıç ve bitiş arasındaki tüm günleri döngüye alıyoruz
                 for i in range(delta.days + 1):
                     gun = baslangic + timedelta(days=i)
                     t_str = gun.strftime('%Y-%m-%d')
@@ -356,9 +359,9 @@ elif menu == "Yönetici Paneli (Fiyat & Takvim)":
                 st.session_state.kapali_df = pd.DataFrame(columns=["Tarih"])
             else:
                 st.session_state.kapali_df['Tarih'] = st.session_state.kapali_df['Tarih'].apply(tarihi_duzelt)
-                
+
             edited_kapali_df = st.data_editor(st.session_state.kapali_df, num_rows="dynamic", use_container_width=True, key="editor_kapali")
-            
+
             if st.button("Kapalı Tarihleri Güncelle"):
                 st.session_state.kapali_df = edited_kapali_df
                 try:
@@ -370,10 +373,8 @@ elif menu == "Yönetici Paneli (Fiyat & Takvim)":
         with tab3:
             st.subheader("Fiyat Ayarları")
             indirim = st.number_input("Yüksek Fiyat Oranı (%)", min_value=1, max_value=99, value=10, key="kamp_ind")
-            
-            # Kampanya için de tarih aralığı seçimi ekliyoruz
             kampanya_aralik = st.date_input("Yüksek Fiyat Tarih Aralığı Seçiniz", value=(date.today(), date.today()), min_value=date.today(), key="kamp_aralik_sec")
-            
+
             if st.button("Yüksek Fiyat Aralığı Ekle ve Kaydet"):
                 if isinstance(kampanya_aralik, tuple) and len(kampanya_aralik) == 2:
                     baslangic, bitis = kampanya_aralik
@@ -387,7 +388,6 @@ elif menu == "Yönetici Paneli (Fiyat & Takvim)":
                     gun = baslangic + timedelta(days=i)
                     t_str = gun.strftime('%Y-%m-%d')
                     
-                    # Eğer bu tarih tabloda yoksa veya güncellenecekse ekle
                     mevcut_dizi = st.session_state.kampanya_df["Tarih"].values if not st.session_state.kampanya_df.empty else []
                     if t_str not in mevcut_dizi:
                         yeni_satir = pd.DataFrame([{"Tarih": t_str, "Indirim": int(indirim)}])
@@ -396,19 +396,19 @@ elif menu == "Yönetici Paneli (Fiyat & Takvim)":
                 
                 if eklenen_sayisi > 0:
                     takvim_verilerini_kaydet()
-                    st.success(f"{eklenen_sayisi} günlük kampanya aralığı kaydedildi ve E-Tabloya işlendi!")
+                    st.success(f"{eklenen_sayisi} günlük yüksek fiyat aralığı kaydedildi ve E-Tabloya işlendi!")
                     st.rerun()
                 else:
-                    st.warning("Seçilen tarih(ler) için kampanya zaten tanımlı.")
+                    st.warning("Seçilen tarih(ler) için zaten tanımlı.")
 
             st.markdown("### Yüksek Fiyatlı Tarihler ve Oranları (Tablo Yönetimi):")
             if "kampanya_df" not in st.session_state or st.session_state.kampanya_df.empty:
                 st.session_state.kampanya_df = pd.DataFrame(columns=["Tarih", "Indirim"])
             else:
                 st.session_state.kampanya_df['Tarih'] = st.session_state.kampanya_df['Tarih'].apply(tarihi_duzelt)
-                
+
             edited_kampanya_df = st.data_editor(st.session_state.kampanya_df, num_rows="dynamic", use_container_width=True, key="editor_kampanya")
-            
+
             if st.button("Kampanyaları Güncelle"):
                 st.session_state.kampanya_df = edited_kampanya_df
                 try:
@@ -416,6 +416,6 @@ elif menu == "Yönetici Paneli (Fiyat & Takvim)":
                     st.success("Kampanyalar güncellendi!")
                 except Exception as ex:
                     st.error(f"Hata: {ex}")
-                
+
     elif password != "":
         st.error("Hatalı Şifre!")
