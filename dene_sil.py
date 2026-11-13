@@ -208,10 +208,8 @@ if menu == "Müşteri Teklif Formu":
     sehir_listesi = ["Afyonkarahisar", "Ankara", "İstanbul", "İzmir", "Antalya", "Konya", "Bursa", "Eskişehir", "Diğer"]
     sehir = st.selectbox("Şehir *", ["Seçiniz..."] + sehir_listesi)
     
-    # 3 satır yüksekliğinde sipariş notu alanı (height=100)
     siparis_notu = st.text_area("Sipariş Notu", placeholder="Eklemek istediklerinizi yazabilirsiniz...", height=100)
 
-    # Üst alanların dolu olup olmadığını kontrol eden koşul
     ust_bolum_dolu = bool(ad_soyad.strip() and telefon.strip() and email.strip() and sehir != "Seçiniz...")
 
     if not ust_bolum_dolu:
@@ -220,6 +218,21 @@ if menu == "Müşteri Teklif Formu":
         st.success("✅ İletişim bilgileri alındı. Lütfen paket ve tarih seçimini tamamlayınız.")
         st.markdown("---")
 
+        # --- YENİ: DİJİTAL ÇEKİM PAKETİ SEÇENEĞİ ---
+        dijital_paket_secildi = st.checkbox("Dijital Çekim Paketi")
+        
+        secilen_mekan = ""
+        fiyat_dijital = 0.0
+
+        if dijital_paket_secildi:
+            dijital_mekan = st.selectbox("Çekim Alanı Seçiniz *", ["Afyon Merkez", "FotoBest Plato"])
+            if dijital_mekan == "Afyon Merkez":
+                fiyat_dijital = 6000.0
+                secilen_mekan = "Dijital Çekim Paketi - Afyon Merkez"
+            else:
+                fiyat_dijital = 7000.0
+                secilen_mekan = "Dijital Çekim Paketi - FotoBest Plato"
+        
         kampanya_dict = get_campaign_dict()
         closed_lst = get_closed_dates_list()
 
@@ -243,32 +256,40 @@ if menu == "Müşteri Teklif Formu":
         if tarih_kapali_mi:
             st.error(f"⚠️ Seçtiğiniz tarih ({rezervasyon_tarihi.strftime('%d.%m.%Y')}) doludur.")
 
-        df_prices = st.session_state.prices_df
-        ana_album_opts = df_prices[df_prices['Kategori'] == 'Ana Albüm']
-        album_opts = df_prices[df_prices['Kategori'] == 'Aile Albümü']
-        tablo_opts = df_prices[df_prices['Kategori'] == 'Tablo Seçimi']
-        poz_opts = df_prices[df_prices['Kategori'] == 'Poz Sayısı']
-        mekan_opts = df_prices[df_prices['Kategori'] == 'Çekim Mekanı']
-        klip_opts = df_prices[df_prices['Kategori'] == 'Dış Çekim Klibi']
+        # Eğer dijital paket seçilmediyse standart albüm/paket seçeneklerini göster
+        secilen_ana_album = ""
+        secilen_album = ""
+        secilen_tablo = ""
+        ham_tutar = fiyat_dijital
 
-        secilen_ana_album = st.selectbox("Ana Albüm", ana_album_opts['Secenek'].tolist()) if not ana_album_opts.empty else ""
-        secilen_album = st.selectbox("Aile Albümü", album_opts['Secenek'].tolist()) if not album_opts.empty else ""
-        secilen_tablo = st.selectbox("Tablo Seçimi", tablo_opts['Secenek'].tolist()) if not tablo_opts.empty else ""
-        secilen_poz = st.selectbox("Albüm İçi Poz Sayısı", poz_opts['Secenek'].tolist()) if not poz_opts.empty else ""
-        secilen_mekan = st.selectbox("Çekim Mekanı", mekan_opts['Secenek'].tolist()) if not mekan_opts.empty else ""
-        secilen_klip = st.radio("Dış Çekim Klibi İstiyorum", klip_opts['Secenek'].tolist()) if not klip_opts.empty else ""
+        if not dijital_paket_secildi:
+            df_prices = st.session_state.prices_df
+            ana_album_opts = df_prices[df_prices['Kategori'] == 'Ana Albüm']
+            album_opts = df_prices[df_prices['Kategori'] == 'Aile Albümü']
+            tablo_opts = df_prices[df_prices['Kategori'] == 'Tablo Seçimi']
+            poz_opts = df_prices[df_prices['Kategori'] == 'Poz Sayısı']
+            mekan_opts = df_prices[df_prices['Kategori'] == 'Çekim Mekanı']
+            klip_opts = df_prices[df_prices['Kategori'] == 'Dış Çekim Klibi']
 
-        try:
-            f_ana_album = float(ana_album_opts[ana_album_opts['Secenek'] == secilen_ana_album]['Fiyat'].values[0]) if secilen_ana_album else 0.0
-            f_album = float(album_opts[album_opts['Secenek'] == secilen_album]['Fiyat'].values[0]) if secilen_album else 0.0
-            f_tablo = float(tablo_opts[tablo_opts['Secenek'] == secilen_tablo]['Fiyat'].values[0]) if secilen_tablo else 0.0
-            f_poz = float(poz_opts[poz_opts['Secenek'] == secilen_poz]['Fiyat'].values[0]) if secilen_poz else 0.0
-            f_mekan = float(mekan_opts[mekan_opts['Secenek'] == secilen_mekan]['Fiyat'].values[0]) if secilen_mekan else 0.0
-            f_klip = float(klip_opts[klip_opts['Secenek'] == secilen_klip]['Fiyat'].values[0]) if secilen_klip else 0.0
-        except:
-            f_ana_album = f_album = f_tablo = f_poz = f_mekan = f_klip = 0.0
+            secilen_ana_album = st.selectbox("Ana Albüm", ana_album_opts['Secenek'].tolist()) if not ana_album_opts.empty else ""
+            secilen_album = st.selectbox("Aile Albümü", album_opts['Secenek'].tolist()) if not album_opts.empty else ""
+            secilen_tablo = st.selectbox("Tablo Seçimi", tablo_opts['Secenek'].tolist()) if not tablo_opts.empty else ""
+            secilen_poz = st.selectbox("Albüm İçi Poz Sayısı", poz_opts['Secenek'].tolist()) if not poz_opts.empty else ""
+            secilen_mekan = st.selectbox("Çekim Mekanı", mekan_opts['Secenek'].tolist()) if not mekan_opts.empty else ""
+            secilen_klip = st.radio("Dış Çekim Klibi İstiyorum", klip_opts['Secenek'].tolist()) if not klip_opts.empty else ""
 
-        ham_tutar = f_ana_album + f_album + f_tablo + f_poz + f_mekan + f_klip
+            try:
+                f_ana_album = float(ana_album_opts[ana_album_opts['Secenek'] == secilen_ana_album]['Fiyat'].values[0]) if secilen_ana_album else 0.0
+                f_album = float(album_opts[album_opts['Secenek'] == secilen_album]['Fiyat'].values[0]) if secilen_album else 0.0
+                f_tablo = float(tablo_opts[tablo_opts['Secenek'] == secilen_tablo]['Fiyat'].values[0]) if secilen_tablo else 0.0
+                f_poz = float(poz_opts[poz_opts['Secenek'] == secilen_poz]['Fiyat'].values[0]) if secilen_poz else 0.0
+                f_mekan = float(mekan_opts[mekan_opts['Secenek'] == secilen_mekan]['Fiyat'].values[0]) if secilen_mekan else 0.0
+                f_klip = float(klip_opts[klip_opts['Secenek'] == secilen_klip]['Fiyat'].values[0]) if secilen_klip else 0.0
+            except:
+                f_ana_album = f_album = f_tablo = f_poz = f_mekan = f_klip = 0.0
+
+            ham_tutar = f_ana_album + f_album + f_tablo + f_poz + f_mekan + f_klip
+
         toplam_tutar = ham_tutar
 
         if kampanya_orani > 0:
@@ -282,7 +303,11 @@ if menu == "Müşteri Teklif Formu":
                 st.error("Kapalı tarih!")
             else:
                 t_str = rezervasyon_tarihi.strftime('%d.%m.%Y')
-                detaylar = f"{secilen_ana_album} | {secilen_album} | {secilen_tablo}"
+                
+                if dijital_paket_secildi:
+                    detaylar = secilen_mekan
+                else:
+                    detaylar = f"{secilen_ana_album} | {secilen_album} | {secilen_tablo}"
                 
                 veri = {
                     "tarih": t_str, 
