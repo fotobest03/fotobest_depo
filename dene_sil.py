@@ -172,13 +172,13 @@ def takvim_verilerini_kaydet():
     except: pass
 
 #--- E-POSTA GÖNDERME ---
-def mail_gonder(alici_eposta, ad_soyad, telefon, email, tarih_str, detaylar, toplam_tutar):
+def mail_gonder(alici_eposta, ad_soyad, telefon, sehir, siparis_notu, tarih_str, detaylar, toplam_tutar):
     try:
         msg = MIMEMultipart()
         msg['From'] = GMAIL_KULLANICI
         msg['To'] = GMAIL_KULLANICI
         msg['Subject'] = f"Yeni Rezervasyon Talebi: {ad_soyad}"
-        govde = f"Yeni Rezervasyon:\nAd Soyad: {ad_soyad}\nTelefon: {telefon}\nTarih & Saat: {tarih_str}\nDetaylar: {detaylar}\nTutar: {toplam_tutar:,.2f} TL"
+        govde = f"Yeni Rezervasyon:\nAd Soyad: {ad_soyad}\nTelefon: {telefon}\nŞehir: {sehir}\nSipariş Notu: {siparis_notu}\nTarih & Saat: {tarih_str}\nDetaylar: {detaylar}\nTutar: {toplam_tutar:,.2f} TL"
         msg.attach(MIMEText(govde, 'plain', 'utf-8'))
         server = smtplib.SMTP('smtp.gmail.com', 587)
         server.starttls()
