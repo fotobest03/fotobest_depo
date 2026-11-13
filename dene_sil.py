@@ -13,7 +13,7 @@ st.set_page_config(page_title="Teklif ve Fiyat Yönetimi", page_icon="", layout=
 
 
 #--- AYARLAR VE GİZLİ BİLGİLER ---
-GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwjPfzt9sBU8XBJDjtzVIOgaQOTqdOKuhxbGyI6sWA9HXcr7H4BMICAldS8SeneKnXS/exec"
+GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw8cuRim-zolXECVOWFrZ20wpf4TtqccNx4YjNfzlqpCqiS7XO54siAt7nY0oF8YW0X/exec"
 GMAIL_KULLANICI = "afotobest@gmail.com"
 GMAIL_SIFRE = "byyewfosgesogdft"
 
@@ -300,7 +300,7 @@ if menu == "Müşteri Teklif Formu":
                     requests.post(GOOGLE_SCRIPT_URL, json=veri)
                 except: pass
                 
-                mail_gonder(email, ad_soyad, telefon, email, sehir, siparis_notu, f"{t_str} (Saat: {cekim_saati})", detaylar, toplam_tutar)
+                mail_gonder(email, ad_soyad, telefon, sehir, siparis_notu, f"{t_str} (Saat: {cekim_saati})", detaylar, toplam_tutar)
                 st.success("Rezervasyon alındı!")
                 st.balloons()
 
