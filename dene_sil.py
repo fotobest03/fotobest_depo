@@ -13,7 +13,7 @@ st.set_page_config(page_title="Teklif ve Fiyat Yönetimi", page_icon="", layout=
 
 
 #--- AYARLAR VE GİZLİ BİLGİLER ---
-GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwi2hGL8hYkypt8-YD3yJWeQn8_1pbN-2R41ivDm60EIq43XAyaXXTCZVnvziwK-n_1/exec"
+GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwjPfzt9sBU8XBJDjtzVIOgaQOTqdOKuhxbGyI6sWA9HXcr7H4BMICAldS8SeneKnXS/exec"
 GMAIL_KULLANICI = "afotobest@gmail.com"
 GMAIL_SIFRE = "byyewfosgesogdft"
 
@@ -200,94 +200,109 @@ if menu == "Müşteri Teklif Formu":
     except:
         pass
 
+    # Üst Bölüm: İletişim, Şehir ve Sipariş Notu
     ad_soyad = st.text_input("Ad Soyad *")
     telefon = st.text_input("Telefon *")
     email = st.text_input("E-Posta Adresi *")
-
-    kampanya_dict = get_campaign_dict()
-    closed_lst = get_closed_dates_list()
-
-    if kampanya_dict:
-        kampanya_metni = "✨ **Fiyatlarımızın Yüksek Olduğu Günler:**\n"
-        for d, oran in sorted(kampanya_dict.items()):
-            if d >= date.today():
-                kampanya_metni += f"- 📅 **{d.strftime('%d.%m.%Y')}** tarihte **%{oran} zamlı fiyat!**\n"
-        st.info(kampanya_metni)
-
-    rezervasyon_tarihi = st.date_input("Çekim Tarihi Seçiniz", value=date.today(), min_value=date.today())
     
-    # Çekim Saati Seçimi
-    cekim_saati = st.selectbox(
-        "Çekim Saati Seçiniz *",
-        ["10.00-12.00", "12.00-14.00", "14.00-16.00", "16.00-18.00"]
-    )
+    sehir_listesi = ["Afyonkarahisar", "Ankara", "İstanbul", "İzmir", "Antalya", "Konya", "Bursa", "Eskişehir", "Diğer"]
+    sehir = st.selectbox("Şehir *", ["Seçiniz..."] + sehir_listesi)
+    
+    # 3 satır yüksekliğinde sipariş notu alanı (height=100)
+    siparis_notu = st.text_area("Sipariş Notu", placeholder="Eklemek istediklerinizi yazabilirsiniz...", height=100)
 
-    tarih_kapali_mi = rezervasyon_tarihi in closed_lst
-    kampanya_orani = kampanya_dict.get(rezervasyon_tarihi, 0)
+    # Üst alanların dolu olup olmadığını kontrol eden koşul
+    ust_bolum_dolu = bool(ad_soyad.strip() and telefon.strip() and email.strip() and sehir != "Seçiniz...")
 
-    if tarih_kapali_mi:
-        st.error(f"⚠️ Seçtiğiniz tarih ({rezervasyon_tarihi.strftime('%d.%m.%Y')}) doludur.")
+    if not ust_bolum_dolu:
+        st.info("ℹ️ Lütfen yukarıdaki zorunlu alanları (`Ad Soyad`, `Telefon`, `E-Posta`, `Şehir`) doldurunuz. Formun devamı bu alanlar doldurulduktan sonra açılacaktır.")
+    else:
+        st.success("✅ İletişim bilgileri alındı. Lütfen paket ve tarih seçimini tamamlayınız.")
+        st.markdown("---")
 
-    df_prices = st.session_state.prices_df
-    ana_album_opts = df_prices[df_prices['Kategori'] == 'Ana Albüm']
-    album_opts = df_prices[df_prices['Kategori'] == 'Aile Albümü']
-    tablo_opts = df_prices[df_prices['Kategori'] == 'Tablo Seçimi']
-    poz_opts = df_prices[df_prices['Kategori'] == 'Poz Sayısı']
-    mekan_opts = df_prices[df_prices['Kategori'] == 'Çekim Mekanı']
-    klip_opts = df_prices[df_prices['Kategori'] == 'Dış Çekim Klibi']
+        kampanya_dict = get_campaign_dict()
+        closed_lst = get_closed_dates_list()
 
-    secilen_ana_album = st.selectbox("Ana Albüm", ana_album_opts['Secenek'].tolist()) if not ana_album_opts.empty else ""
-    secilen_album = st.selectbox("Aile Albümü", album_opts['Secenek'].tolist()) if not album_opts.empty else ""
-    secilen_tablo = st.selectbox("Tablo Seçimi", tablo_opts['Secenek'].tolist()) if not tablo_opts.empty else ""
-    secilen_poz = st.selectbox("Albüm İçi Poz Sayısı", poz_opts['Secenek'].tolist()) if not poz_opts.empty else ""
-    secilen_mekan = st.selectbox("Çekim Mekanı", mekan_opts['Secenek'].tolist()) if not mekan_opts.empty else ""
-    secilen_klip = st.radio("Dış Çekim Klibi İstiyorum", klip_opts['Secenek'].tolist()) if not klip_opts.empty else ""
+        if kampanya_dict:
+            kampanya_metni = "✨ **Fiyatlarımızın Yüksek Olduğu Günler:**\n"
+            for d, oran in sorted(kampanya_dict.items()):
+                if d >= date.today():
+                    kampanya_metni += f"- 📅 **{d.strftime('%d.%m.%Y')}** tarihte **%{oran} zamlı fiyat!**\n"
+            st.info(kampanya_metni)
 
-    try:
-        f_ana_album = float(ana_album_opts[ana_album_opts['Secenek'] == secilen_ana_album]['Fiyat'].values[0]) if secilen_ana_album else 0.0
-        f_album = float(album_opts[album_opts['Secenek'] == secilen_album]['Fiyat'].values[0]) if secilen_album else 0.0
-        f_tablo = float(tablo_opts[tablo_opts['Secenek'] == secilen_tablo]['Fiyat'].values[0]) if secilen_tablo else 0.0
-        f_poz = float(poz_opts[poz_opts['Secenek'] == secilen_poz]['Fiyat'].values[0]) if secilen_poz else 0.0
-        f_mekan = float(mekan_opts[mekan_opts['Secenek'] == secilen_mekan]['Fiyat'].values[0]) if secilen_mekan else 0.0
-        f_klip = float(klip_opts[klip_opts['Secenek'] == secilen_klip]['Fiyat'].values[0]) if secilen_klip else 0.0
-    except:
-        f_ana_album = f_album = f_tablo = f_poz = f_mekan = f_klip = 0.0
+        rezervasyon_tarihi = st.date_input("Çekim Tarihi Seçiniz", value=date.today(), min_value=date.today())
+        
+        cekim_saati = st.selectbox(
+            "Çekim Saati Seçiniz *",
+            ["10.00-12.00", "12.00-14.00", "14.00-16.00", "16.00-18.00"]
+        )
 
-    ham_tutar = f_ana_album + f_album + f_tablo + f_poz + f_mekan + f_klip
-    toplam_tutar = ham_tutar
+        tarih_kapali_mi = rezervasyon_tarihi in closed_lst
+        kampanya_orani = kampanya_dict.get(rezervasyon_tarihi, 0)
 
-    if kampanya_orani > 0:
-        toplam_tutar = ham_tutar * (1 + kampanya_orani / 100)
-        st.success(f"🎉 Bu tarihte **%{kampanya_orani} daha yüksek** fiyat!")
-
-    st.markdown(f"### **Toplam Tutar: {toplam_tutar:,.2f} TL**")
-
-    if st.button("Teklifi Gönder ve Kaydet"):
         if tarih_kapali_mi:
-            st.error("Kapalı tarih!")
-        elif not ad_soyad or not telefon or not email:
-            st.warning("Bilgileri doldurun.")
-        else:
-            t_str = rezervasyon_tarihi.strftime('%d.%m.%Y')
-            detaylar = f"{secilen_ana_album} | {secilen_album} | {secilen_tablo}"
-            
-            veri = {
-                "tarih": t_str, 
-                "saat": cekim_saati, 
-                "ad_soyad": ad_soyad, 
-                "telefon": telefon, 
-                "email": email, 
-                "detaylar": detaylar, 
-                "tutar": f"{toplam_tutar:,.2f} TL"
-            }
-            
-            try:
-                requests.post(GOOGLE_SCRIPT_URL, json=veri)
-            except: pass
-            
-            mail_gonder(email, ad_soyad, telefon, email, f"{t_str} (Saat: {cekim_saati})", detaylar, toplam_tutar)
-            st.success("Rezervasyon alındı!")
-            st.balloons()
+            st.error(f"⚠️ Seçtiğiniz tarih ({rezervasyon_tarihi.strftime('%d.%m.%Y')}) doludur.")
+
+        df_prices = st.session_state.prices_df
+        ana_album_opts = df_prices[df_prices['Kategori'] == 'Ana Albüm']
+        album_opts = df_prices[df_prices['Kategori'] == 'Aile Albümü']
+        tablo_opts = df_prices[df_prices['Kategori'] == 'Tablo Seçimi']
+        poz_opts = df_prices[df_prices['Kategori'] == 'Poz Sayısı']
+        mekan_opts = df_prices[df_prices['Kategori'] == 'Çekim Mekanı']
+        klip_opts = df_prices[df_prices['Kategori'] == 'Dış Çekim Klibi']
+
+        secilen_ana_album = st.selectbox("Ana Albüm", ana_album_opts['Secenek'].tolist()) if not ana_album_opts.empty else ""
+        secilen_album = st.selectbox("Aile Albümü", album_opts['Secenek'].tolist()) if not album_opts.empty else ""
+        secilen_tablo = st.selectbox("Tablo Seçimi", tablo_opts['Secenek'].tolist()) if not tablo_opts.empty else ""
+        secilen_poz = st.selectbox("Albüm İçi Poz Sayısı", poz_opts['Secenek'].tolist()) if not poz_opts.empty else ""
+        secilen_mekan = st.selectbox("Çekim Mekanı", mekan_opts['Secenek'].tolist()) if not mekan_opts.empty else ""
+        secilen_klip = st.radio("Dış Çekim Klibi İstiyorum", klip_opts['Secenek'].tolist()) if not klip_opts.empty else ""
+
+        try:
+            f_ana_album = float(ana_album_opts[ana_album_opts['Secenek'] == secilen_ana_album]['Fiyat'].values[0]) if secilen_ana_album else 0.0
+            f_album = float(album_opts[album_opts['Secenek'] == secilen_album]['Fiyat'].values[0]) if secilen_album else 0.0
+            f_tablo = float(tablo_opts[tablo_opts['Secenek'] == secilen_tablo]['Fiyat'].values[0]) if secilen_tablo else 0.0
+            f_poz = float(poz_opts[poz_opts['Secenek'] == secilen_poz]['Fiyat'].values[0]) if secilen_poz else 0.0
+            f_mekan = float(mekan_opts[mekan_opts['Secenek'] == secilen_mekan]['Fiyat'].values[0]) if secilen_mekan else 0.0
+            f_klip = float(klip_opts[klip_opts['Secenek'] == secilen_klip]['Fiyat'].values[0]) if secilen_klip else 0.0
+        except:
+            f_ana_album = f_album = f_tablo = f_poz = f_mekan = f_klip = 0.0
+
+        ham_tutar = f_ana_album + f_album + f_tablo + f_poz + f_mekan + f_klip
+        toplam_tutar = ham_tutar
+
+        if kampanya_orani > 0:
+            toplam_tutar = ham_tutar * (1 + kampanya_orani / 100)
+            st.success(f"🎉 Bu tarihte **%{kampanya_orani} daha yüksek** fiyat!")
+
+        st.markdown(f"### **Toplam Tutar: {toplam_tutar:,.2f} TL**")
+
+        if st.button("Teklifi Gönder ve Kaydet"):
+            if tarih_kapali_mi:
+                st.error("Kapalı tarih!")
+            else:
+                t_str = rezervasyon_tarihi.strftime('%d.%m.%Y')
+                detaylar = f"{secilen_ana_album} | {secilen_album} | {secilen_tablo}"
+                
+                veri = {
+                    "tarih": t_str, 
+                    "saat": cekim_saati, 
+                    "ad_soyad": ad_soyad, 
+                    "telefon": telefon, 
+                    "email": email, 
+                    "sehir": sehir,
+                    "siparis_notu": siparis_notu,
+                    "detaylar": detaylar, 
+                    "tutar": f"{toplam_tutar:,.2f} TL"
+                }
+                
+                try:
+                    requests.post(GOOGLE_SCRIPT_URL, json=veri)
+                except: pass
+                
+                mail_gonder(email, ad_soyad, telefon, email, sehir, siparis_notu, f"{t_str} (Saat: {cekim_saati})", detaylar, toplam_tutar)
+                st.success("Rezervasyon alındı!")
+                st.balloons()
 
 # ================= YÖNETİCİ PANELİ =================
 elif menu == "Yönetici Paneli (Fiyat & Takvim)":
