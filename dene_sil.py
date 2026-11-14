@@ -48,16 +48,6 @@ if st.session_state.get("yonetim_menu_acik", False):
                 st.session_state.yonetim_menu_acik = False
                 st.rerun()
 
-# --- 2. ALT KISIMDA 2 ADET YAN YANA İNSTAGRAM BUTONU ---
-col_ig1, col_ig2 = st.columns(2)
-
-with col_ig1:
-    st.link_button("📸 Foto Best IG", "https://www.instagram.com/fotobestofficial?utm_source=qr", use_container_width=True)
-
-with col_ig2:
-    st.link_button("🏛️ Plato IG", "https://www.instagram.com/afyoncekimplatosu?utm_source=qr", use_container_width=True)
-
-st.markdown("<br>", unsafe_allow_html=True)
 #--- SAYFA YAPILANDIRMASI VE GÖRÜNÜM AYARI ---
 st.set_page_config(page_title="Teklif ve Fiyat Yönetimi", page_icon="", layout="centered")
 
@@ -333,7 +323,17 @@ if menu == "Müşteri Teklif Formu":
         st.markdown('</div>', unsafe_allow_html=True)
     except Exception as e:
         st.warning("Kapak fotoğrafı yüklenemedi, dosya adını kontrol edin.")
+        
+    # --- 2. ALT KISIMDA 2 ADET YAN YANA İNSTAGRAM BUTONU ---
+    col_ig1, col_ig2 = st.columns(2)
 
+    with col_ig1:
+        st.link_button("📸 Foto Best IG", "https://www.instagram.com/fotobestofficial?utm_source=qr", use_container_width=True)
+
+    with col_ig2:
+        st.link_button("🏛️ Plato IG", "https://www.instagram.com/afyoncekimplatosu?utm_source=qr", use_container_width=True)
+
+    st.markdown("<br>", unsafe_allow_html=True)
     
     # --- 2. HAKKIMIZDA BİLGİ KARTI (Sade ve Hatasız) ---
     st.markdown("""
