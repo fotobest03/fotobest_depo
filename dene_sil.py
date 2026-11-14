@@ -6,17 +6,6 @@ import json
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-# --- 1. EN ÜST SAĞ KÖŞEDE MİNİ YÖNETİM BUTONU (≡) ---
-col_bos, col_yonet = st.columns([11, 1])
-
-with col_yonet:
-    if "yonetim_menu_acik" not in st.session_state:
-        st.session_state.yonetim_menu_acik = False
-    
-    # Sağ üst köşede sade 3 çizgi menü butonu
-    if st.button("≡", use_container_width=True, help="Yönetici Girişi"):
-        st.session_state.yonetim_menu_acik = not st.session_state.yonetim_menu_acik
-        st.rerun()
 
 # --- SAĞ ÜST KÖŞEDE MİNİ YÖNETİM MENÜSÜ (POP-OVER İLE BOŞLUKSUZ ÇÖZÜM) ---
 col_bos, col_yonet = st.columns([11, 1])
