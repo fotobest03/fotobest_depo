@@ -195,44 +195,67 @@ menu = st.sidebar.radio("Sayfa Seçin", ["Müşteri Teklif Formu", "Yönetici Pa
 # ================= MÜŞTERİ FORMU =================
 if menu == "Müşteri Teklif Formu":
     
-    # --- KAPAK GÖRSELİ VE ÖZEL STİL ---
+    # --- MÜKEMMEL DÜZEN: FOTOĞRAF TAM GENİŞLİK, FORM ORTALANMIŞ ---
     st.markdown("""
         <style>
-            /* Streamlit üst boşluğunu daraltıp görseli tepeye oturtuyoruz */
             .block-container {
-                padding-top: 1rem !important;
+                padding-top: 0rem !important;
+                padding-left: 1rem !important;
+                padding-right: 1rem !important;
+                max-width: 750px !important;
+                margin: 0 auto;
             }
-            .cover-box {
-                width: 100%;
-                border-radius: 12px;
-                overflow: hidden;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            
+            header {visibility: hidden;}
+
+            .full-width-banner {
+                width: 100vw !important;
+                position: relative;
+                left: 50vw;
+                right: 50vw;
+                margin-left: -50vw;
+                margin-right: -50vw;
                 margin-bottom: 25px;
+            }
+            .full-width-banner img {
+                width: 100% !important;
+                height: auto;
+                display: block;
+                max-height: 380px;
+                object-fit: cover;
             }
         </style>
     """, unsafe_allow_html=True)
 
-    # Kapak fotoğrafını tam genişlikte ve şık çerçeveyle ekleme
+    # --- 1. KAPAK GÖRSELİ (Yatayda Full) ---
     try:
-        st.markdown('<div class="cover-box">', unsafe_allow_html=True)
+        st.markdown('<div class="full-width-banner">', unsafe_allow_html=True)
         st.image("kapak_foto.jpeg", use_container_width=True)
         st.markdown('</div>', unsafe_allow_html=True)
     except Exception as e:
         st.warning("Kapak fotoğrafı yüklenemedi, dosya adını kontrol edin.")
-    print("""Hakkımızda! 
-Afyonkarahisar merkezde hizmet veren Foto Best, yılların deneyimini modern teknolojiler ve sanatsal bir bakış açısıyla buluşturuyor. Bireysel ve kurumsal tüm fotoğrafçılık ihtiyaçlarınıza profesyonel çözümler sunuyoruz.
 
-Hizmetlerimiz:
+    # --- 2. HAKKIMIZDA BİLGİ KARTI (Görselin altı, formun üstü) ---
+    st.markdown("""
+        <div style="background-color: #f8fbff; padding: 22px; border-radius: 12px; border-left: 6px solid #0066cc; border: 1px solid #d0e3ff; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
+            <h3 style="color: #004080; margin-top: 0; margin-bottom: 12px; font-size: 20px;">✨ Hakkımızda</h3>
+            <p style="color: #333333; font-size: 14px; line-height: 1.6; margin-bottom: 15px;">
+                Afyonkarahisar merkezde hizmet veren <b>Foto Best</b>, yılların deneyimini modern teknolojiler ve sanatsal bir bakış açısıyla buluşturuyor. Bireysel ve kurumsal tüm fotoğrafçılık ihtiyaçlarınıza profesyonel çözümler sunuyoruz.
+            </p>
+            <h4 style="color: #004080; font-size: 16px; margin-bottom: 8px;">Hizmetlerimiz:</h4>
+            <ul style="color: #333333; font-size: 14px; line-height: 1.5; margin-bottom: 15px; padding-left: 20px;">
+                <li><b>Özel Gün Çekimleri:</b> Düğün, nişan, kına, söz ve sünnet organizasyonlarında en mutlu anlarınızı özenle ölümsüzleştiriyoruz.</li>
+                <li><b>Dış Mekan & Konsept:</b> Şehiriçi ve Şehirdışı gibi tarihi ve doğal mekanlarda özgün çekimler gerçekleştiriyoruz.</li>
+                <li><b>Stüdyo Portreleri:</b> Vesikalık, biyometrik, aile portrelerinin yanı sıra yenidoğan ve bebek konsept çekimleri yapıyoruz.</li>
+                <li><b>Kurumsal & Ticari Çözümler:</b> Ürün, menü, katalog ve sosyal medya görselleriyle markanızın dijital kimliğini güçlendiriyoruz.</li>
+            </ul>
+            <p style="color: #555555; font-size: 13px; font-style: italic; margin-bottom: 0;">
+                Her bütçeye uygun esnek paketlerimiz ve dönemsel kampanyalarımız hakkında bilgi almak ve randevu oluşturmak için formu doldurarak bize hemen ulaşabilirsiniz!
+            </p>
+        </div>
+    """, unsafe_allow_html=True)
 
-*Özel Gün Çekimleri: Düğün, nişan, kına, söz ve sünnet organizasyonlarında en mutlu anlarınızı özenle ölümsüzleştiriyoruz.
-
-*Dış Mekan & Konsept: Şehiriçi ve Şehirdışı gibi tarihi ve doğal mekanlarda özgün çekimler gerçekleştiriyoruz.
-
-*Stüdyo Portreleri: Vesikalık, biyometrik, aile portrelerinin yanı sıra yenidoğan ve bebek konsept çekimleri yapıyoruz.
-
-*Kurumsal & Ticari Çözümler: Ürün, menü, katalog ve sosyal medya görselleriyle markanızın dijital kimliğini güçlendiriyoruz.
-
-Her bütçeye uygun esnek paketlerimiz ve dönemsel kampanyalarımız hakkında bilgi almak ve randevu oluşturmak için formu doldurarak bize hemen ulaşabilirsiniz! """)
+    # --- 3. FORM BAŞLIĞI VE ALANLARI ---
     st.title("📸 Çekim & Paket Teklif Formu")
     try:
         st.image("kapak_foto.jpg", use_container_width=True)
