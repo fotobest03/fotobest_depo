@@ -206,7 +206,7 @@ if menu == "Müşteri Teklif Formu":
                 margin: 0 auto;
             }
             
-            header {visibility: hidden;}
+            
 
             .full-width-banner {
                 width: 100vw !important;
