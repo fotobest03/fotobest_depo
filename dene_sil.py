@@ -7,6 +7,18 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
+
+#--- SAYFA YAPILANDIRMASI VE GÖRÜNÜM AYARI ---
+st.set_page_config(page_title="Teklif ve Fiyat Yönetimi", page_icon="", layout="centered")
+
+# --- TARAYICI SEKMESİ AYARLARI (FAVICON VE BAŞLIK) ---
+st.set_page_config(
+    page_title="Foto Best - Çekim & Paket Teklif Formu",
+    page_icon="logo.png",  # <-- Buraya logomuzun dosya adını yazıyoruz (örn: logo.jpeg, logo.png vb.)
+    layout="centered",
+    #initial_sidebar_state="auto"
+    initial_sidebar_state="collapsed"
+)
 # --- SAĞ ÜST KÖŞEDE MİNİ YÖNETİM MENÜSÜ (POP-OVER İLE BOŞLUKSUZ ÇÖZÜM) ---
 col_bos, col_yonet = st.columns([11, 1])
 
@@ -31,18 +43,7 @@ with col_yonet:
             if st.button("Oturumu Kapat", use_container_width=True, key="popover_cikis_btn"):
                 st.session_state.admin_giris = False
                 st.rerun()
-
-#--- SAYFA YAPILANDIRMASI VE GÖRÜNÜM AYARI ---
-st.set_page_config(page_title="Teklif ve Fiyat Yönetimi", page_icon="", layout="centered")
-
-# --- TARAYICI SEKMESİ AYARLARI (FAVICON VE BAŞLIK) ---
-st.set_page_config(
-    page_title="Foto Best - Çekim & Paket Teklif Formu",
-    page_icon="logo.png",  # <-- Buraya logomuzun dosya adını yazıyoruz (örn: logo.jpeg, logo.png vb.)
-    layout="centered",
-    #initial_sidebar_state="auto"
-    initial_sidebar_state="collapsed"
-)
+                
 # 1. Oturum durumunu başlatıyoruz
 if "admin_giris" not in st.session_state:
     st.session_state.admin_giris = False
