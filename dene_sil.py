@@ -318,22 +318,33 @@ if menu == "Müşteri Teklif Formu":
         st.success("✅ İletişim bilgileri doğrulandı. Lütfen paket ve tarih seçimini tamamlayınız.")
         st.markdown("---")
 
-        # --- 1. YENİ: VIP ÇEKİM PAKETİ SEÇENEĞİ (EN ÜSTTE) ---
-        st.markdown("""
+        # =========================================================================
+        # BURAYA EKLEYİN: VIP ÇEKİM PAKETİ FİYATINI TABLODAN DİNAMİK ÇEKME
+        # =========================================================================
+        df_prices = st.session_state.prices_df
+        vip_row = df_prices[df_prices['Kategori'] == 'VIP Çekim Paketi']
+        if not vip_row.empty:
+            fiyat_vip_tablo = float(vip_row['Fiyat'].values[0])
+        else:
+               fiyat_vip_tablo = 21000.0  # Tabloda bulunamazsa varsayılan değer
+        # =========================================================================
+
+        # --- 1. VIP ÇEKİM PAKETİ SEÇENEĞİ (TABLODAN DİNAMİK FİYATLI) ---
+        st.markdown(f"""
             <div style="background-color: #fdf2e9; padding: 18px; border-radius: 10px; border-left: 6px solid #e67e22; border-top: 1px solid #f5cba7; border-right: 1px solid #f5cba7; border-bottom: 1px solid #f5cba7; margin-bottom: 8px;">
                 <h4 style="color: #b9770e; margin: 0 0 8px 0; font-size: 19px;">👑 VIP Çekim Paketi</h4>
-                <p style="color: #2c3e50; margin: 0; font-size: 15px; font-weight: 500;">Özel VIP stüdyo ve dış mekan imkanlarıyla sınırsız ve ayrıcalıklı çekim deneyimi.</p>
+                <p style="color: #2c3e50; margin: 0; font-size: 15px; font-weight: 500;">Özel VIP stüdyo ve dış mekan imkanlarıyla sınırsız ve ayrıcalıklı çekim deneyimi. (Fiyat: {fiyat_vip_tablo:,.0f} TL)</p>
             </div>
         """, unsafe_allow_html=True)
 
-        vip_paket_secildi = st.checkbox("🌟 BU PAKETİ SEÇMEK İÇİN İŞARETLEYİN (VIP Çekim Paketi - 30.000 TL)")
-        
+        vip_paket_secildi = st.checkbox(f"🌟 BU PAKETİ SEÇMEK İÇİN İŞARETLEYİN (VIP Çekim Paketi - {fiyat_vip_tablo:,.0f} TL)")
+            
         fiyat_vip = 0.0
         fiyat_vip_klip = 0.0
         vip_klip_secildi = False
 
         if vip_paket_secildi:
-            fiyat_vip = 30000.0
+            fiyat_vip = fiyat_vip_tablo  # Fiyatı tablodan dinamik olarak atıyoruz!
             st.markdown("""
                 <div style="background-color: #fef9e7; padding: 18px; border-radius: 10px; border: 1px dashed #f39c12; margin: 10px 0 15px 0;">
                     <h4 style="color: #b9770e; margin: 0 0 10px 0; font-size: 16px;">👑 VIP Paket Detayları & İçeriği:</h4>
@@ -348,11 +359,12 @@ if menu == "Müşteri Teklif Formu":
                     </ul>
                 </div>
             """, unsafe_allow_html=True)
+                
             vip_klip_secildi = st.checkbox("🎬 Dış Çekim Klibi İstiyorum (+10.000 TL)")
-            st.markdown("</div>", unsafe_allow_html=True)
 
             if vip_klip_secildi:
-                fiyat_vip_klip = 10000.0
+                klip_row = df_prices[(df_prices['Kategori'] == 'Dış Çekim Klibi') & (df_prices['Secenek'] == 'Evet')]
+                fiyat_vip_klip = float(klip_row['Fiyat'].values[0]) if not klip_row.empty else 10000.0
 
         st.markdown("<br>", unsafe_allow_html=True)
 
