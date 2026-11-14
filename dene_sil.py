@@ -6,7 +6,58 @@ import json
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+# --- 1. EN ÜST SAĞ KÖŞEDE MİNİ YÖNETİM BUTONU (≡) ---
+col_bos, col_yonet = st.columns([11, 1])
 
+with col_yonet:
+    if "yonetim_menu_acik" not in st.session_state:
+        st.session_state.yonetim_menu_acik = False
+    
+    # Sağ üst köşede sade 3 çizgi menü butonu
+    if st.button("≡", use_container_width=True, help="Yönetici Girişi"):
+        st.session_state.yonetim_menu_acik = not st.session_state.yonetim_menu_acik
+        st.rerun()
+
+# --- ≡ BUTONUNA BASILDIYSA AÇILAN GENİŞ VE DÜZGÜN ŞİFRE KUTUSU ---
+if st.session_state.get("yonetim_menu_acik", False):
+    with st.container():
+        st.markdown("""
+            <div style="background-color: #f8f9fa; padding: 12px; border-radius: 8px; border: 1px solid #e0e0e0; margin-bottom: 15px;">
+                <span style="font-size: 13px; font-weight: bold; color: #444;">🔐 Yönetici Girişi</span>
+            </div>
+        """, unsafe_allow_html=True)
+        
+        col_sifre, col_giris_btn = st.columns([4, 1])
+        
+        with col_sifre:
+            sifre_input = st.text_input("Şifre", type="password", key="ust_sifre_kutusu", label_visibility="collapsed", placeholder="Yönetici şifresi...")
+            
+        with col_giris_btn:
+            if st.button("Giriş", use_container_width=True, key="ust_giris_btn"):
+                if sifre_input == "1453":  # Kendi şifreniz
+                    st.session_state.admin_giris = True
+                    st.session_state.yonetim_menu_acik = False
+                    st.success("Giriş başarılı!")
+                    st.rerun()
+                else:
+                    st.error("Hatalı!")
+                    
+        if st.session_state.admin_giris:
+            if st.button("🔓 Oturumu Kapat", use_container_width=True):
+                st.session_state.admin_giris = False
+                st.session_state.yonetim_menu_acik = False
+                st.rerun()
+
+# --- 2. ALT KISIMDA 2 ADET YAN YANA İNSTAGRAM BUTONU ---
+col_ig1, col_ig2 = st.columns(2)
+
+with col_ig1:
+    st.link_button("📸 Foto Best IG", "https://www.instagram.com/fotobestofficial?utm_source=qr", use_container_width=True)
+
+with col_ig2:
+    st.link_button("🏛️ Plato IG", "https://www.instagram.com/afyoncekimplatosu?utm_source=qr", use_container_width=True)
+
+st.markdown("<br>", unsafe_allow_html=True)
 #--- SAYFA YAPILANDIRMASI VE GÖRÜNÜM AYARI ---
 st.set_page_config(page_title="Teklif ve Fiyat Yönetimi", page_icon="", layout="centered")
 
