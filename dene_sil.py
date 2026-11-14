@@ -9,7 +9,44 @@ from email.mime.multipart import MIMEMultipart
 
 #--- SAYFA YAPILANDIRMASI VE GÖRÜNÜM AYARI ---
 st.set_page_config(page_title="Teklif ve Fiyat Yönetimi", page_icon="", layout="centered")
+st.markdown("""
+        <style>
+            .block-container {
+                padding-top: 0rem !important;
+                padding-left: 1rem !important;
+                padding-right: 1rem !important;
+                max-width: 750px !important;
+                margin: 0 auto;
+            }
+            
+            /* SADECE sağ üstteki araç çubuğunu (Share, GitHub, menü vb.) gizler */
+            header[data-testid="stHeader"] {
+                display: none !important;
+            }
+            
+            /* SADECE sağ alttaki "Manage app / Uygulamayı yönet" butonunu gizler */
+            [data-testid="stStatusWidget"] {
+                display: none !important;
+            }
 
+            .full-width-banner {
+                width: 100vw !important;
+                position: relative;
+                left: 50vw;
+                right: 50vw;
+                margin-left: -50vw;
+                margin-right: -50vw;
+                margin-bottom: 25px;
+            }
+            .full-width-banner img {
+                width: 100% !important;
+                height: auto;
+                display: block;
+                max-height: 380px;
+                object-fit: cover;
+            }
+        </style>
+    """, unsafe_allow_html=True)
 
 
 #--- AYARLAR VE GİZLİ BİLGİLER ---
