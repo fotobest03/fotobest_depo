@@ -193,33 +193,57 @@ def mail_gonder(alici_eposta, ad_soyad, telefon, sehir, siparis_notu, tarih_str,
 menu = st.sidebar.radio("Sayfa Seçin", ["Müşteri Teklif Formu", "Yönetici Paneli (Fiyat & Takvim)"])
 
 # ================= MÜŞTERİ FORMU =================
+# ================= MÜŞTERİ FORMU =================
 if menu == "Müşteri Teklif Formu":
     
-    # --- KAPAK GÖRSELİ VE ÖZEL STİL ---
+    # --- GÖRSELİ YATAYDA FULL KAPLATAN ÖZEL CSS ---
     st.markdown("""
         <style>
-            /* Streamlit üst boşluğunu daraltıp görseli tepeye oturtuyoruz */
+            /* Streamlit'in ana sayfa üst ve yan boşluklarını sıfırlıyoruz */
             .block-container {
-                padding-top: 1rem !important;
+                padding-top: 0rem !important;
+                padding-left: 0rem !important;
+                padding-right: 0rem !important;
+                max-width: 100% !important;
             }
-            .cover-box {
-                width: 100%;
-                border-radius: 12px;
-                overflow: hidden;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            
+            /* Üstteki Streamlit boşluk gizleyicileri */
+            header {visibility: hidden;}
+            
+            /* Kapak görselini tam ekran genişliğine sabitleme */
+            .full-width-banner {
+                width: 100vw;
+                position: relative;
+                left: 50%;
+                right: 50%;
+                margin-left: -50vw;
+                margin-right: -50vw;
                 margin-bottom: 25px;
+            }
+            .full-width-banner img {
+                width: 100% !important;
+                height: auto;
+                display: block;
+            }
+            
+            /* Form elemanlarının tekrar hizalı durması için iç container boşluğu */
+            .form-content {
+                padding: 0 2rem;
             }
         </style>
     """, unsafe_allow_html=True)
 
-    # Kapak fotoğrafını tam genişlikte ve şık çerçeveyle ekleme
+    # --- KAPAK GÖRSELİNİ TAM GENİŞLİKTE EKLEME ---
     try:
-        st.markdown('<div class="cover-box">', unsafe_allow_html=True)
+        st.markdown('<div class="full-width-banner">', unsafe_allow_html=True)
         st.image("kapak_foto.jpeg", use_container_width=True)
         st.markdown('</div>', unsafe_allow_html=True)
     except Exception as e:
         st.warning("Kapak fotoğrafı yüklenemedi, dosya adını kontrol edin.")
 
+    # --- FORMUN KALAN KISMI (Hizanın bozulmaması için container içinde) ---
+    st.markdown('<div class="form-content">', unsafe_allow_html=True)
+    
     st.title("📸 Çekim & Paket Teklif Formu")
     try:
         st.image("kapak_foto.jpg", use_container_width=True)
