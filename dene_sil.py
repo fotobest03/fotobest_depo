@@ -219,7 +219,20 @@ if menu == "Müşteri Teklif Formu":
         st.markdown('</div>', unsafe_allow_html=True)
     except Exception as e:
         st.warning("Kapak fotoğrafı yüklenemedi, dosya adını kontrol edin.")
+    print("""Hakkımızda! 
+Afyonkarahisar merkezde hizmet veren Foto Best, yılların deneyimini modern teknolojiler ve sanatsal bir bakış açısıyla buluşturuyor. Bireysel ve kurumsal tüm fotoğrafçılık ihtiyaçlarınıza profesyonel çözümler sunuyoruz.
 
+Hizmetlerimiz:
+
+*Özel Gün Çekimleri: Düğün, nişan, kına, söz ve sünnet organizasyonlarında en mutlu anlarınızı özenle ölümsüzleştiriyoruz.
+
+*Dış Mekan & Konsept: Şehiriçi ve Şehirdışı gibi tarihi ve doğal mekanlarda özgün çekimler gerçekleştiriyoruz.
+
+*Stüdyo Portreleri: Vesikalık, biyometrik, aile portrelerinin yanı sıra yenidoğan ve bebek konsept çekimleri yapıyoruz.
+
+*Kurumsal & Ticari Çözümler: Ürün, menü, katalog ve sosyal medya görselleriyle markanızın dijital kimliğini güçlendiriyoruz.
+
+Her bütçeye uygun esnek paketlerimiz ve dönemsel kampanyalarımız hakkında bilgi almak ve randevu oluşturmak için formu doldurarak bize hemen ulaşabilirsiniz! """)
     st.title("📸 Çekim & Paket Teklif Formu")
     try:
         st.image("kapak_foto.jpg", use_container_width=True)
