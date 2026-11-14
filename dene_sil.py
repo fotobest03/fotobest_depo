@@ -200,6 +200,7 @@ if menu == "Müşteri Teklif Formu":
                 padding-top: 0rem !important;
                 padding-left: 1rem !important;
                 padding-right: 1rem !important;
+                border-radius: 12px;
                 max-width: 750px !important;
                 margin: 0 auto;
             }
