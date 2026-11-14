@@ -55,7 +55,30 @@ st.markdown("""
 """, unsafe_allow_html=True)
 #--- SAYFA YAPILANDIRMASI VE GÖRÜNÜM AYARI ---
 st.set_page_config(page_title="Teklif ve Fiyat Yönetimi", page_icon="", layout="centered")
+# --- FOTOĞRAFTAN ÖNCE SAĞ ÜSTTE YÖNETİCİ GİRİŞ BUTONU ---
+col_bosluk, col_buton = st.columns([4, 1.2])
+with col_buton:
+    # Kullanıcı butona basınca sayfayı yönetici paneline çeviriyoruz
+    if st.button("🔐 Yönetici Paneli", use_container_width=True):
+        st.session_state["yonetici_giris"] = True
 
+# Eğer yönetici girişi aktifse veya menüden seçildiyse Yönetici Panelini aç
+if st.session_state.get("yonetici_giris", False):
+    st.warning("🛠️ Yönetici Panelindesiniz.")
+    if st.button("⬅️ Müşteri Formuna Geri Dön"):
+        st.session_state["yonetici_giris"] = False
+        st.rerun()
+    
+    # === BURAYA YÖNETİCİ PANELİ KODLARINIZ GELECEK ===
+    st.stop()
+
+# --- 1. KAPAK GÖRSELİ (Yatayda Full) ---
+try:
+    st.markdown('<div class="full-width-banner">', unsafe_allow_html=True)
+    st.image("kapak_foto.jpeg", use_container_width=True)
+    st.markdown('</div>', unsafe_allow_html=True)
+except Exception as e:
+    st.warning("Kapak fotoğrafı yüklenemedi, dosya adını kontrol edin.")
 # --- TARAYICI SEKMESİ AYARLARI (FAVICON VE BAŞLIK) ---
 st.set_page_config(
     page_title="Foto Best - Çekim & Paket Teklif Formu",
@@ -277,30 +300,7 @@ if menu == "Müşteri Teklif Formu":
             }
         </style>
     """, unsafe_allow_html=True)
-# --- FOTOĞRAFTAN ÖNCE SAĞ ÜSTTE YÖNETİCİ GİRİŞ BUTONU ---
-col_bosluk, col_buton = st.columns([4, 1.2])
-with col_buton:
-    # Kullanıcı butona basınca sayfayı yönetici paneline çeviriyoruz
-    if st.button("🔐 Yönetici Paneli", use_container_width=True):
-        st.session_state["yonetici_giris"] = True
 
-# Eğer yönetici girişi aktifse veya menüden seçildiyse Yönetici Panelini aç
-if st.session_state.get("yonetici_giris", False):
-    st.warning("🛠️ Yönetici Panelindesiniz.")
-    if st.button("⬅️ Müşteri Formuna Geri Dön"):
-        st.session_state["yonetici_giris"] = False
-        st.rerun()
-    
-    # === BURAYA YÖNETİCİ PANELİ KODLARINIZ GELECEK ===
-    st.stop()
-
-# --- 1. KAPAK GÖRSELİ (Yatayda Full) ---
-try:
-    st.markdown('<div class="full-width-banner">', unsafe_allow_html=True)
-    st.image("kapak_foto.jpeg", use_container_width=True)
-    st.markdown('</div>', unsafe_allow_html=True)
-except Exception as e:
-    st.warning("Kapak fotoğrafı yüklenemedi, dosya adını kontrol edin.")
     # --- 1. KAPAK GÖRSELİ (Yatayda Full) ---
     try:
         st.markdown('<div class="full-width-banner">', unsafe_allow_html=True)
