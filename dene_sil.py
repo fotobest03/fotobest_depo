@@ -294,7 +294,7 @@ if menu == "Müşteri Teklif Formu":
 
         if vip_paket_secildi:
             fiyat_vip = 30000.0
-            st.markdown("""
+            st.markdown("""gdsgdsgagfdgfdgfdgdfsdfshdfgh
                 <div style="background-color: #fef9e7; padding: 12px; border-radius: 8px; border: 1px dashed #f39c12; margin: 10px 0 15px 0;">
             """, unsafe_allow_html=True)
             vip_klip_secildi = st.checkbox("🎬 Dış Çekim Klibi İstiyorum (+10.000 TL)")
