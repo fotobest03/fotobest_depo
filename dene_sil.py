@@ -28,7 +28,7 @@ sidebar_durumu = "auto" if st.session_state.admin_giris else "collapsed"
 
 st.set_page_config(
     page_title="Foto Best - Çekim & Paket Teklif Formu",
-    page_icon="logo.jpeg",
+    page_icon="logo.png",
     layout="centered",
     initial_sidebar_state=sidebar_durumu
 )
