@@ -334,55 +334,6 @@ if menu == "Müşteri Teklif Formu":
     except Exception as e:
         st.warning("Kapak fotoğrafı yüklenemedi, dosya adını kontrol edin.")
 
-    # --- ÜST KISIM: 2 ADET INSTAGRAM + SAĞDA KÜÇÜK YÖNETİM İKONU (≡) ---
-    col_ig1, col_ig2, col_adm = st.columns([4, 4, 1])
-
-    with col_ig1:
-        st.link_button("📸 Foto Best IG", "https://www.instagram.com/fotobestofficial?utm_source=qr", use_container_width=True)
-
-    with col_ig2:
-        st.link_button("🏛️ Plato IG", "https://www.instagram.com/afyoncekimplatosu?utm_source=qr", use_container_width=True)
-
-    with col_adm:
-        if "yonetim_menu_acik" not in st.session_state:
-            st.session_state.yonetim_menu_acik = False
-            
-        # Küçük ve dikkat çekmeyen 3 çizgi menü butonu
-        if st.button("≡", use_container_width=True, help="Yönetici Girişi"):
-            st.session_state.yonetim_menu_acik = not st.session_state.yonetim_menu_acik
-            st.rerun()
-
-        # --- ≡ İKONUNA BASILDIYSA AÇILAN COMPACT ŞİFRE GİRİŞ ALANI ---
-        if st.session_state.get("yonetim_menu_acik", False):
-            with st.container():
-                st.markdown("""
-                    <div style="background-color: #f8f9fa; padding: 12px; border-radius: 8px; border: 1px solid #e0e0e0; margin-bottom: 15px;">
-                        <span style="font-size: 13px; font-weight: bold; color: #444;">🔐 Yönetici Girişi</span>
-                    </div>
-                """, unsafe_allow_html=True)
-                
-                col_sifre, col_giris_btn = st.columns([3, 1])
-                
-                with col_sifre:
-                    sifre_input = st.text_input("Şifre", type="password", key="kompakt_sifre", label_visibility="collapsed", placeholder="Yönetici şifresi...")
-                    
-                with col_giris_btn:
-                    if st.button("Giriş", use_container_width=True, key="kompakt_giris_btn"):
-                        if sifre_input == "1453":  # Kendi şifreniz
-                            st.session_state.admin_giris = True
-                            st.session_state.yonetim_menu_acik = False
-                            st.success("Giriş başarılı!")
-                            st.rerun()
-                        else:
-                            st.error("Hatalı!")
-                            
-                if st.session_state.admin_giris:
-                    if st.button("🔓 Oturumu Kapat", use_container_width=True):
-                        st.session_state.admin_giris = False
-                        st.session_state.yonetim_menu_acik = False
-                        st.rerun()
-
-        st.markdown("<br>", unsafe_allow_html=True)
     
     # --- 2. HAKKIMIZDA BİLGİ KARTI (Sade ve Hatasız) ---
     st.markdown("""
