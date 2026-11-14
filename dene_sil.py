@@ -361,7 +361,7 @@ if menu == "Müşteri Teklif Formu":
             """, unsafe_allow_html=True)
             
             dijital_paket_secildi = st.checkbox("📸 BU PAKETİ SEÇMEK İÇİN İŞARETLEYİN (Dijital Çekim Paketi)")
-            st.markdown("---")
+            
             if dijital_paket_secildi:
                 dijital_mekan = st.selectbox("Çekim Alanı Seçiniz *", ["Afyon Merkez", "FotoBest Plato"])
                 if dijital_mekan == "Afyon Merkez":
@@ -376,6 +376,7 @@ if menu == "Müşteri Teklif Formu":
 
         # --- YENİ: DÜĞÜN TARİHİM BELLİ DEĞİL KUTUCUĞU ---
         st.markdown("<br>", unsafe_allow_html=True)
+        st.markdown("---")
         tarih_belli_degil = st.checkbox("📅 Düğün tarihim belli değil (Daha sonra belirleyeceğim)")
 
         rezervasyon_tarihi = None
