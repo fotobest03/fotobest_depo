@@ -19,12 +19,15 @@ st.markdown("""
                 margin: 0 auto;
             }
             
-            /* SADECE sağ üstteki araç çubuğunu (Share, GitHub, menü vb.) gizler */
+            /* Sol menü okunu koruyoruz, sadece sağ üstteki paylaşim/GitHub vb. butonları gizliyoruz */
             header[data-testid="stHeader"] {
+                background: transparent !important;
+            }
+            header[data-testid="stHeader"] > div:first-child {
                 display: none !important;
             }
             
-            /* SADECE sağ alttaki "Manage app / Uygulamayı yönet" butonunu gizler */
+            /* SADECE sağ alttaki "Manage app / Uygulamayı yönet" rozetini gizler */
             [data-testid="stStatusWidget"] {
                 display: none !important;
             }
