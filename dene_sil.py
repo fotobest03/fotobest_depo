@@ -20,29 +20,6 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# 3. DİNAMİK CSS: Yönetici değilse üst barı/GitHub butonlarını gizle, yönetici ise göster
-if not st.session_state.admin_giris:
-    st.markdown("""
-        <style>
-            .block-container {
-                padding-top: 0rem !important;
-                padding-left: 1rem !important;
-                padding-right: 1rem !important;
-                max-width: 750px !important;
-                margin: 0 auto;
-            }
-            /* Sadece normal kullanıcılarda üst barı (GitHub, Share vb.) gizle */
-            header[data-testid="stHeader"] {
-                display: none !important;
-            }
-            [data-testid="stStatusWidget"] {
-                display: none !important;
-            }
-        </style>
-    """, unsafe_allow_html=True)
-else:
-    # Yönetici giriş yaptıysa üst bar, GitHub ve sol menü otomatik olarak görünür hale gelir!
-    pass
 
 #--- AYARLAR VE GİZLİ BİLGİLER ---
 GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw8cuRim-zolXECVOWFrZ20wpf4TtqccNx4YjNfzlqpCqiS7XO54siAt7nY0oF8YW0X/exec"
@@ -300,6 +277,29 @@ if menu == "Müşteri Teklif Formu":
         layout="centered",
         initial_sidebar_state=sidebar_durumu
     )
+    # 3. DİNAMİK CSS: Yönetici değilse üst barı/GitHub butonlarını gizle, yönetici ise göster
+    if not st.session_state.admin_giris:
+        st.markdown("""
+            <style>
+                .block-container {
+                    padding-top: 0rem !important;
+                    padding-left: 1rem !important;
+                    padding-right: 1rem !important;
+                    max-width: 750px !important;
+                    margin: 0 auto;
+                }
+                /* Sadece normal kullanıcılarda üst barı (GitHub, Share vb.) gizle */
+                header[data-testid="stHeader"] {
+                    display: none !important;
+                }
+                [data-testid="stStatusWidget"] {
+                    display: none !important;
+                }
+            </style>
+        """, unsafe_allow_html=True)
+    else:
+        # Yönetici giriş yaptıysa üst bar, GitHub ve sol menü otomatik olarak görünür hale gelir!
+        pass
 
         
     # --- 1. KAPAK GÖRSELİ (Yatayda Full) ---
