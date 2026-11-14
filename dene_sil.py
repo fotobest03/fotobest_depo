@@ -242,7 +242,7 @@ if menu == "Müşteri Teklif Formu":
         st.markdown('</div>', unsafe_allow_html=True)
     except Exception as e:
         st.warning("Kapak fotoğrafı yüklenemedi, dosya adını kontrol edin.")
-        
+
 # --- SAYFANIN ÜST KISMINDA INSTAGRAM BAĞLANTI BUTONLARI ---
     col_ig1, col_ig2 = st.columns(2)
     with col_ig1:
@@ -263,6 +263,7 @@ if menu == "Müşteri Teklif Formu":
         </p>
         <h4 style="color: #004080; font-size: 16px; margin-bottom: 8px;">Hizmetlerimiz:</h4>
         <ul style="color: #333333; font-size: 14px; line-height: 1.5; margin-bottom: 15px; padding-left: 20px;">
+            <li><b>Ayrıcalıklı Mekan:</b> İl merkezine 33km uzaklıkta yer alan FotoBest'e ait 300m<sup>2</sup> kapalı, 1700m<sup>2</sup> açık alanla konsept çekimler için plato imkanı sunuyoruz.</li>
             <li><b>Özel Gün Çekimleri:</b> Düğün, nişan, kına, söz ve sünnet organizasyonlarında en mutlu anlarınızı özenle ölümsüzleştiriyoruz.</li>
             <li><b>Dış Mekan & Konsept:</b> Şehiriçi ve Şehirdışı gibi tarihi ve doğal mekanlarda özgün çekimler gerçekleştiriyoruz.</li>
             <li><b>Stüdyo Portreleri:</b> Vesikalık, biyometrik, aile portrelerinin yanı sıra yenidoğan ve bebek konsept çekimleri yapıyoruz.</li>
