@@ -259,232 +259,227 @@ if menu == "Müşteri Teklif Formu":
         st.image("kapak_foto.jpg", use_container_width=True)
     except:
         pass
-        import re
 
-        # --- ÜST BÖLÜM: İLETİŞİM BİLGİLERİ VE FORMAT KONTROLLERİ ---
-        ad_soyad = st.text_input("Ad Soyad *", placeholder="Adınızı ve soyadınızı giriniz")
-        telefon = st.text_input("Telefon *", placeholder="05XXXXXXXXX veya 5XXXXXXXXX")
-        email = st.text_input("E-Posta Adresi *", placeholder="ornek@email.com")
+    # Üst Bölüm: İletişim, Şehir ve Sipariş Notu
+    ad_soyad = st.text_input("Ad Soyad *")
+    telefon = st.text_input("Telefon *")
+    email = st.text_input("E-Posta Adresi *")
+    
+    sehir_listesi = ["Afyonkarahisar", "Ankara", "İstanbul", "İzmir", "Antalya", "Konya", "Bursa", "Eskişehir", "Diğer"]
+    sehir = st.selectbox("Şehir *", ["Seçiniz..."] + sehir_listesi)
+    
+    siparis_notu = st.text_area("Sipariş Notu", placeholder="Eklemek istediklerinizi yazabilirsiniz...", height=100)
 
-        sehir_listesi = ["Afyonkarahisar", "Ankara", "İstanbul", "İzmir", "Antalya", "Konya", "Bursa", "Eskişehir", "Diğer"]
-        sehir = st.selectbox("Şehir *", ["Seçiniz..."] + sehir_listesi)
+    ust_bolum_dolu = bool(ad_soyad.strip() and telefon.strip() and email.strip() and sehir != "Seçiniz...")
 
-        siparis_notu = st.text_area("Sipariş Notu", placeholder="Eklemek istediklerinizi yazabilirsiniz...", height=100)
+    if not ust_bolum_dolu:
+        st.info("ℹ️ Lütfen yukarıdaki zorunlu alanları (`Ad Soyad`, `Telefon`, `E-Posta`, `Şehir`) doldurunuz. Formun devamı bu alanlar doldurulduktan sonra açılacaktır.")
+    else:
+        st.success("İletişim bilgileri alındı. Lütfen paket ve tarih seçimini tamamlayınız.")
+        st.markdown("---")
 
-        # --- KONTROL MEKANİZMASI VE UYARI ---
-        ust_bolum_dolu = bool(ad_soyad.strip() and telefon_gecerli and email_gecerli and sehir != "Seçiniz...")
+        # --- 1. YENİ: VIP ÇEKİM PAKETİ SEÇENEĞİ (EN ÜSTTE) ---
+        st.markdown("""
+            <div style="background-color: #fdf2e9; padding: 18px; border-radius: 10px; border-left: 6px solid #e67e22; border-top: 1px solid #f5cba7; border-right: 1px solid #f5cba7; border-bottom: 1px solid #f5cba7; margin-bottom: 8px;">
+                <h4 style="color: #b9770e; margin: 0 0 8px 0; font-size: 19px;">👑 VIP Çekim Paketi</h4>
+                <p style="color: #2c3e50; margin: 0; font-size: 15px; font-weight: 500;">Özel VIP stüdyo ve dış mekan imkanlarıyla sınırsız ve ayrıcalıklı çekim deneyimi.</p>
+            </div>
+        """, unsafe_allow_html=True)
 
-        if not ust_bolum_dolu:
-            st.info("ℹ️ Lütfen yukarıdaki zorunlu alanları (`Ad Soyad`, geçerli `Telefon`, geçerli `E-Posta` ve `Şehir`) doğru formatta doldurunuz. Formun devamı bu alanlar eksiksiz doldurulduktan sonra açılacaktır.")
-        else:
-            st.success("✅ İletişim bilgileri doğrulandı. Lütfen paket ve tarih seçimini tamamlayınız.")
-            st.markdown("---")
+        vip_paket_secildi = st.checkbox("🌟 BU PAKETİ SEÇMEK İÇİN İŞARETLEYİN (VIP Çekim Paketi - 30.000 TL)")
+        
+        fiyat_vip = 0.0
+        fiyat_vip_klip = 0.0
+        vip_klip_secildi = False
 
-            # =========================================================================
-            # ALT BÖLÜM: SADECE ÜST ALANLAR TAMAMLANDIĞINDA GÖRÜnen PAKET VE TARİH SEÇİMLERİ
-            # =========================================================================
-
-            # --- 1. VIP ÇEKİM PAKETİ SEÇENEĞİ (EN ÜSTTE) ---
+        if vip_paket_secildi:
+            fiyat_vip = 30000.0
             st.markdown("""
-                <div style="background-color: #fdf2e9; padding: 18px; border-radius: 10px; border-left: 6px solid #e67e22; border-top: 1px solid #f5cba7; border-right: 1px solid #f5cba7; border-bottom: 1px solid #f5cba7; margin-bottom: 8px;">
-                    <h4 style="color: #b9770e; margin: 0 0 8px 0; font-size: 19px;">👑 VIP Çekim Paketi</h4>
-                    <p style="color: #2c3e50; margin: 0; font-size: 15px; font-weight: 500;">Özel VIP stüdyo ve dış mekan imkanlarıyla sınırsız ve ayrıcalıklı çekim deneyimi.</p>
+                <div style="background-color: #fef9e7; padding: 18px; border-radius: 10px; border: 1px dashed #f39c12; margin: 10px 0 15px 0;">
+                    <h4 style="color: #b9770e; margin: 0 0 10px 0; font-size: 16px;">👑 VIP Paket Detayları & İçeriği:</h4>
+                    <ul style="color: #333333; font-size: 14px; line-height: 1.6; margin: 0; padding-left: 20px;">
+                        <li><b>1 Adet 30x76 Ebadında Mat Albüm</b> (10 Sayfa)</li>
+                        <li><b>2 Adet Aile Albümü</b> ve <b>1 Adet 50x70 Kanvas Tablo</b></li>
+                        <li><b>Çekim Süresi:</b> 5-6 Saat + Gün Batımı</li>
+                        <li><b>Fotoğraf Seçimi:</b> Albüm içine girecek 55 poz fotoğraf işlenir (Sadece 55 poz fotoğraf işlenir)</li>
+                        <li><b>Çekim Mekanı:</b> Antalya - Kapadokya - Salda - Fethiye - Eskişehir</li>
+                        <li><b>Teslimat:</b> Seçilen bütün fotoğraflar USB'ye atılır <i>(USB müşteriye aittir)</i></li>
+                        <li><b>Ulaşım:</b> Mekana ulaşım her iki tarafın da kendisine aittir</li>
+                    </ul>
                 </div>
             """, unsafe_allow_html=True)
+            vip_klip_secildi = st.checkbox("🎬 Dış Çekim Klibi İstiyorum (+10.000 TL)")
+            st.markdown("</div>", unsafe_allow_html=True)
 
-            vip_paket_secildi = st.checkbox("🌟 BU PAKETİ SEÇMEK İÇİN İŞARETLEYİN (VIP Çekim Paketi - 30.000 TL)")
+            if vip_klip_secildi:
+                fiyat_vip_klip = 10000.0
+
+        st.markdown("<br>", unsafe_allow_html=True)
+
+        # --- 2. ÖZEL DİJİTAL ÇEKİM SEÇENEĞİ ---
+        dijital_paket_secildi = False
+        secilen_ana_album = ""
+        secilen_album = ""
+        secilen_tablo = ""
+        secilen_mekan = ""
+        fiyat_dijital = 0.0
+        fiyat_ek_mekan = 0.0
+        ilave_mekan_secildi = False
+        secilen_klip = ""
+        f_ana_album = f_album = f_tablo = f_poz = f_mekan = f_klip = 0.0
+
+        if not vip_paket_secildi:
+            st.markdown("""
+                <div style="background-color: #eef6ff; padding: 18px; border-radius: 10px; border-left: 6px solid #0066cc; border-top: 1px solid #d0e3ff; border-right: 1px solid #d0e3ff; border-bottom: 1px solid #d0e3ff; margin-bottom: 8px;">
+                    <h4 style="color: #004080; margin: 0 0 8px 0; font-size: 19px;">✨ Özel Dijital Çekim Seçeneği</h4>
+                    <p style="color: #2c3e50; margin: 0; font-size: 15px; font-weight: 500;">Albüm istemiyorsanız sadece dijital çekim paketimizi tercih edebilirsiniz. Bu paket sadece dijital ortamda teslim edilecektir.</p>
+                </div>
+            """, unsafe_allow_html=True)
             
-            fiyat_vip = 0.0
-            fiyat_vip_klip = 0.0
-            vip_klip_secildi = False
-
-            if vip_paket_secildi:
-                fiyat_vip = 30000.0
-                st.markdown("""
-                    <div style="background-color: #fef9e7; padding: 18px; border-radius: 10px; border: 1px dashed #f39c12; margin: 10px 0 15px 0;">
-                        <h4 style="color: #b9770e; margin: 0 0 10px 0; font-size: 16px;">👑 VIP Paket Detayları & İçeriği:</h4>
-                        <ul style="color: #333333; font-size: 14px; line-height: 1.6; margin: 0; padding-left: 20px;">
-                            <li><b>1 Adet 30x76 Ebadında Mat Albüm</b> (10 Sayfa)</li>
-                            <li><b>2 Adet Aile Albümü</b> ve <b>1 Adet 50x70 Kanvas Tablo</b></li>
-                            <li><b>Çekim Süresi:</b> 5-6 Saat + Gün Batımı</li>
-                            <li><b>Fotoğraf Seçimi:</b> Albüm içine girecek 55 poz fotoğraf işlenir (Sadece 55 poz fotoğraf işlenir)</li>
-                            <li><b>Çekim Mekanı:</b> Antalya - Kapadokya - Salda - Fethiye - Eskişehir</li>
-                            <li><b>Teslimat:</b> Seçilen bütün fotoğraflar USB'ye atılır <i>(USB müşteriye aittir)</i></li>
-                            <li><b>Ulaşım:</b> Mekana ulaşım her iki tarafın da kendisine aittir</li>
-                        </ul>
-                    </div>
-                """, unsafe_allow_html=True)
-                
-                vip_klip_secildi = st.checkbox("🎬 Dış Çekim Klibi İstiyorum (+10.000 TL)")
-
-                if vip_klip_secildi:
-                    fiyat_vip_klip = 10000.0
-
-            st.markdown("<br>", unsafe_allow_html=True)
-
-            # --- 2. ÖZEL DİJİTAL ÇEKİM SEÇENEĞİ ---
-            dijital_paket_secildi = False
-            secilen_ana_album = ""
-            secilen_album = ""
-            secilen_tablo = ""
-            secilen_mekan = ""
-            fiyat_dijital = 0.0
-            fiyat_ek_mekan = 0.0
-            ilave_mekan_secildi = False
-            secilen_klip = ""
-            f_ana_album = f_album = f_tablo = f_poz = f_mekan = f_klip = 0.0
-
-            if not vip_paket_secildi:
-                st.markdown("""
-                    <div style="background-color: #eef6ff; padding: 18px; border-radius: 10px; border-left: 6px solid #0066cc; border-top: 1px solid #d0e3ff; border-right: 1px solid #d0e3ff; border-bottom: 1px solid #d0e3ff; margin-bottom: 8px;">
-                        <h4 style="color: #004080; margin: 0 0 8px 0; font-size: 19px;">✨ Özel Dijital Çekim Seçeneği</h4>
-                        <p style="color: #2c3e50; margin: 0; font-size: 15px; font-weight: 500;">Albüm istemiyorsanız sadece dijital çekim paketimizi tercih edebilirsiniz. Bu paket sadece dijital ortamda teslim edilecektir.</p>
-                    </div>
-                """, unsafe_allow_html=True)
-                
-                dijital_paket_secildi = st.checkbox("📸 BU PAKETİ SEÇMEK İÇİN İŞARETLEYİN (Dijital Çekim Paketi)")
-                
-                if dijital_paket_secildi:
-                    dijital_mekan = st.selectbox("Çekim Alanı Seçiniz *", ["Afyon Merkez", "FotoBest Plato"])
-                    if dijital_mekan == "Afyon Merkez":
-                        fiyat_dijital = 6000.0
-                        secilen_mekan = "Dijital Çekim Paketi - Afyon Merkez"
-                    else:
-                        fiyat_dijital = 7000.0
-                        secilen_mekan = "Dijital Çekim Paketi - FotoBest Plato"
-
-            kampanya_dict = get_campaign_dict()
-            closed_lst = get_closed_dates_list()
-
-            # Düğün tarihim belli değil kutucuğu
-            st.markdown("<br>", unsafe_allow_html=True)
-            tarih_belli_degil = st.checkbox("📅 Düğün tarihim belli değil (Daha sonra belirleyeceğim)")
-
-            rezervasyon_tarihi = None
-            cekim_saati = "Belirtilmedi"
-            tarih_kapali_mi = False
-            kampanya_orani = 0
-
-            if not tarih_belli_degil:
-                rezervasyon_tarihi = st.date_input("Çekim Tarihi Seçiniz", value=date.today(), min_value=date.today())
-                
-                if not vip_paket_secildi:
-                    cekim_saati = st.selectbox(
-                        "Çekim Saati Seçiniz *",
-                        ["10.00-12.00", "12.00-14.00", "14.00-16.00", "16.00-18.00"]
-                    )
+            dijital_paket_secildi = st.checkbox("📸 BU PAKETİ SEÇMEK İÇİN İŞARETLEYİN (Dijital Çekim Paketi)")
+            
+            if dijital_paket_secildi:
+                dijital_mekan = st.selectbox("Çekim Alanı Seçiniz *", ["Afyon Merkez", "FotoBest Plato"])
+                if dijital_mekan == "Afyon Merkez":
+                    fiyat_dijital = 6000.0
+                    secilen_mekan = "Dijital Çekim Paketi - Afyon Merkez"
                 else:
-                    cekim_saati = "Tüm Gün / VIP Çekim"
+                    fiyat_dijital = 7000.0
+                    secilen_mekan = "Dijital Çekim Paketi - FotoBest Plato"
 
-                tarih_kapali_mi = rezervasyon_tarihi in closed_lst
-                kampanya_orani = kampanya_dict.get(rezervasyon_tarihi, 0)
+        kampanya_dict = get_campaign_dict()
+        closed_lst = get_closed_dates_list()
 
-                if tarih_kapali_mi:
-                    st.error(f"⚠️ Seçtiğiniz tarih ({rezervasyon_tarihi.strftime('%d.%m.%Y')}) doludur.")
+        # --- YENİ: DÜĞÜN TARİHİM BELLİ DEĞİL KUTUCUĞU ---
+        st.markdown("<br>", unsafe_allow_html=True)
+        tarih_belli_degil = st.checkbox("📅 Düğün tarihim belli değil (Daha sonra belirleyeceğim)")
+
+        rezervasyon_tarihi = None
+        cekim_saati = "Belirtilmedi"
+        tarih_kapali_mi = False
+        kampanya_orani = 0
+
+        if not tarih_belli_degil:
+            rezervasyon_tarihi = st.date_input("Çekim Tarihi Seçiniz", value=date.today(), min_value=date.today())
+            
+            # Çekim saati (VIP seçilmediyse gösterilir)
+            if not vip_paket_secildi:
+                cekim_saati = st.selectbox(
+                    "Çekim Saati Seçiniz *",
+                    ["10.00-12.00", "12.00-14.00", "14.00-16.00", "16.00-18.00"]
+                )
             else:
-                st.info("ℹ️ Tarih ve saat alanı gizlendi. Randevu detayını daha sonra netleştirebilirsiniz.")
+                cekim_saati = "Tüm Gün / VIP Çekim"
 
-            # --- 3. STANDART ALBÜM KOMBİNASYONLARI ---
-            if vip_paket_secildi:
-                ham_tutar = fiyat_vip + fiyat_vip_klip
-            elif dijital_paket_secildi:
-                ham_tutar = fiyat_dijital
-            else:
-                st.markdown("""
-                    <div style="background-color: #f8f9fa; padding: 12px; border-radius: 8px; border: 1px solid #e0e0e0; margin: 15px 0 10px 0;">
-                        <span style="color: #2c3e50; font-weight: bold; font-size: 15px;">📦 Albüm ve Paket Kombinasyonları</span>
-                    </div>
-                """, unsafe_allow_html=True)
+            tarih_kapali_mi = rezervasyon_tarihi in closed_lst
+            kampanya_orani = kampanya_dict.get(rezervasyon_tarihi, 0)
 
-                df_prices = st.session_state.prices_df
-                ana_album_opts = df_prices[df_prices['Kategori'] == 'Ana Albüm']
-                album_opts = df_prices[df_prices['Kategori'] == 'Aile Albümü']
-                tablo_opts = df_prices[df_prices['Kategori'] == 'Tablo Seçimi']
-                poz_opts = df_prices[df_prices['Kategori'] == 'Poz Sayısı']
-                mekan_opts = df_prices[df_prices['Kategori'] == 'Çekim Mekanı']
-                klip_opts = df_prices[df_prices['Kategori'] == 'Dış Çekim Klibi']
+            if tarih_kapali_mi:
+                st.error(f"⚠️ Seçtiğiniz tarih ({rezervasyon_tarihi.strftime('%d.%m.%Y')}) doludur.")
+        else:
+            st.info("ℹ️ Tarih ve saat alanı gizlendi. Randevu detayını daha sonra netleştirebilirsiniz.")
 
-                secilen_ana_album = st.selectbox("Ana Albüm", ana_album_opts['Secenek'].tolist()) if not ana_album_opts.empty else ""
-                secilen_album = st.selectbox("Aile Albümü", album_opts['Secenek'].tolist()) if not album_opts.empty else ""
-                secilen_tablo = st.selectbox("Tablo Seçimi", tablo_opts['Secenek'].tolist()) if not tablo_opts.empty else ""
-                secilen_poz = st.selectbox("Albüm İçi Poz Sayısı", poz_opts['Secenek'].tolist()) if not poz_opts.empty else ""
-                
-                secilen_mekan = st.selectbox("Çekim Mekanı", ["Seçiniz..."] + mekan_opts['Secenek'].tolist()) if not mekan_opts.empty else "Seçiniz..."
-                
-                if secilen_mekan != "Seçiniz...":
-                    ilave_mekan_secildi = st.checkbox("Merkez Çekimi istiyorum (İlave Mekan - +1.500 TL)")
-                    if ilave_mekan_secildi:
-                        fiyat_ek_mekan = 1500.0
-
-                secilen_klip = st.radio("Dış Çekim Klibi İstiyorum", klip_opts['Secenek'].tolist()) if not klip_opts.empty else ""
-
-                try:
-                    f_ana_album = float(ana_album_opts[ana_album_opts['Secenek'] == secilen_ana_album]['Fiyat'].values[0]) if secilen_ana_album else 0.0
-                    f_album = float(album_opts[album_opts['Secenek'] == secilen_album]['Fiyat'].values[0]) if secilen_album else 0.0
-                    f_tablo = float(tablo_opts[tablo_opts['Secenek'] == secilen_tablo]['Fiyat'].values[0]) if secilen_tablo else 0.0
-                    f_poz = float(poz_opts[poz_opts['Secenek'] == secilen_poz]['Fiyat'].values[0]) if secilen_poz else 0.0
-                    f_mekan = float(mekan_opts[mekan_opts['Secenek'] == secilen_mekan]['Fiyat'].values[0]) if secilen_mekan != "Seçiniz..." else 0.0
-                    f_klip = float(klip_opts[klip_opts['Secenek'] == secilen_klip]['Fiyat'].values[0]) if secilen_klip else 0.0
-                except:
-                    f_ana_album = f_album = f_tablo = f_poz = f_mekan = f_klip = 0.0
-
-                ham_tutar = f_ana_album + f_album + f_tablo + f_poz + f_mekan + f_klip + fiyat_ek_mekan
-
-            # --- SOSYAL MEDYA PAYLAŞIMI ---
-            sosyal_medya_paylasimi = st.checkbox("📱 Sosyal medya paylaşımı istiyorum (İzin veriyorum)")
-
-            toplam_tutar = ham_tutar
-
-            if kampanya_orani > 0:
-                toplam_tutar = ham_tutar * (1 + kampanya_orani / 100)
-                st.success(f"🎉 Bu tarihte **%{kampanya_orani} daha yüksek** fiyat!")
-
-            # --- ŞIK TOPLAM TUTAR KARTI ---
-            st.markdown(f"""
-                <div style="background-color: #e8f8f5; padding: 15px; border-radius: 10px; border: 1px solid #2ecc71; text-align: center; margin: 20px 0;">
-                    <span style="color: #27ae60; font-size: 18px; font-weight: bold;">Hesaplanan Toplam Tutar</span>
-                    <h2 style="color: #16a085; margin: 5px 0 0 0;">{toplam_tutar:,.2f} TL</h2>
+        # --- 3. STANDART ALBÜM KOMBİNASYONLARI (VIP VEYA DİJİTAL SEÇİLDIYSE GİZLENİR) ---
+        if vip_paket_secildi:
+            ham_tutar = fiyat_vip + fiyat_vip_klip
+        elif dijital_paket_secildi:
+            ham_tutar = fiyat_dijital
+        else:
+            st.markdown("""
+                <div style="background-color: #f8f9fa; padding: 12px; border-radius: 8px; border: 1px solid #e0e0e0; margin: 15px 0 10px 0;">
+                    <span style="color: #2c3e50; font-weight: bold; font-size: 15px;">📦 Albüm ve Paket Kombinasyonları</span>
                 </div>
             """, unsafe_allow_html=True)
 
-            if st.button("Teklifi Gönder ve Kaydet"):
-                if tarih_kapali_mi:
-                    st.error("Kapalı tarih!")
-                elif not vip_paket_secildi and not dijital_paket_secildi and secilen_mekan == "Seçiniz...":
-                    st.warning("Lütfen bir Çekim Mekanı seçiniz.")
+            df_prices = st.session_state.prices_df
+            ana_album_opts = df_prices[df_prices['Kategori'] == 'Ana Albüm']
+            album_opts = df_prices[df_prices['Kategori'] == 'Aile Albümü']
+            tablo_opts = df_prices[df_prices['Kategori'] == 'Tablo Seçimi']
+            poz_opts = df_prices[df_prices['Kategori'] == 'Poz Sayısı']
+            mekan_opts = df_prices[df_prices['Kategori'] == 'Çekim Mekanı']
+            klip_opts = df_prices[df_prices['Kategori'] == 'Dış Çekim Klibi']
+
+            secilen_ana_album = st.selectbox("Ana Albüm", ana_album_opts['Secenek'].tolist()) if not ana_album_opts.empty else ""
+            secilen_album = st.selectbox("Aile Albümü", album_opts['Secenek'].tolist()) if not album_opts.empty else ""
+            secilen_tablo = st.selectbox("Tablo Seçimi", tablo_opts['Secenek'].tolist()) if not tablo_opts.empty else ""
+            secilen_poz = st.selectbox("Albüm İçi Poz Sayısı", poz_opts['Secenek'].tolist()) if not poz_opts.empty else ""
+            
+            secilen_mekan = st.selectbox("Çekim Mekanı", ["Seçiniz..."] + mekan_opts['Secenek'].tolist()) if not mekan_opts.empty else "Seçiniz..."
+            
+            if secilen_mekan != "Seçiniz...":
+                ilave_mekan_secildi = st.checkbox("Merkez Çekimi istiyorum (İlave Mekan - +1.500 TL)")
+                if ilave_mekan_secildi:
+                    fiyat_ek_mekan = 1500.0
+
+            secilen_klip = st.radio("Dış Çekim Klibi İstiyorum", klip_opts['Secenek'].tolist()) if not klip_opts.empty else ""
+
+            try:
+                f_ana_album = float(ana_album_opts[ana_album_opts['Secenek'] == secilen_ana_album]['Fiyat'].values[0]) if secilen_ana_album else 0.0
+                f_album = float(album_opts[album_opts['Secenek'] == secilen_album]['Fiyat'].values[0]) if secilen_album else 0.0
+                f_tablo = float(tablo_opts[tablo_opts['Secenek'] == secilen_tablo]['Fiyat'].values[0]) if secilen_tablo else 0.0
+                f_poz = float(poz_opts[poz_opts['Secenek'] == secilen_poz]['Fiyat'].values[0]) if secilen_poz else 0.0
+                f_mekan = float(mekan_opts[mekan_opts['Secenek'] == secilen_mekan]['Fiyat'].values[0]) if secilen_mekan != "Seçiniz..." else 0.0
+                f_klip = float(klip_opts[klip_opts['Secenek'] == secilen_klip]['Fiyat'].values[0]) if secilen_klip else 0.0
+            except:
+                f_ana_album = f_album = f_tablo = f_poz = f_mekan = f_klip = 0.0
+
+            ham_tutar = f_ana_album + f_album + f_tablo + f_poz + f_mekan + f_klip + fiyat_ek_mekan
+
+        # --- SOSYAL MEDYA PAYLAŞIMI ---
+        sosyal_medya_paylasimi = st.checkbox("📱 Sosyal medya paylaşımı istiyorum (İzin veriyorum)")
+
+        toplam_tutar = ham_tutar
+
+        if kampanya_orani > 0:
+            toplam_tutar = ham_tutar * (1 + kampanya_orani / 100)
+            st.success(f"🎉 Bu tarihte **%{kampanya_orani} daha yüksek** fiyat!")
+
+        # --- ŞIK TOPLAM TUTAR KARTI ---
+        st.markdown(f"""
+            <div style="background-color: #e8f8f5; padding: 15px; border-radius: 10px; border: 1px solid #2ecc71; text-align: center; margin: 20px 0;">
+                <span style="color: #27ae60; font-size: 18px; font-weight: bold;">Hesaplanan Toplam Tutar</span>
+                <h2 style="color: #16a085; margin: 5px 0 0 0;">{toplam_tutar:,.2f} TL</h2>
+            </div>
+        """, unsafe_allow_html=True)
+
+        if st.button("Teklifi Gönder ve Kaydet"):
+            if tarih_kapali_mi:
+                st.error("Kapalı tarih!")
+            elif not vip_paket_secildi and not dijital_paket_secildi and secilen_mekan == "Seçiniz...":
+                st.warning("Lütfen bir Çekim Mekanı seçiniz.")
+            else:
+                t_str = rezervasyon_tarihi.strftime('%d.%m.%Y')
+                
+                sm_durumu = "Sosyal Medya Paylaşımı: Evet" if sosyal_medya_paylasimi else "Sosyal Medya Paylaşımı: Hayır"
+                
+                if vip_paket_secildi:
+                    klip_detay = " + Dış Çekim Klibi" if vip_klip_secildi else ""
+                    detaylar = f"👑 VIP Çekim Paketi{klip_detay} | {sm_durumu}"
+                elif dijital_paket_secildi:
+                    detaylar = f"{secilen_mekan} | {sm_durumu}"
                 else:
-                    t_str = rezervasyon_tarihi.strftime('%d.%m.%Y') if rezervasyon_tarihi else "Tarih Belirsiz (Daha Sonra Belirlenecek)"
-                    
-                    sm_durumu = "Sosyal Medya Paylaşımı: Evet" if sosyal_medya_paylasimi else "Sosyal Medya Paylaşımı: Hayır"
-                    
-                    if vip_paket_secildi:
-                        klip_detay = " + Dış Çekim Klibi" if vip_klip_secildi else ""
-                        detaylar = f"👑 VIP Çekim Paketi{klip_detay} | {sm_durumu}"
-                    elif dijital_paket_secildi:
-                        detaylar = f"{secilen_mekan} | {sm_durumu}"
-                    else:
-                        mekan_detay = f"{secilen_mekan} (+ Merkez Çekimi)" if ilave_mekan_secildi else secilen_mekan
-                        detaylar = f"{secilen_ana_album} | {secilen_album} | {secilen_tablo} | Mekan: {mekan_detay} | {sm_durumu}"
-                    
-                    veri = {
-                        "tarih": t_str, 
-                        "saat": cekim_saati, 
-                        "ad_soyad": ad_soyad, 
-                        "telefon": telefon, 
-                        "email": email, 
-                        "sehir": sehir,
-                        "siparis_notu": siparis_notu,
-                        "detaylar": detaylar, 
-                        "tutar": f"{toplam_tutar:,.2f} TL"
-                    }
-                    
-                    try:
-                        requests.post(GOOGLE_SCRIPT_URL, json=veri)
-                    except: pass
-                    
-                    mail_gonder(email, ad_soyad, telefon, sehir, siparis_notu, f"{t_str} (Saat: {cekim_saati})", detaylar, toplam_tutar)
-                    st.success("Rezervasyon alındı!")
-                    st.balloons()
+                    mekan_detay = f"{secilen_mekan} (+ Merkez Çekimi)" if ilave_mekan_secildi else secilen_mekan
+                    detaylar = f"{secilen_ana_album} | {secilen_album} | {secilen_tablo} | Mekan: {mekan_detay} | {sm_durumu}"
+                
+                veri = {
+                    "tarih": t_str, 
+                    "saat": cekim_saati, 
+                    "ad_soyad": ad_soyad, 
+                    "telefon": telefon, 
+                    "email": email, 
+                    "sehir": sehir,
+                    "siparis_notu": siparis_notu,
+                    "detaylar": detaylar, 
+                    "tutar": f"{toplam_tutar:,.2f} TL"
+                }
+                
+                try:
+                    requests.post(GOOGLE_SCRIPT_URL, json=veri)
+                except: pass
+                
+                mail_gonder(email, ad_soyad, telefon, sehir, siparis_notu, f"{t_str} (Saat: {cekim_saati})", detaylar, toplam_tutar)
+                st.success("Rezervasyon alındı!")
+                st.balloons()
 
 # ================= YÖNETİCİ PANELİ =================
 elif menu == "Yönetici Paneli (Fiyat & Takvim)":
