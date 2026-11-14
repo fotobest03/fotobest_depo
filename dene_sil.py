@@ -323,15 +323,15 @@ if menu == "Müşteri Teklif Formu":
         st.markdown('</div>', unsafe_allow_html=True)
     except Exception as e:
         st.warning("Kapak fotoğrafı yüklenemedi, dosya adını kontrol edin.")
-        
+
     # --- 2. ALT KISIMDA 2 ADET YAN YANA İNSTAGRAM BUTONU ---
     col_ig1, col_ig2 = st.columns(2)
 
     with col_ig1:
-        st.link_button("📸 Foto Best IG", "https://www.instagram.com/fotobestofficial?utm_source=qr", use_container_width=True)
+        st.link_button("📸 FotoBest İnstagram", "https://www.instagram.com/fotobestofficial?utm_source=qr", use_container_width=True)
 
     with col_ig2:
-        st.link_button("🏛️ Plato IG", "https://www.instagram.com/afyoncekimplatosu?utm_source=qr", use_container_width=True)
+        st.link_button("🏛️ FotoBest Plato İnstagram", "https://www.instagram.com/afyoncekimplatosu?utm_source=qr", use_container_width=True)
 
     st.markdown("<br>", unsafe_allow_html=True)
     
@@ -757,22 +757,3 @@ elif menu == "Yönetici Paneli (Fiyat & Takvim)":
 
     elif password != "":
         st.error("Hatalı Şifre!")
-
-# --- SAYFANIN EN ALTINDA GİZLİ YÖNETİCİ GİRİŞİ ---
-st.markdown("<br><hr><br>", unsafe_allow_html=True)
-
-with st.expander("🛠️ Yönetici Paneli Girişi (Yetkililer İçin)"):
-    if not st.session_state.admin_giris:
-        sifre_input = st.text_input("Yönetici Şifresi", type="password", key="yonetici_sifre_kutusu")
-        if st.button("Giriş Yap ve Araçları Aktif Et", key="yonetici_giris_buton"):
-            if sifre_input == "1453":  # Belirlediğiniz şifre
-                st.session_state.admin_giris = True
-                st.success("Giriş başarılı! Menüler ve araçlar aktif ediliyor...")
-                st.rerun()  # Sayfayı yenileyerek üst barı ve sol menüyü açar
-            else:
-                st.error("Hatalı şifre!")
-    else:
-        st.success("🔓 Yönetici araçları ve sol menü aktif.")
-        if st.button("Oturumu Kapat (Araçları Gizle)", key="oturum_kapat_buton"):
-            st.session_state.admin_giris = False
-            st.rerun()  # Sayfayı yenileyerek tekrar her şeyi gizler
