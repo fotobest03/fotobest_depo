@@ -19,38 +19,6 @@ st.set_page_config(
     #initial_sidebar_state="auto"
     initial_sidebar_state="collapsed"
 )
-# --- SAĞ ÜST KÖŞEDE MİNİ YÖNETİM MENÜSÜ (POP-OVER İLE BOŞLUKSUZ ÇÖZÜM) ---
-col_bos, col_yonet = st.columns([11, 1])
-
-with col_yonet:
-    # st.popover buton tıklandığında doğrudan şık bir kutu açar, kapalıyken sayfada yer kaplamaz
-    with st.popover("≡", help="Yönetici Girişi"):
-        
-        if not st.session_state.get("admin_giris", False):
-            st.markdown("<b>🔐 Yönetici Girişi</b>", unsafe_allow_html=True)
-            
-            sifre_input = st.text_input("Şifre", type="password", key="popover_sifre", placeholder="Şifrenizi girin...")
-            
-            if st.button("Giriş Yap", use_container_width=True, key="popover_giris_btn"):
-                if sifre_input == "1453":  # Kendi şifreniz
-                    st.session_state.admin_giris = True
-                    st.success("Giriş başarılı!")
-                    st.rerun()
-                else:
-                    st.error("Hatalı şifre!")
-        else:
-            st.success("🔓 Oturum Açık")
-            if st.button("Oturumu Kapat", use_container_width=True, key="popover_cikis_btn"):
-                st.session_state.admin_giris = False
-                st.rerun()
-                
-# 1. Oturum durumunu başlatıyoruz
-if "admin_giris" not in st.session_state:
-    st.session_state.admin_giris = False
-
-# 2. SAYfa YAPILANDIRMASI
-# Eğer yönetici girişi YAPILDIYSA sol menüyü aç ("auto"), yapılmadıysa kapat ("collapsed")
-sidebar_durumu = "auto" if st.session_state.admin_giris else "collapsed"
 
 st.set_page_config(
     page_title="Foto Best - Çekim & Paket Teklif Formu",
@@ -300,6 +268,38 @@ if menu == "Müşteri Teklif Formu":
         </style>
     """, unsafe_allow_html=True)
 
+    # --- SAĞ ÜST KÖŞEDE MİNİ YÖNETİM MENÜSÜ (POP-OVER İLE BOŞLUKSUZ ÇÖZÜM) ---
+    col_bos, col_yonet = st.columns([11, 1])
+
+    with col_yonet:
+        # st.popover buton tıklandığında doğrudan şık bir kutu açar, kapalıyken sayfada yer kaplamaz
+        with st.popover("≡", help="Yönetici Girişi"):
+            
+            if not st.session_state.get("admin_giris", False):
+                st.markdown("<b>🔐 Yönetici Girişi</b>", unsafe_allow_html=True)
+                
+                sifre_input = st.text_input("Şifre", type="password", key="popover_sifre", placeholder="Şifrenizi girin...")
+                
+                if st.button("Giriş Yap", use_container_width=True, key="popover_giris_btn"):
+                    if sifre_input == "1453":  # Kendi şifreniz
+                        st.session_state.admin_giris = True
+                        st.success("Giriş başarılı!")
+                        st.rerun()
+                    else:
+                        st.error("Hatalı şifre!")
+            else:
+                st.success("🔓 Oturum Açık")
+                if st.button("Oturumu Kapat", use_container_width=True, key="popover_cikis_btn"):
+                    st.session_state.admin_giris = False
+                    st.rerun()
+                    
+    # 1. Oturum durumunu başlatıyoruz
+    if "admin_giris" not in st.session_state:
+        st.session_state.admin_giris = False
+
+    # 2. SAYfa YAPILANDIRMASI
+    # Eğer yönetici girişi YAPILDIYSA sol menüyü aç ("auto"), yapılmadıysa kapat ("collapsed")
+    sidebar_durumu = "auto" if st.session_state.admin_giris else "collapsed"
         
     # --- 1. KAPAK GÖRSELİ (Yatayda Full) ---
     try:
