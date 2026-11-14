@@ -361,7 +361,7 @@ if menu == "Müşteri Teklif Formu":
             """, unsafe_allow_html=True)
             
             dijital_paket_secildi = st.checkbox("📸 BU PAKETİ SEÇMEK İÇİN İŞARETLEYİN (Dijital Çekim Paketi)")
-            
+            st.markdown("---")
             if dijital_paket_secildi:
                 dijital_mekan = st.selectbox("Çekim Alanı Seçiniz *", ["Afyon Merkez", "FotoBest Plato"])
                 if dijital_mekan == "Afyon Merkez":
