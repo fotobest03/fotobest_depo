@@ -293,7 +293,24 @@ if menu == "Müşteri Teklif Formu":
         st.link_button("🏛️ Plato Instagram", 
                        "https://www.instagram.com/afyoncekimplatosu?utm_source=qr", 
                        use_container_width=True)    
-    
+    # --- SAYFANIN EN ALTINDA GİZLİ YÖNETİCİ GİRİŞİ ---
+st.markdown("<br><hr><br>", unsafe_allow_html=True)
+
+with st.expander("🛠️ Yönetici Paneli Girişi (Yetkililer İçin)"):
+    if not st.session_state.admin_giris:
+        sifre_input = st.text_input("Yönetici Şifresi", type="password", key="yonetici_sifre_kutusu")
+        if st.button("Giriş Yap ve Araçları Aktif Et", key="yonetici_giris_buton"):
+            if sifre_input == "1453":  # Belirlediğiniz şifre
+                st.session_state.admin_giris = True
+                st.success("Giriş başarılı! Menüler ve araçlar aktif ediliyor...")
+                st.rerun()  # Sayfayı yenileyerek üst barı ve sol menüyü açar
+            else:
+                st.error("Hatalı şifre!")
+    else:
+        st.success("🔓 Yönetici araçları ve sol menü aktif.")
+        if st.button("Oturumu Kapat (Araçları Gizle)", key="oturum_kapat_buton"):
+            st.session_state.admin_giris = False
+            st.rerun()  # Sayfayı yenileyerek tekrar her şeyi gizler
     # --- 2. HAKKIMIZDA BİLGİ KARTI (Sade ve Hatasız) ---
     st.markdown("""
     <div style="background-color: #f8fbff; padding: 22px; border-radius: 12px; border-left: 6px solid #0066cc; border: 1px solid #d0e3ff; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
@@ -716,22 +733,3 @@ elif menu == "Yönetici Paneli (Fiyat & Takvim)":
 
     elif password != "":
         st.error("Hatalı Şifre!")
-
-# --- SAYFANIN EN ALTINDA GİZLİ YÖNETİCİ GİRİŞİ ---
-st.markdown("<br><hr><br>", unsafe_allow_html=True)
-
-with st.expander("🛠️ Yönetici Paneli Girişi (Yetkililer İçin)"):
-    if not st.session_state.admin_giris:
-        sifre_input = st.text_input("Yönetici Şifresi", type="password", key="yonetici_sifre_kutusu")
-        if st.button("Giriş Yap ve Araçları Aktif Et", key="yonetici_giris_buton"):
-            if sifre_input == "1453":  # Belirlediğiniz şifre
-                st.session_state.admin_giris = True
-                st.success("Giriş başarılı! Menüler ve araçlar aktif ediliyor...")
-                st.rerun()  # Sayfayı yenileyerek üst barı ve sol menüyü açar
-            else:
-                st.error("Hatalı şifre!")
-    else:
-        st.success("🔓 Yönetici araçları ve sol menü aktif.")
-        if st.button("Oturumu Kapat (Araçları Gizle)", key="oturum_kapat_buton"):
-            st.session_state.admin_giris = False
-            st.rerun()  # Sayfayı yenileyerek tekrar her şeyi gizler
