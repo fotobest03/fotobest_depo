@@ -395,7 +395,6 @@ if menu == "Müşteri Teklif Formu":
             """, unsafe_allow_html=True)
             
             dijital_paket_secildi = st.checkbox("📸 BU PAKETİ SEÇMEK İÇİN İŞARETLEYİN (Dijital Çekim Paketi)")
-            
             if dijital_paket_secildi:
                 dijital_mekan = st.selectbox("Çekim Alanı Seçiniz *", ["Afyon Merkez", "FotoBest Plato"])
                 if dijital_mekan == "Afyon Merkez":
@@ -404,12 +403,10 @@ if menu == "Müşteri Teklif Formu":
                 else:
                     fiyat_dijital = 7000.0
                     secilen_mekan = "Dijital Çekim Paketi - FotoBest Plato"
-
         kampanya_dict = get_campaign_dict()
         closed_lst = get_closed_dates_list()
-
         # --- YENİ: DÜĞÜN TARİHİM BELLİ DEĞİL KUTUCUĞU ---
-        st.markdown("<br>", unsafe_allow_html=True)
+        #st.markdown("<br>", unsafe_allow_html=True)
         st.markdown("---")
         tarih_belli_degil = st.checkbox("📅 Düğün tarihim belli değil (Daha sonra belirleyeceğim)")
 
