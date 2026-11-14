@@ -240,24 +240,41 @@ if menu == "Müşteri Teklif Formu":
     except Exception as e:
         st.warning("Kapak fotoğrafı yüklenemedi, dosya adını kontrol edin.")
 
-    # --- 2. HAKKIMIZDA BİLGİ KARTI (Görselin altı, formun üstü) ---
+    # --- 2. HAKKIMIZDA BİLGİ KARTI (Instagram Butonları ile Güncellendi) ---
     st.markdown("""
-        <div style="background-color: #f8fbff; padding: 22px; border-radius: 12px; border-left: 6px solid #0066cc; border: 1px solid #d0e3ff; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
-            <h3 style="color: #004080; margin-top: 0; margin-bottom: 12px; font-size: 20px;">✨ Hakkımızda</h3>
-            <p style="color: #333333; font-size: 14px; line-height: 1.6; margin-bottom: 15px;">
-                Afyonkarahisar merkezde hizmet veren <b>Foto Best</b>, yılların deneyimini modern teknolojiler ve sanatsal bir bakış açısıyla buluşturuyor. Bireysel ve kurumsal tüm fotoğrafçılık ihtiyaçlarınıza profesyonel çözümler sunuyoruz.
-            </p>
-            <h4 style="color: #004080; font-size: 16px; margin-bottom: 8px;">Hizmetlerimiz:</h4>
-            <ul style="color: #333333; font-size: 14px; line-height: 1.5; margin-bottom: 15px; padding-left: 20px;">
-                <li><b>Özel Gün Çekimleri:</b> Düğün, nişan, kına, söz ve sünnet organizasyonlarında en mutlu anlarınızı özenle ölümsüzleştiriyoruz.</li>
-                <li><b>Dış Mekan & Konsept:</b> Şehiriçi ve Şehirdışı gibi tarihi ve doğal mekanlarda özgün çekimler gerçekleştiriyoruz.</li>
-                <li><b>Stüdyo Portreleri:</b> Vesikalık, biyometrik, aile portrelerinin yanı sıra yenidoğan ve bebek konsept çekimleri yapıyoruz.</li>
-                <li><b>Kurumsal & Ticari Çözümler:</b> Ürün, menü, katalog ve sosyal medya görselleriyle markanızın dijital kimliğini güçlendiriyoruz.</li>
-            </ul>
-            <p style="color: #555555; font-size: 13px; font-style: italic; margin-bottom: 0;">
-                Her bütçeye uygun esnek paketlerimiz ve dönemsel kampanyalarımız hakkında bilgi almak ve randevu oluşturmak için formu doldurarak bize hemen ulaşabilirsiniz!
-            </p>
+    <div style="background-color: #f8fbff; padding: 22px; border-radius: 12px; border-left: 6px solid #0066cc; border: 1px solid #d0e3ff; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
+        
+        <!-- Başlık ve Instagram Butonları İçin Esnek Alan (Flexbox) -->
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 12px;">
+            <h3 style="color: #004080; margin: 0; font-size: 20px;">
+                ✨ Hakkımızda
+            </h3>
+            <div style="display: flex; gap: 8px; margin-top: 5px;">
+                <a href="https://www.instagram.com/fotobestofficial?utm_source=qr" target="_blank" style="background: linear-pressed(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); color: white; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: bold; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    📸 Foto Best IG
+                </a>
+                <a href="https://www.instagram.com/afyoncekimplatosu?utm_source=qr" target="_blank" style="background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); color: white; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: bold; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    🏛️ Plato IG
+                </a>
+            </div>
         </div>
+
+        <p style="color: #333333; font-size: 14px; line-height: 1.6; margin-bottom: 15px;">
+            Afyonkarahisar merkezde hizmet veren <b>Foto Best</b>, yılların deneyimini modern teknolojiler ve sanatsal bir bakış açısıyla buluşturuyor. Bireysel ve kurumsal tüm fotoğrafçılık ihtiyaçlarınıza profesyonel çözümler sunuyoruz.
+        </p>
+        
+        <h4 style="color: #004080; font-size: 16px; margin-bottom: 8px;">Hizmetlerimiz:</h4>
+        <ul style="color: #333333; font-size: 14px; line-height: 1.5; margin-bottom: 15px; padding-left: 20px;">
+            <li><b>Özel Gün Çekimleri:</b> Düğün, nişan, kına, söz ve sünnet organizasyonlarında en mutlu anlarınızı özenle ölümsüzleştiriyoruz.</li>
+            <li><b>Dış Mekan & Konsept:</b> Şehiriçi ve Şehirdışı gibi tarihi ve doğal mekanlarda özgün çekimler gerçekleştiriyoruz.</li>
+            <li><b>Stüdyo Portreleri:</b> Vesikalık, biyometrik, aile portrelerinin yanı sıra yenidoğan ve bebek konsept çekimleri yapıyoruz.</li>
+            <li><b>Kurumsal & Ticari Çözümler:</b> Ürün, menü, katalog ve sosyal medya görselleriyle markanızın dijital kimliğini güçlendiriyoruz.</li>
+        </ul>
+        
+        <p style="color: #555555; font-size: 13px; font-style: italic; margin-bottom: 0;">
+            Her bütçeye uygun esnek paketlerimiz ve dönemsel kampanyalarımız hakkında bilgi almak ve randevu oluşturmak için formu doldurarak bize hemen ulaşabilirsiniz!
+        </p>
+    </div>
     """, unsafe_allow_html=True)
 
     # --- 3. FORM BAŞLIĞI VE ALANLARI ---
