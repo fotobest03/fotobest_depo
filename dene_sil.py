@@ -194,6 +194,32 @@ menu = st.sidebar.radio("Sayfa Seçin", ["Müşteri Teklif Formu", "Yönetici Pa
 
 # ================= MÜŞTERİ FORMU =================
 if menu == "Müşteri Teklif Formu":
+    
+    # --- KAPAK GÖRSELİ VE ÖZEL STİL ---
+    st.markdown("""
+        <style>
+            /* Streamlit üst boşluğunu daraltıp görseli tepeye oturtuyoruz */
+            .block-container {
+                padding-top: 1rem !important;
+            }
+            .cover-box {
+                width: 100%;
+                border-radius: 12px;
+                overflow: hidden;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                margin-bottom: 25px;
+            }
+        </style>
+    """, unsafe_allow_html=True)
+
+    # Kapak fotoğrafını tam genişlikte ve şık çerçeveyle ekleme
+    try:
+        st.markdown('<div class="cover-box">', unsafe_allow_html=True)
+        st.image("kapak_foto.jpeg", use_container_width=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+    except Exception as e:
+        st.warning("Kapak fotoğrafı yüklenemedi, dosya adını kontrol edin.")
+
     st.title("📸 Çekim & Paket Teklif Formu")
     try:
         st.image("kapak_foto.jpg", use_container_width=True)
