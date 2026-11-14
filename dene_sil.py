@@ -260,15 +260,47 @@ if menu == "Müşteri Teklif Formu":
     except:
         pass
 
-    # Üst Bölüm: İletişim, Şehir ve Sipariş Notu
-    ad_soyad = st.text_input("Ad Soyad *")
-    telefon = st.text_input("Telefon *")
-    email = st.text_input("E-Posta Adresi *")
-    
-    sehir_listesi = ["Afyonkarahisar", "Ankara", "İstanbul", "İzmir", "Antalya", "Konya", "Bursa", "Eskişehir", "Diğer"]
-    sehir = st.selectbox("Şehir *", ["Seçiniz..."] + sehir_listesi)
-    
-    siparis_notu = st.text_area("Sipariş Notu", placeholder="Eklemek istediklerinizi yazabilirsiniz...", height=100)
+    import re
+
+# --- ÜST BÖLÜM: İLETİŞİM BİLGİLERİ VE FORMAT KONTROLLERİ ---
+ad_soyad = st.text_input("Ad Soyad *", placeholder="Adınızı ve soyadınızı giriniz")
+telefon = st.text_input("Telefon *", placeholder="05XXXXXXXXX veya 5XXXXXXXXX")
+email = st.text_input("E-Posta Adresi *", placeholder="ornek@email.com")
+
+sehir_listesi = ["Afyonkarahisar", "Ankara", "İstanbul", "İzmir", "Antalya", "Konya", "Bursa", "Eskişehir", "Diğer"]
+sehir = st.selectbox("Şehir *", ["Seçiniz..."] + sehir_listesi)
+
+siparis_notu = st.text_area("Sipariş Notu", placeholder="Eklemek istediklerinizi yazabilirsiniz...", height=100)
+
+# --- FORMAT DOĞRULAMA (VALIDATION) ---
+# E-posta kontrolü için regex
+email_gecerli = bool(re.match(r"^[\w\.-]+@[\w\.-]+\.\w+$", email)) if email else False
+
+# Telefon kontrolü (sadece rakam, boşluk veya başında 0/+90 kontrolü - en az 10 hane)
+temiz_telefon = re.sub(r"\D", "", telefon)
+telefon_gecerli = len(temiz_telefon) >= 10 if telefon else False
+
+# Uyarı mesajları ve form kilit mekanizması
+form_hatalari = []
+
+if email and not email_gecerli:
+    form_hatalari.append("⚠️ Geçerli bir **E-posta adresi** giriniz (Örn: ad soyad@domain.com).")
+
+if telefon and not telefon_gecerli:
+    form_hatalari.append("⚠️ Geçerli bir **Telefon numarası** giriniz (En az 10 haneli rakam olmalıdır).")
+
+# Hataları ekranda göster
+if form_hatalari:
+    for hata in form_hatalari:
+        st.error(hata)
+
+ust_bolum_dolu = bool(ad_soyad.strip() and telefon_gecerli and email_gecerli and sehir != "Seçiniz...")
+
+if not ust_bolum_dolu:
+    st.info("ℹ️ Lütfen yukarıdaki zorunlu alanları (`Ad Soyad`, geçerli `Telefon`, geçerli `E-Posta` ve `Şehir`) doğru formatta doldurunuz. Formun devamı bu alanlar eksiksiz doldurulduktan sonra açılacaktır.")
+else:
+    st.success("✅ İletişim bilgileri doğrulandı. Lütfen paket ve tarih seçimini tamamlayınız.")
+    st.markdown("---")
 
     ust_bolum_dolu = bool(ad_soyad.strip() and telefon.strip() and email.strip() and sehir != "Seçiniz...")
 
