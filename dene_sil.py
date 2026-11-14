@@ -92,7 +92,11 @@ def tarihi_duzelt(val):
         pass
         
     return s.split("T")[0].strip()
-
+with st.sidebar:
+    st.markdown("---")
+    if st.button("🔐 Yönetici Paneline Giriş"):
+        # Yönetici sayfasına yönlendirme veya state değişimi
+        pass
 # --- GOOGLE E-TABLODAN VERİ ÇEKME ---
 def verileri_tablodan_getir():
     fiyat_df = pd.DataFrame([
