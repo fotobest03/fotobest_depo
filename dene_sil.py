@@ -283,52 +283,50 @@ if menu == "Müşteri Teklif Formu":
     except Exception as e:
         st.warning("Kapak fotoğrafı yüklenemedi, dosya adını kontrol edin.")
 
-    # --- ÜST KISIM: 2 ADET INSTAGRAM BUTONU ---
-    col_ig1, col_ig2 = st.columns(2)
+    # --- ÜST KISIM: 2 ADET INSTAGRAM + SAĞDA KÜÇÜK YÖNETİM İKONU (≡) ---
+col_ig1, col_ig2, col_adm = st.columns([4, 4, 1])
 
-    with col_ig1:
-        st.link_button("📸 Foto Best Instagram", "https://www.instagram.com/fotobestofficial?utm_source=qr", use_container_width=True)
+with col_ig1:
+    st.link_button("📸 Foto Best IG", "https://www.instagram.com/fotobestofficial?utm_source=qr", use_container_width=True)
 
-    with col_ig2:
-        st.link_button("🏛️ Plato Instagram", "https://www.instagram.com/afyoncekimplatosu?utm_source=qr", use_container_width=True)
+with col_ig2:
+    st.link_button("🏛️ Plato IG", "https://www.instagram.com/afyoncekimplatosu?utm_source=qr", use_container_width=True)
 
-    # --- ≡ YÖNETİM BUTONU (İnstagram butonlarının hemen altında tam genişlikte) ---
+with col_adm:
     if "yonetim_menu_acik" not in st.session_state:
         st.session_state.yonetim_menu_acik = False
-
-    # Yönetim menüsünü açıp kapatan buton
-    if st.button("≡ Yönetim Paneli Girişi", use_container_width=True):
+        
+    # Küçük ve dikkat çekmeyen 3 çizgi menü butonu
+    if st.button("≡", use_container_width=True, help="Yönetici Girişi"):
         st.session_state.yonetim_menu_acik = not st.session_state.yonetim_menu_acik
         st.rerun()
 
-    # --- AÇILAN ŞİFRE GİRİŞ KUTUSU (Şık ve Düzgün Tasarım) ---
+    # --- ≡ İKONUNA BASILDIYSA AÇILAN COMPACT ŞİFRE GİRİŞ ALANI ---
     if st.session_state.get("yonetim_menu_acik", False):
         with st.container():
             st.markdown("""
-                <div style="background-color: #f8f9fa; padding: 20px; border-radius: 10px; border: 1px solid #ced4da; margin-top: 10px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
-                    <h4 style="color: #333; margin-top: 0; margin-bottom: 15px; font-size: 16px;">🔐 Yönetici Şifre Doğrulama</h4>
+                <div style="background-color: #f8f9fa; padding: 12px; border-radius: 8px; border: 1px solid #e0e0e0; margin-bottom: 15px;">
+                    <span style="font-size: 13px; font-weight: bold; color: #444;">🔐 Yönetici Girişi</span>
                 </div>
             """, unsafe_allow_html=True)
             
-            # İçeriği düzgün hizalamak için geniş sütunlar kullanıyoruz
             col_sifre, col_giris_btn = st.columns([3, 1])
             
             with col_sifre:
-                sifre_input = st.text_input("Yönetici Şifresi", type="password", key="ust_menu_sifre", placeholder="Şifrenizi girin...")
+                sifre_input = st.text_input("Şifre", type="password", key="kompakt_sifre", label_visibility="collapsed", placeholder="Yönetici şifresi...")
                 
             with col_giris_btn:
-                st.markdown("<div style='margin-top: 27px;'></div>", unsafe_allow_html=True) # Hizalama boşluğu
-                if st.button("Giriş Yap", use_container_width=True):
+                if st.button("Giriş", use_container_width=True, key="kompakt_giris_btn"):
                     if sifre_input == "1453":  # Kendi şifreniz
                         st.session_state.admin_giris = True
                         st.session_state.yonetim_menu_acik = False
-                        st.success("Giriş başarılı! Araçlar aktifleşiyor...")
+                        st.success("Giriş başarılı!")
                         st.rerun()
                     else:
-                        st.error("Hatalı şifre!")
+                        st.error("Hatalı!")
                         
             if st.session_state.admin_giris:
-                if st.button("🔓 Oturumu Kapat (Gizle)", use_container_width=True):
+                if st.button("🔓 Oturumu Kapat", use_container_width=True):
                     st.session_state.admin_giris = False
                     st.session_state.yonetim_menu_acik = False
                     st.rerun()
