@@ -6,7 +6,48 @@ import json
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+# --- PROFESYONEL CSS: SAĞ ÜST/ALT BUTONLAR GİZLİ, SOL MENÜ VE OK KALIYOR ---
+st.markdown("""
+        <style>
+            .block-container {
+                padding-top: 0rem !important;
+                padding-left: 1rem !important;
+                padding-right: 1rem !important;
+                max-width: 750px !important;
+                margin: 0 auto;
+            }
+            
+            /* Sol menü okunu korur, sadece sağ üstteki paylaşım/GitHub araç çubuğunu gizler */
+            header[data-testid="stHeader"] {
+                background: transparent !important;
+            }
+            header[data-testid="stHeader"] > div:first-child {
+                display: none !important;
+            }
+            
+            /* Sağ alttaki "Uygulamayı yönet" (Manage app) butonunu gizler */
+            [data-testid="stStatusWidget"] {
+                display: none !important;
+            }
 
+            .full-width-banner {
+                width: 100vw !important;
+                position: relative;
+                left: 50vw;
+                right: 50vw;
+                margin-left: -50vw;
+                margin-right: -50vw;
+                margin-bottom: 25px;
+            }
+            .full-width-banner img {
+                width: 100% !important;
+                height: auto;
+                display: block;
+                max-height: 380px;
+                object-fit: cover;
+            }
+        </style>
+    """, unsafe_allow_html=True)
 #--- SAYFA YAPILANDIRMASI VE GÖRÜNÜM AYARI ---
 st.set_page_config(page_title="Teklif ve Fiyat Yönetimi", page_icon="", layout="centered")
 
