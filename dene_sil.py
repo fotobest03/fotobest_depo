@@ -240,17 +240,16 @@ if menu == "Müşteri Teklif Formu":
     except Exception as e:
         st.warning("Kapak fotoğrafı yüklenemedi, dosya adını kontrol edin.")
 
-    # --- 2. HAKKIMIZDA BİLGİ KARTI (Instagram Butonları ile Güncellendi) ---
+    # --- 2. HAKKIMIZDA BİLGİ KARTI ---
     st.markdown("""
     <div style="background-color: #f8fbff; padding: 22px; border-radius: 12px; border-left: 6px solid #0066cc; border: 1px solid #d0e3ff; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
         
-        <!-- Başlık ve Instagram Butonları İçin Esnek Alan (Flexbox) -->
         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 12px;">
             <h3 style="color: #004080; margin: 0; font-size: 20px;">
                 ✨ Hakkımızda
             </h3>
             <div style="display: flex; gap: 8px; margin-top: 5px;">
-                <a href="https://www.instagram.com/fotobestofficial?utm_source=qr" target="_blank" style="background: linear-pressed(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); color: white; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: bold; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                <a href="https://www.instagram.com/fotobestofficial?utm_source=qr" target="_blank" style="background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); color: white; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: bold; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                     📸 Foto Best IG
                 </a>
                 <a href="https://www.instagram.com/afyoncekimplatosu?utm_source=qr" target="_blank" style="background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); color: white; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: bold; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
