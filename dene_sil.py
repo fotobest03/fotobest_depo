@@ -6,49 +6,53 @@ import json
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-# --- PROFESYONEL CSS: SOL MENÜ OKU VE PANELİ KALIYOR, SAĞ ÜST ARAÇLAR GİZLİ ---
-st.markdown("""
-        <style>
-            .block-container {
-                padding-top: 0rem !important;
-                padding-left: 1rem !important;
-                padding-right: 1rem !important;
-                max-width: 750px !important;
-                margin: 0 auto;
-            }
-            
-            /* Sadece sağ üstteki paylaşım, tema ve GitHub ikonlarını gizler, sol menü okuna dokunmaz */
-            header[data-testid="stHeader"] {
-                background: transparent !important;
-            }
-            /* Sağ üstteki action menu / toolbar buton grubu */
-            header[data-testid="stHeader"] [data-testid="stToolbar"] {
-                display: none !important;
-            }
-            
-            /* Sağ alttaki "Uygulamayı yönet" (Manage app) butonunu gizler */
-            [data-testid="stStatusWidget"] {
-                display: none !important;
-            }
+import streamlit as st
 
-            .full-width-banner {
-                width: 100vw !important;
-                position: relative;
-                left: 50vw;
-                right: 50vw;
-                margin-left: -50vw;
-                margin-right: -50vw;
-                margin-bottom: 25px;
-            }
-            .full-width-banner img {
-                width: 100% !important;
-                height: auto;
-                display: block;
-                max-height: 380px;
-                object-fit: cover;
-            }
-        </style>
-    """, unsafe_allow_html=True)    
+# Sayfa yapılandırması (Sol menüyü kapalı başlatıyoruz)
+st.set_page_config(
+    page_title="Foto Best - Çekim & Paket Teklif Formu",
+    page_icon="logo.jpeg",
+    layout="centered",
+    initial_sidebar_state="collapsed"
+)
+
+# --- ŞIK CSS: ÜST KISIM VE YÖNETİCİ BUTONU İÇİN DÜZENLEMELER ---
+st.markdown("""
+    <style>
+        .block-container {
+            padding-top: 0rem !important;
+            padding-left: 1rem !important;
+            padding-right: 1rem !important;
+            max-width: 750px !important;
+            margin: 0 auto;
+        }
+        
+        /* Streamlit'in standart üst araç çubuğunu ve sağ alttaki yönet widget'ını tamamen gizle */
+        header[data-testid="stHeader"] {
+            display: none !important;
+        }
+        [data-testid="stStatusWidget"] {
+            display: none !important;
+        }
+
+        .full-width-banner {
+            width: 100vw !important;
+            position: relative;
+            left: 50vw;
+            right: 50vw;
+            margin-left: -50vw;
+            margin-right: -50vw;
+            margin-bottom: 25px;
+        }
+        .full-width-banner img {
+            width: 100% !important;
+            height: auto;
+            display: block;
+            max-height: 380px;
+            object-fit: cover;
+        }
+    </style>
+""", unsafe_allow_html=True)
 #--- SAYFA YAPILANDIRMASI VE GÖRÜNÜM AYARI ---
 st.set_page_config(page_title="Teklif ve Fiyat Yönetimi", page_icon="", layout="centered")
 
@@ -273,7 +277,30 @@ if menu == "Müşteri Teklif Formu":
             }
         </style>
     """, unsafe_allow_html=True)
+# --- FOTOĞRAFTAN ÖNCE SAĞ ÜSTTE YÖNETİCİ GİRİŞ BUTONU ---
+col_bosluk, col_buton = st.columns([4, 1.2])
+with col_buton:
+    # Kullanıcı butona basınca sayfayı yönetici paneline çeviriyoruz
+    if st.button("🔐 Yönetici Paneli", use_container_width=True):
+        st.session_state["yonetici_giris"] = True
 
+# Eğer yönetici girişi aktifse veya menüden seçildiyse Yönetici Panelini aç
+if st.session_state.get("yonetici_giris", False):
+    st.warning("🛠️ Yönetici Panelindesiniz.")
+    if st.button("⬅️ Müşteri Formuna Geri Dön"):
+        st.session_state["yonetici_giris"] = False
+        st.rerun()
+    
+    # === BURAYA YÖNETİCİ PANELİ KODLARINIZ GELECEK ===
+    st.stop()
+
+# --- 1. KAPAK GÖRSELİ (Yatayda Full) ---
+try:
+    st.markdown('<div class="full-width-banner">', unsafe_allow_html=True)
+    st.image("kapak_foto.jpeg", use_container_width=True)
+    st.markdown('</div>', unsafe_allow_html=True)
+except Exception as e:
+    st.warning("Kapak fotoğrafı yüklenemedi, dosya adını kontrol edin.")
     # --- 1. KAPAK GÖRSELİ (Yatayda Full) ---
     try:
         st.markdown('<div class="full-width-banner">', unsafe_allow_html=True)
