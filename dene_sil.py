@@ -259,11 +259,11 @@ if menu == "Müşteri Teklif Formu":
     <div style="background-color: #f8fbff; padding: 22px; border-radius: 12px; border-left: 6px solid #0066cc; border: 1px solid #d0e3ff; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
         <h3 style="color: #004080; margin-top: 0; margin-bottom: 12px; font-size: 20px;">✨ Hakkımızda</h3>
         <p style="color: #333333; font-size: 14px; line-height: 1.6; margin-bottom: 15px;">
-            Afyonkarahisar merkezde hizmet veren <b>Foto Best</b>, yılların deneyimini modern teknolojiler ve sanatsal bir bakış açısıyla buluşturuyor. Bireysel ve kurumsal tüm fotoğrafçılık ihtiyaçlarınıza profesyonel çözümler sunuyoruz.
+            Afyonkarahisar merkezde hizmet veren <b>FotoBest</b>, yılların deneyimini modern teknolojiler ve sanatsal bir bakış açısıyla buluşturuyor. Bireysel ve kurumsal tüm fotoğrafçılık ihtiyaçlarınıza profesyonel çözümler sunuyoruz.
         </p>
         <h4 style="color: #004080; font-size: 16px; margin-bottom: 8px;">Hizmetlerimiz:</h4>
         <ul style="color: #333333; font-size: 14px; line-height: 1.5; margin-bottom: 15px; padding-left: 20px;">
-            <li><b>Ayrıcalıklı Mekan:</b> İl merkezine 33km uzaklıkta yer alan FotoBest'e ait 300m<sup>2</sup> kapalı, 1700m<sup>2</sup> açık alanla konsept çekimler için plato imkanı sunuyoruz.</li>
+            <li><b>Ayrıcalıklı Mekan:</b> İl merkezine 33km uzaklıkta yer alan <b>FotoBest</b>'e ait 300m<sup>2</sup> kapalı, 1700m<sup>2</sup> açık alanla konsept çekimler için plato imkanı sunuyoruz.</li>
             <li><b>Özel Gün Çekimleri:</b> Düğün, nişan, kına, söz ve sünnet organizasyonlarında en mutlu anlarınızı özenle ölümsüzleştiriyoruz.</li>
             <li><b>Dış Mekan & Konsept:</b> Şehiriçi ve Şehirdışı gibi tarihi ve doğal mekanlarda özgün çekimler gerçekleştiriyoruz.</li>
             <li><b>Stüdyo Portreleri:</b> Vesikalık, biyometrik, aile portrelerinin yanı sıra yenidoğan ve bebek konsept çekimleri yapıyoruz.</li>
