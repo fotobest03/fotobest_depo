@@ -193,29 +193,28 @@ def mail_gonder(alici_eposta, ad_soyad, telefon, sehir, siparis_notu, tarih_str,
 menu = st.sidebar.radio("Sayfa Seçin", ["Müşteri Teklif Formu", "Yönetici Paneli (Fiyat & Takvim)"])
 
 # ================= MÜŞTERİ FORMU =================
-# ================= MÜŞTERİ FORMU =================
 if menu == "Müşteri Teklif Formu":
     
-    # --- GÖRSELİ YATAYDA FULL KAPLATAN ÖZEL CSS ---
+    # --- MÜKEMMEL DÜZEN: FOTOĞRAF TAM GENİŞLİK, FORM ORTALANMIŞ ---
     st.markdown("""
         <style>
-            /* Streamlit'in ana sayfa üst ve yan boşluklarını sıfırlıyoruz */
+            /* Streamlit'in kendi ana genişliğini koruyoruz ama üst boşluğu sıfırlıyoruz */
             .block-container {
                 padding-top: 0rem !important;
-                padding-left: 0rem !important;
-                padding-right: 0rem !important;
-                max-width: 100% !important;
+                padding-left: 1rem !important;
+                padding-right: 1rem !important;
+                max-width: 750px !important; /* Formun çok yayılmasını önleyip şık durmasını sağlar */
+                margin: 0 auto;
             }
             
-            /* Üstteki Streamlit boşluk gizleyicileri */
             header {visibility: hidden;}
-            
-            /* Kapak görselini tam ekran genişliğine sabitleme */
+
+            /* Kapak fotoğrafını sayfanın en tepesinde tam genişlikte gösteren sihirli kod */
             .full-width-banner {
-                width: 100vw;
+                width: 100vw !important;
                 position: relative;
-                left: 50%;
-                right: 50%;
+                left: 50vw;
+                right: 50vw;
                 margin-left: -50vw;
                 margin-right: -50vw;
                 margin-bottom: 25px;
@@ -224,16 +223,13 @@ if menu == "Müşteri Teklif Formu":
                 width: 100% !important;
                 height: auto;
                 display: block;
-            }
-            
-            /* Form elemanlarının tekrar hizalı durması için iç container boşluğu */
-            .form-content {
-                padding: 0 2rem;
+                max-height: 380px;
+                object-fit: cover;
             }
         </style>
     """, unsafe_allow_html=True)
 
-    # --- KAPAK GÖRSELİNİ TAM GENİŞLİKTE EKLEME ---
+    # --- KAPAK GÖRSELİ (Yatayda Full) ---
     try:
         st.markdown('<div class="full-width-banner">', unsafe_allow_html=True)
         st.image("kapak_foto.jpeg", use_container_width=True)
@@ -241,9 +237,7 @@ if menu == "Müşteri Teklif Formu":
     except Exception as e:
         st.warning("Kapak fotoğrafı yüklenemedi, dosya adını kontrol edin.")
 
-    # --- FORMUN KALAN KISMI (Hizanın bozulmaması için container içinde) ---
-    st.markdown('<div class="form-content">', unsafe_allow_html=True)
-    
+    # --- FORM BAŞLIĞI VE ALANLARI (Ortalanmış ve Şık) ---
     st.title("📸 Çekim & Paket Teklif Formu")
     try:
         st.image("kapak_foto.jpg", use_container_width=True)
