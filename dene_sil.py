@@ -9,48 +9,6 @@ from email.mime.multipart import MIMEMultipart
 
 #--- SAYFA YAPILANDIRMASI VE GÖRÜNÜM AYARI ---
 st.set_page_config(page_title="Teklif ve Fiyat Yönetimi", page_icon="", layout="centered")
-st.markdown("""
-        <style>
-            .block-container {
-                padding-top: 0rem !important;
-                padding-left: 1rem !important;
-                padding-right: 1rem !important;
-                max-width: 750px !important;
-                margin: 0 auto;
-            }
-            
-            /* Sol menü okunu koruyoruz, sadece sağ üstteki paylaşim/GitHub vb. butonları gizliyoruz */
-            header[data-testid="stHeader"] {
-                background: transparent !important;
-            }
-            header[data-testid="stHeader"] > div:first-child {
-                display: none !important;
-            }
-            
-            /* SADECE sağ alttaki "Manage app / Uygulamayı yönet" rozetini gizler */
-            [data-testid="stStatusWidget"] {
-                display: none !important;
-            }
-
-            .full-width-banner {
-                width: 100vw !important;
-                position: relative;
-                left: 50vw;
-                right: 50vw;
-                margin-left: -50vw;
-                margin-right: -50vw;
-                margin-bottom: 25px;
-            }
-            .full-width-banner img {
-                width: 100% !important;
-                height: auto;
-                display: block;
-                max-height: 380px;
-                object-fit: cover;
-            }
-        </style>
-    """, unsafe_allow_html=True)
-
 
 #--- AYARLAR VE GİZLİ BİLGİLER ---
 GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw8cuRim-zolXECVOWFrZ20wpf4TtqccNx4YjNfzlqpCqiS7XO54siAt7nY0oF8YW0X/exec"
