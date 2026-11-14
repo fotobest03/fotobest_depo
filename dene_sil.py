@@ -195,49 +195,31 @@ menu = st.sidebar.radio("Sayfa Seçin", ["Müşteri Teklif Formu", "Yönetici Pa
 # ================= MÜŞTERİ FORMU =================
 if menu == "Müşteri Teklif Formu":
     
-    # --- MÜKEMMEL DÜZEN: FOTOĞRAF TAM GENİŞLİK, FORM ORTALANMIŞ ---
+    # --- KAPAK GÖRSELİ VE ÖZEL STİL ---
     st.markdown("""
         <style>
-            /* Streamlit'in kendi ana genişliğini koruyoruz ama üst boşluğu sıfırlıyoruz */
+            /* Streamlit üst boşluğunu daraltıp görseli tepeye oturtuyoruz */
             .block-container {
-                padding-top: 0rem !important;
-                padding-left: 1rem !important;
-                padding-right: 1rem !important;
-                max-width: 750px !important; /* Formun çok yayılmasını önleyip şık durmasını sağlar */
-                margin: 0 auto;
+                padding-top: 1rem !important;
             }
-            
-            header {visibility: hidden;}
-
-            /* Kapak fotoğrafını sayfanın en tepesinde tam genişlikte gösteren sihirli kod */
-            .full-width-banner {
-                width: 100vw !important;
-                position: relative;
-                left: 50vw;
-                right: 50vw;
-                margin-left: -50vw;
-                margin-right: -50vw;
+            .cover-box {
+                width: 100%;
+                border-radius: 12px;
+                overflow: hidden;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
                 margin-bottom: 25px;
-            }
-            .full-width-banner img {
-                width: 100% !important;
-                height: auto;
-                display: block;
-                max-height: 380px;
-                object-fit: cover;
             }
         </style>
     """, unsafe_allow_html=True)
 
-    # --- KAPAK GÖRSELİ (Yatayda Full) ---
+    # Kapak fotoğrafını tam genişlikte ve şık çerçeveyle ekleme
     try:
-        st.markdown('<div class="full-width-banner">', unsafe_allow_html=True)
+        st.markdown('<div class="cover-box">', unsafe_allow_html=True)
         st.image("kapak_foto.jpeg", use_container_width=True)
         st.markdown('</div>', unsafe_allow_html=True)
     except Exception as e:
         st.warning("Kapak fotoğrafı yüklenemedi, dosya adını kontrol edin.")
 
-    # --- FORM BAŞLIĞI VE ALANLARI (Ortalanmış ve Şık) ---
     st.title("📸 Çekim & Paket Teklif Formu")
     try:
         st.image("kapak_foto.jpg", use_container_width=True)
