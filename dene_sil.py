@@ -350,21 +350,34 @@ if menu == "Müşteri Teklif Formu":
         kampanya_dict = get_campaign_dict()
         closed_lst = get_closed_dates_list()
 
-        rezervasyon_tarihi = st.date_input("Çekim Tarihi Seçiniz", value=date.today(), min_value=date.today())
-        
-        # --- ÇEKİM SAATİ (SADECE VIP SEÇİLMEDİYSE GÖSTERİLİR) ---
-        cekim_saati = "Tüm Gün / VIP Çekim"
-        if not vip_paket_secildi:
-            cekim_saati = st.selectbox(
-                "Çekim Saati Seçiniz *",
-                ["10.00-12.00", "12.00-14.00", "14.00-16.00", "16.00-18.00"]
-            )
+        # --- YENİ: DÜĞÜN TARİHİM BELLİ DEĞİL KUTUCUĞU ---
+        st.markdown("<br>", unsafe_allow_html=True)
+        tarih_belli_degil = st.checkbox("📅 Düğün tarihim belli değil (Daha sonra belirleyeceğim)")
 
-        tarih_kapali_mi = rezervasyon_tarihi in closed_lst
-        kampanya_orani = kampanya_dict.get(rezervasyon_tarihi, 0)
+        rezervasyon_tarihi = None
+        cekim_saati = "Belirtilmedi"
+        tarih_kapali_mi = False
+        kampanya_orani = 0
 
-        if tarih_kapali_mi:
-            st.error(f"⚠️ Seçtiğiniz tarih ({rezervasyon_tarihi.strftime('%d.%m.%Y')}) doludur.")
+        if not tarih_belli_degil:
+            rezervasyon_tarihi = st.date_input("Çekim Tarihi Seçiniz", value=date.today(), min_value=date.today())
+            
+            # Çekim saati (VIP seçilmediyse gösterilir)
+            if not vip_paket_secildi:
+                cekim_saati = st.selectbox(
+                    "Çekim Saati Seçiniz *",
+                    ["10.00-12.00", "12.00-14.00", "14.00-16.00", "16.00-18.00"]
+                )
+            else:
+                cekim_saati = "Tüm Gün / VIP Çekim"
+
+            tarih_kapali_mi = rezervasyon_tarihi in closed_lst
+            kampanya_orani = kampanya_dict.get(rezervasyon_tarihi, 0)
+
+            if tarih_kapali_mi:
+                st.error(f"⚠️ Seçtiğiniz tarih ({rezervasyon_tarihi.strftime('%d.%m.%Y')}) doludur.")
+        else:
+            st.info("ℹ️ Tarih ve saat alanı gizlendi. Randevu detayını daha sonra netleştirebilirsiniz.")
 
         # --- 3. STANDART ALBÜM KOMBİNASYONLARI (VIP VEYA DİJİTAL SEÇİLDIYSE GİZLENİR) ---
         if vip_paket_secildi:
@@ -435,7 +448,7 @@ if menu == "Müşteri Teklif Formu":
             elif not vip_paket_secildi and not dijital_paket_secildi and secilen_mekan == "Seçiniz...":
                 st.warning("Lütfen bir Çekim Mekanı seçiniz.")
             else:
-                t_str = rezervasyon_tarihi.strftime('%d.%m.%Y')
+                t_str = rezervasyon_tarihi.strftime('%d.%m.%Y') if rezervasyon_tarihi else "Tarih Belirsiz (Daha Sonra Belirlenecek)"
                 
                 sm_durumu = "Sosyal Medya Paylaşımı: Evet" if sosyal_medya_paylasimi else "Sosyal Medya Paylaşımı: Hayır"
                 
