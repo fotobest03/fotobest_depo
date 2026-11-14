@@ -242,13 +242,12 @@ if menu == "Müşteri Teklif Formu":
         st.markdown('</div>', unsafe_allow_html=True)
     except Exception as e:
         st.warning("Kapak fotoğrafı yüklenemedi, dosya adını kontrol edin.")
-    # --- SAYFANIN ÜST KISMINDA INSTAGRAM BAĞLANTI BUTONLARI ---
-        col_ig1, col_ig2 = st.columns(2)
-        with col_ig1:
-            st.link_button("📸 Foto Best Instagram", "[https://www.instagram.com/fotobestofficial?utm_source=qr](https://www.instagram.com/fotobestofficial?utm_source=qr)", use_container_width=True)
-        with col_ig2:
-            st.link_button("🏛️ Plato Instagram", "[https://www.instagram.com/afyoncekimplatosu?utm_source=qr](https://www.instagram.com/afyoncekimplatosu?utm_source=qr)", use_container_width=True)
-    
+# --- SAYFANIN ÜST KISMINDA INSTAGRAM BAĞLANTI BUTONLARI ---
+    col_ig1, col_ig2 = st.columns(2)
+    with col_ig1:
+        st.link_button("📸 Foto Best Instagram", "[https://www.instagram.com/fotobestofficial?utm_source=qr](https://www.instagram.com/fotobestofficial?utm_source=qr)", use_container_width=True)
+    with col_ig2:
+        st.link_button("🏛️ Plato Instagram", "[https://www.instagram.com/afyoncekimplatosu?utm_source=qr](https://www.instagram.com/afyoncekimplatosu?utm_source=qr)", use_container_width=True)    
     # --- 2. HAKKIMIZDA BİLGİ KARTI (Sade ve Hatasız) ---
     st.markdown("""
     <div style="background-color: #f8fbff; padding: 22px; border-radius: 12px; border-left: 6px solid #0066cc; border: 1px solid #d0e3ff; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
