@@ -52,13 +52,6 @@ def tarihi_duzelt(val):
         
     return s.split("T")[0].strip()
 
-# --- SAYFANIN ÜST KISMINDA INSTAGRAM BAĞLANTI BUTONLARI ---
-col_ig1, col_ig2 = st.columns(2)
-with col_ig1:
-    st.link_button("📸 Foto Best Instagram", "[https://www.instagram.com/fotobestofficial?utm_source=qr](https://www.instagram.com/fotobestofficial?utm_source=qr)", use_container_width=True)
-with col_ig2:
-    st.link_button("🏛️ Plato Instagram", "[https://www.instagram.com/afyoncekimplatosu?utm_source=qr](https://www.instagram.com/afyoncekimplatosu?utm_source=qr)", use_container_width=True)
-
 st.markdown("<br>", unsafe_allow_html=True)
 
 # --- GOOGLE E-TABLODAN VERİ ÇEKME ---
@@ -240,7 +233,14 @@ if menu == "Müşteri Teklif Formu":
             }
         </style>
     """, unsafe_allow_html=True)
-
+    
+    # --- SAYFANIN ÜST KISMINDA INSTAGRAM BAĞLANTI BUTONLARI ---
+    col_ig1, col_ig2 = st.columns(2)
+    with col_ig1:
+        st.link_button("📸 Foto Best Instagram", "[https://www.instagram.com/fotobestofficial?utm_source=qr](https://www.instagram.com/fotobestofficial?utm_source=qr)", use_container_width=True)
+    with col_ig2:
+        st.link_button("🏛️ Plato Instagram", "[https://www.instagram.com/afyoncekimplatosu?utm_source=qr](https://www.instagram.com/afyoncekimplatosu?utm_source=qr)", use_container_width=True)
+    
     # --- 1. KAPAK GÖRSELİ (Yatayda Full) ---
     try:
         st.markdown('<div class="full-width-banner">', unsafe_allow_html=True)
