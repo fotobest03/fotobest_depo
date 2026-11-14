@@ -18,34 +18,29 @@ with col_yonet:
         st.session_state.yonetim_menu_acik = not st.session_state.yonetim_menu_acik
         st.rerun()
 
-# --- ≡ BUTONUNA BASILDIYSA AÇILAN GENİŞ VE DÜZGÜN ŞİFRE KUTUSU ---
-if st.session_state.get("yonetim_menu_acik", False):
-    with st.container():
-        st.markdown("""
-            <div style="background-color: #f8f9fa; padding: 12px; border-radius: 8px; border: 1px solid #e0e0e0; margin-bottom: 15px;">
-                <span style="font-size: 13px; font-weight: bold; color: #444;">🔐 Yönetici Girişi</span>
-            </div>
-        """, unsafe_allow_html=True)
+# --- SAĞ ÜST KÖŞEDE MİNİ YÖNETİM MENÜSÜ (POP-OVER İLE BOŞLUKSUZ ÇÖZÜM) ---
+col_bos, col_yonet = st.columns([11, 1])
+
+with col_yonet:
+    # st.popover buton tıklandığında doğrudan şık bir kutu açar, kapalıyken sayfada yer kaplamaz
+    with st.popover("≡", help="Yönetici Girişi"):
         
-        col_sifre, col_giris_btn = st.columns([4, 1])
-        
-        with col_sifre:
-            sifre_input = st.text_input("Şifre", type="password", key="ust_sifre_kutusu", label_visibility="collapsed", placeholder="Yönetici şifresi...")
+        if not st.session_state.get("admin_giris", False):
+            st.markdown("<b>🔐 Yönetici Girişi</b>", unsafe_allow_html=True)
             
-        with col_giris_btn:
-            if st.button("Giriş", use_container_width=True, key="ust_giris_btn"):
+            sifre_input = st.text_input("Şifre", type="password", key="popover_sifre", placeholder="Şifrenizi girin...")
+            
+            if st.button("Giriş Yap", use_container_width=True, key="popover_giris_btn"):
                 if sifre_input == "1453":  # Kendi şifreniz
                     st.session_state.admin_giris = True
-                    st.session_state.yonetim_menu_acik = False
                     st.success("Giriş başarılı!")
                     st.rerun()
                 else:
-                    st.error("Hatalı!")
-                    
-        if st.session_state.admin_giris:
-            if st.button("🔓 Oturumu Kapat", use_container_width=True):
+                    st.error("Hatalı şifre!")
+        else:
+            st.success("🔓 Oturum Açık")
+            if st.button("Oturumu Kapat", use_container_width=True, key="popover_cikis_btn"):
                 st.session_state.admin_giris = False
-                st.session_state.yonetim_menu_acik = False
                 st.rerun()
 
 #--- SAYFA YAPILANDIRMASI VE GÖRÜNÜM AYARI ---
