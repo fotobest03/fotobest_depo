@@ -10,6 +10,13 @@ from email.mime.multipart import MIMEMultipart
 #--- SAYFA YAPILANDIRMASI VE GÖRÜNÜM AYARI ---
 st.set_page_config(page_title="Teklif ve Fiyat Yönetimi", page_icon="", layout="centered")
 
+# --- TARAYICI SEKMESİ AYARLARI (FAVICON VE BAŞLIK) ---
+st.set_page_config(
+    page_title="Foto Best - Çekim & Paket Teklif Formu",
+    page_icon="logo.png",  # <-- Buraya logomuzun dosya adını yazıyoruz (örn: logo.jpeg, logo.png vb.)
+    layout="centered",
+    initial_sidebar_state="auto"
+)
 #--- AYARLAR VE GİZLİ BİLGİLER ---
 GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw8cuRim-zolXECVOWFrZ20wpf4TtqccNx4YjNfzlqpCqiS7XO54siAt7nY0oF8YW0X/exec"
 GMAIL_KULLANICI = "afotobest@gmail.com"
