@@ -469,41 +469,45 @@ if menu == "Müşteri Teklif Formu":
 
         if st.button("Teklifi Gönder ve Kaydet"):
             if tarih_kapali_mi:
-                st.error("Kapalı tarih!")
+                st.error("⚠️ Seçtiğiniz tarih doludur, lütfen başka bir tarih seçiniz.")
             elif not vip_paket_secildi and not dijital_paket_secildi and secilen_mekan == "Seçiniz...":
-                st.warning("Lütfen bir Çekim Mekanı seçiniz.")
+                st.warning("⚠️ Lütfen bir Çekim Mekanı seçiniz.")
             else:
-                t_str = rezervasyon_tarihi.strftime('%d.%m.%Y')
+                # --- YÜKLENİYOR İKONU VE BEKLETME MESAJI ---
+                with st.spinner("⏳ Formunuz gönderiliyor, lütfen bekleyiniz..."):
+                    t_str = rezervasyon_tarihi.strftime('%d.%m.%Y') if rezervasyon_tarihi else "Tarih Belirsiz (Daha Sonra Belirlenecek)"
+                    
+                    sm_durumu = "Sosyal Medya Paylaşımı: Evet" if sosyal_medya_paylasimi else "Sosyal Medya Paylaşımı: Hayır"
+                    
+                    if vip_paket_secildi:
+                        klip_detay = " + Dış Çekim Klibi" if vip_klip_secildi else ""
+                        detaylar = f"👑 VIP Çekim Paketi{klip_detay} | {sm_durumu}"
+                    elif dijital_paket_secildi:
+                        detaylar = f"{secilen_mekan} | {sm_durumu}"
+                    else:
+                        mekan_detay = f"{secilen_mekan} (+ Merkez Çekimi)" if ilave_mekan_secildi else secilen_mekan
+                        detaylar = f"{secilen_ana_album} | {secilen_album} | {secilen_tablo} | Mekan: {mekan_detay} | {sm_durumu}"
+                    
+                    veri = {
+                        "tarih": t_str, 
+                        "saat": cekim_saati, 
+                        "ad_soyad": ad_soyad, 
+                        "telefon": telefon, 
+                        "email": email, 
+                        "sehir": sehir,
+                        "siparis_notu": siparis_notu,
+                        "detaylar": detaylar, 
+                        "tutar": f"{toplam_tutar:,.2f} TL"
+                    }
+                    
+                    try:
+                        requests.post(GOOGLE_SCRIPT_URL, json=veri)
+                    except: pass
+                    
+                    mail_gonder(email, ad_soyad, telefon, sehir, siparis_notu, f"{t_str} (Saat: {cekim_saati})", detaylar, toplam_tutar)
                 
-                sm_durumu = "Sosyal Medya Paylaşımı: Evet" if sosyal_medya_paylasimi else "Sosyal Medya Paylaşımı: Hayır"
-                
-                if vip_paket_secildi:
-                    klip_detay = " + Dış Çekim Klibi" if vip_klip_secildi else ""
-                    detaylar = f"👑 VIP Çekim Paketi{klip_detay} | {sm_durumu}"
-                elif dijital_paket_secildi:
-                    detaylar = f"{secilen_mekan} | {sm_durumu}"
-                else:
-                    mekan_detay = f"{secilen_mekan} (+ Merkez Çekimi)" if ilave_mekan_secildi else secilen_mekan
-                    detaylar = f"{secilen_ana_album} | {secilen_album} | {secilen_tablo} | Mekan: {mekan_detay} | {sm_durumu}"
-                
-                veri = {
-                    "tarih": t_str, 
-                    "saat": cekim_saati, 
-                    "ad_soyad": ad_soyad, 
-                    "telefon": telefon, 
-                    "email": email, 
-                    "sehir": sehir,
-                    "siparis_notu": siparis_notu,
-                    "detaylar": detaylar, 
-                    "tutar": f"{toplam_tutar:,.2f} TL"
-                }
-                
-                try:
-                    requests.post(GOOGLE_SCRIPT_URL, json=veri)
-                except: pass
-                
-                mail_gonder(email, ad_soyad, telefon, sehir, siparis_notu, f"{t_str} (Saat: {cekim_saati})", detaylar, toplam_tutar)
-                st.success("Rezervasyon alındı!")
+                # İşlem tamamlandığında başarı mesajı ve balonlar
+                st.success("✨ Rezervasyonunuz başarıyla alındı!")
                 st.balloons()
 
 # ================= YÖNETİCİ PANELİ =================
