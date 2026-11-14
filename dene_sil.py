@@ -326,14 +326,11 @@ if menu == "Müşteri Teklif Formu":
 
     # --- 2. ALT KISIMDA 2 ADET YAN YANA İNSTAGRAM BUTONU ---
     col_ig1, col_ig2 = st.columns(2)
-
     with col_ig1:
         st.link_button("📸 FotoBest İnstagram", "https://www.instagram.com/fotobestofficial?utm_source=qr", use_container_width=True)
-
     with col_ig2:
         st.link_button("🏛️ FotoBest Plato İnstagram", "https://www.instagram.com/afyoncekimplatosu?utm_source=qr", use_container_width=True)
-
-    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown("", unsafe_allow_html=True)
     
     # --- 2. HAKKIMIZDA BİLGİ KARTI (Sade ve Hatasız) ---
     st.markdown("""
