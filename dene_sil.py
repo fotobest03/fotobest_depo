@@ -295,8 +295,19 @@ if menu == "Müşteri Teklif Formu":
         if vip_paket_secildi:
             fiyat_vip = 30000.0
             st.markdown("""
-                <div style="background-color: #fef9e7; padding: 12px; border-radius: 8px; border: 1px dashed #f39c12; margin: 10px 0 15px 0;">
-            gdsgdsgagfdgfdgfdgdfsdfshdfgh""", unsafe_allow_html=True)
+                <div style="background-color: #fef9e7; padding: 18px; border-radius: 10px; border: 1px dashed #f39c12; margin: 10px 0 15px 0;">
+                    <h4 style="color: #b9770e; margin: 0 0 10px 0; font-size: 16px;">👑 VIP Paket Detayları & İçeriği:</h4>
+                    <ul style="color: #333333; font-size: 14px; line-height: 1.6; margin: 0; padding-left: 20px;">
+                        <li><b>1 Adet 30x76 Ebadında Mat Albüm</b> (10 Sayfa)</li>
+                        <li><b>2 Adet Aile Albümü</b> ve <b>1 Adet 50x70 Kanvas Tablo</b></li>
+                        <li><b>Çekim Süresi:</b> 5-6 Saat + Gün Batımı</li>
+                        <li><b>Fotoğraf Seçimi:</b> Albüm içine girecek 55 poz fotoğraf işlenir (Sadece 55 poz fotoğraf işlenir)</li>
+                        <li><b>Çekim Mekanı:</b> Antalya - Kapadokya - Salda - Fethiye - Eskişehir</li>
+                        <li><b>Teslimat:</b> Seçilen bütün fotoğraflar USB'ye atılır <i>(USB müşteriye aittir)</i></li>
+                        <li><b>Ulaşım:</b> Mekana ulaşım her iki tarafın da kendisine aittir</li>
+                    </ul>
+                </div>
+            """, unsafe_allow_html=True)
             vip_klip_secildi = st.checkbox("🎬 Dış Çekim Klibi İstiyorum (+10.000 TL)")
             st.markdown("</div>", unsafe_allow_html=True)
 
