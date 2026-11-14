@@ -352,10 +352,13 @@ if menu == "Müşteri Teklif Formu":
 
         rezervasyon_tarihi = st.date_input("Çekim Tarihi Seçiniz", value=date.today(), min_value=date.today())
         
-        cekim_saati = st.selectbox(
-            "Çekim Saati Seçiniz *",
-            ["10.00-12.00", "12.00-14.00", "14.00-16.00", "16.00-18.00"]
-        )
+        # --- ÇEKİM SAATİ (SADECE VIP SEÇİLMEDİYSE GÖSTERİLİR) ---
+        cekim_saati = "Tüm Gün / VIP Çekim"
+        if not vip_paket_secildi:
+            cekim_saati = st.selectbox(
+                "Çekim Saati Seçiniz *",
+                ["10.00-12.00", "12.00-14.00", "14.00-16.00", "16.00-18.00"]
+            )
 
         tarih_kapali_mi = rezervasyon_tarihi in closed_lst
         kampanya_orani = kampanya_dict.get(rezervasyon_tarihi, 0)
