@@ -18,43 +18,44 @@ st.set_page_config(
     #initial_sidebar_state="auto"
     initial_sidebar_state="collapsed"
 )
-# --- TERTEMİZ ARAYÜZ CSS (Tüm gereksiz bar ve butonlar gizli) ---
-st.markdown("""
-    <style>
-        .block-container {
-            padding-top: 0rem !important;
-            padding-left: 1rem !important;
-            padding-right: 1rem !important;
-            max-width: 750px !important;
-            margin: 0 auto;
-        }
-        
-        /* Üst barı ve sağ alttaki widget'ı tamamen gizler */
-        header[data-testid="stHeader"] {
-            display: none !important;
-        }
-        [data-testid="stStatusWidget"] {
-            display: none !important;
-        }
+# 1. Oturum durumunu başlatıyoruz
+if "admin_giris" not in st.session_state:
+    st.session_state.admin_giris = False
 
-        .full-width-banner {
-            width: 100vw !important;
-            position: relative;
-            left: 50vw;
-            right: 50vw;
-            margin-left: -50vw;
-            margin-right: -50vw;
-            margin-bottom: 25px;
-        }
-        .full-width-banner img {
-            width: 100% !important;
-            height: auto;
-            display: block;
-            max-height: 380px;
-            object-fit: cover;
-        }
-    </style>
-""", unsafe_allow_html=True)
+# 2. SAYfa YAPILANDIRMASI
+# Eğer yönetici girişi YAPILDIYSA sol menüyü aç ("auto"), yapılmadıysa kapat ("collapsed")
+sidebar_durumu = "auto" if st.session_state.admin_giris else "collapsed"
+
+st.set_page_config(
+    page_title="Foto Best - Çekim & Paket Teklif Formu",
+    page_icon="logo.jpeg",
+    layout="centered",
+    initial_sidebar_state=sidebar_durumu
+)
+
+# 3. DİNAMİK CSS: Yönetici değilse üst barı/GitHub butonlarını gizle, yönetici ise göster
+if not st.session_state.admin_giris:
+    st.markdown("""
+        <style>
+            .block-container {
+                padding-top: 0rem !important;
+                padding-left: 1rem !important;
+                padding-right: 1rem !important;
+                max-width: 750px !important;
+                margin: 0 auto;
+            }
+            /* Sadece normal kullanıcılarda üst barı (GitHub, Share vb.) gizle */
+            header[data-testid="stHeader"] {
+                display: none !important;
+            }
+            [data-testid="stStatusWidget"] {
+                display: none !important;
+            }
+        </style>
+    """, unsafe_allow_html=True)
+else:
+    # Yönetici giriş yaptıysa üst bar, GitHub ve sol menü otomatik olarak görünür hale gelir!
+    pass
 
 #--- AYARLAR VE GİZLİ BİLGİLER ---
 GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw8cuRim-zolXECVOWFrZ20wpf4TtqccNx4YjNfzlqpCqiS7XO54siAt7nY0oF8YW0X/exec"
@@ -716,30 +717,21 @@ elif menu == "Yönetici Paneli (Fiyat & Takvim)":
     elif password != "":
         st.error("Hatalı Şifre!")
 
-# --- SAYFANIN EN ALTINDA GİZLİ YÖNETİCİ GİRİŞİ (FOOTER) ---
+# --- SAYFANIN EN ALTINDA GİZLİ YÖNETİCİ GİRİŞİ ---
 st.markdown("<br><hr><br>", unsafe_allow_html=True)
 
-# Oturum durumunu kontrol et
-if "admin_giris" not in st.session_state:
-    st.session_state.admin_giris = False
-
-with st.expander("🛠️ Yönetçi Paneli Girişi (Yetkililer İçin)"):
+with st.expander("🛠️ Yönetici Paneli Girişi (Yetkililer İçin)"):
     if not st.session_state.admin_giris:
-        sifre_input = st.text_input("Yönetici Şifresi", type="password")
-        if st.button("Giriş Yap"):
-            if sifre_input == "1453":  # Buradaki şifreyi kendi belirleyeceğiniz bir şifreyle değiştirebilirsiniz
+        sifre_input = st.text_input("Yönetici Şifresi", type="password", key="yonetici_sifre_kutusu")
+        if st.button("Giriş Yap ve Araçları Aktif Et", key="yonetici_giris_buton"):
+            if sifre_input == "1453":  # Belirlediğiniz şifre
                 st.session_state.admin_giris = True
-                st.success("Giriş başarılı! Yönetim paneli yükleniyor...")
-                st.rerun()
+                st.success("Giriş başarılı! Menüler ve araçlar aktif ediliyor...")
+                st.rerun()  # Sayfayı yenileyerek üst barı ve sol menüyü açar
             else:
                 st.error("Hatalı şifre!")
     else:
-        st.success("🔓 Yönetici oturumu açık.")
-        if st.button("Oturumu Kapat"):
+        st.success("🔓 Yönetici araçları ve sol menü aktif.")
+        if st.button("Oturumu Kapat (Araçları Gizle)", key="oturum_kapat_buton"):
             st.session_state.admin_giris = False
-            st.rerun()
-
-        # --- YÖNETİM PANELİ İÇERİĞİNİZ BURAYA GELECEK ---
-        st.subheader("Fiyat ve Takvim Yönetim Paneli")
-        # Örn: st.data_editor(st.session_state.prices_df, ...)
-        # Yönetim paneli kodlarınızı buraya yerleştirebilirsiniz.
+            st.rerun()  # Sayfayı yenileyerek tekrar her şeyi gizler
