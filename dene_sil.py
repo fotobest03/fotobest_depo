@@ -15,9 +15,10 @@ st.set_page_config(
     page_title="Foto Best - Çekim & Paket Teklif Formu",
     page_icon="logo.png",  # <-- Buraya logomuzun dosya adını yazıyoruz (örn: logo.jpeg, logo.png vb.)
     layout="centered",
-    initial_sidebar_state="auto"
+    #initial_sidebar_state="auto"
+    initial_sidebar_state="collapsed"
 )
-# =========================================================================
+# --- TERTEMİZ ARAYÜZ CSS (Tüm gereksiz bar ve butonlar gizli) ---
 st.markdown("""
     <style>
         .block-container {
@@ -28,15 +29,10 @@ st.markdown("""
             margin: 0 auto;
         }
         
-        /* Sol menü okuna ve yapısına dokunmadan sadece sağ üstteki aksiyon butonlarını gizler */
+        /* Üst barı ve sağ alttaki widget'ı tamamen gizler */
         header[data-testid="stHeader"] {
-            background: transparent !important;
-        }
-        header[data-testid="stHeader"] [data-testid="stToolbar"] {
             display: none !important;
         }
-        
-        /* Sağ alttaki siyah "Uygulamayı yönet" (Manage app) rozetini gizler */
         [data-testid="stStatusWidget"] {
             display: none !important;
         }
@@ -59,7 +55,6 @@ st.markdown("""
         }
     </style>
 """, unsafe_allow_html=True)
-# =========================================================================
 
 #--- AYARLAR VE GİZLİ BİLGİLER ---
 GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw8cuRim-zolXECVOWFrZ20wpf4TtqccNx4YjNfzlqpCqiS7XO54siAt7nY0oF8YW0X/exec"
@@ -720,3 +715,31 @@ elif menu == "Yönetici Paneli (Fiyat & Takvim)":
 
     elif password != "":
         st.error("Hatalı Şifre!")
+
+# --- SAYFANIN EN ALTINDA GİZLİ YÖNETİCİ GİRİŞİ (FOOTER) ---
+st.markdown("<br><hr><br>", unsafe_allow_html=True)
+
+# Oturum durumunu kontrol et
+if "admin_giris" not in st.session_state:
+    st.session_state.admin_giris = False
+
+with st.expander("🛠️ Yönetçi Paneli Girişi (Yetkililer İçin)"):
+    if not st.session_state.admin_giris:
+        sifre_input = st.text_input("Yönetici Şifresi", type="password")
+        if st.button("Giriş Yap"):
+            if sifre_input == "1453":  # Buradaki şifreyi kendi belirleyeceğiniz bir şifreyle değiştirebilirsiniz
+                st.session_state.admin_giris = True
+                st.success("Giriş başarılı! Yönetim paneli yükleniyor...")
+                st.rerun()
+            else:
+                st.error("Hatalı şifre!")
+    else:
+        st.success("🔓 Yönetici oturumu açık.")
+        if st.button("Oturumu Kapat"):
+            st.session_state.admin_giris = False
+            st.rerun()
+
+        # --- YÖNETİM PANELİ İÇERİĞİNİZ BURAYA GELECEK ---
+        st.subheader("Fiyat ve Takvim Yönetim Paneli")
+        # Örn: st.data_editor(st.session_state.prices_df, ...)
+        # Yönetim paneli kodlarınızı buraya yerleştirebilirsiniz.
