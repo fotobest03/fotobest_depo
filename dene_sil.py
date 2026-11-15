@@ -255,17 +255,21 @@ if menu == "Müşteri Teklif Formu":
     except Exception as e:
         st.warning("Kapak fotoğrafı yüklenemedi, dosya adını kontrol edin.")
 
-    # --- SAĞA HİZALI VE MOBİLDE YAN YANA 3 BUTON (SADECE İKONLAR) ---
-    col1, col2, col3, col4, col5 = st.columns([1.5, 1.5, 1, 1, 1])
+    # --- SAĞA HİZALI VE MOBİLDE ASLA ALT ALTA İNMEYEN BUTONLAR (FLEXBOX) ---
+    st.markdown("""
+        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-bottom: 10px;">
+            <a href="https://www.instagram.com/fotobestofficial?utm_source=qr" target="_blank" style="text-decoration: none;">
+                <button style="background-color: #ffffff; border: 1px solid #d1d5db; border-radius: 8px; padding: 8px 12px; cursor: pointer; font-size: 16px;" title="FotoBest Instagram">📸</button>
+            </a>
+            <a href="https://www.instagram.com/afyoncekimplatosu?utm_source=qr" target="_blank" style="text-decoration: none;">
+                <button style="background-color: #ffffff; border: 1px solid #d1d5db; border-radius: 8px; padding: 8px 12px; cursor: pointer; font-size: 16px;" title="FotoBest Plato Instagram">🏛️</button>
+            </a>
+        </div>
+    """, unsafe_allow_html=True)
 
-    with col3:
-        st.link_button("📸", "https://www.instagram.com/fotobestofficial?utm_source=qr", use_container_width=False, help="FotoBest Instagram")
-
-    with col4:
-        st.link_button("🏛️", "https://www.instagram.com/afyoncekimplatosu?utm_source=qr", use_container_width=False, help="FotoBest Plato Instagram")
-
-    with col5:
-        # Popover menü (Yönetici Girişi)
+    # Yönetim paneli popover menüsü için sağ üst köşe entegrasyonu
+    col_bos, col_yonet = st.columns([11, 1])
+    with col_yonet:
         with st.popover("≡", help="Yönetici Girişi"):
             if not st.session_state.get("admin_giris", False):
                 st.markdown("<b>🔐 Yönetici Girişi</b>", unsafe_allow_html=True)
