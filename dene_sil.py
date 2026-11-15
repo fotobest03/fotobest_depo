@@ -300,7 +300,6 @@ if menu == "Müşteri Teklif Formu":
                     st.session_state.admin_giris = False
                     st.rerun()
 
-    st.markdown("<br>", unsafe_allow_html=True)
     # 1. Oturum durumunu başlatıyoruz
     if "admin_giris" not in st.session_state:
         st.session_state.admin_giris = False
