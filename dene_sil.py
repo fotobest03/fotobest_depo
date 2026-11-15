@@ -238,17 +238,17 @@ if menu == "Müşteri Teklif Formu":
         </style>
     """, unsafe_allow_html=True)
 
-    # --- SAĞ ÜST KÖŞEDE MİNİ YÖNETİM MENÜSÜ (POP-OVER İLE BOŞLUKSUZ ÇÖZÜM) ---
-    col_bos, col_yonet = st.columns([11, 1])
-# --- 2. ALT KISIMDA 2 ADET YAN YANA İNSTAGRAM BUTONU ---
-    col_ig1, col_ig2 = st.columns(2)
+    # --- TEK SATIRDA 3 BUTON: 2 ADET İNSTAGRAM + 1 ADET POP-OVER YÖNETİM MENÜSÜ ---
+    col_ig1, col_ig2, col_yonet = st.columns([4, 4, 1])
+
     with col_ig1:
-        st.link_button("📸 FotoBest İnstagram", "https://www.instagram.com/fotobestofficial?utm_source=qr", use_container_width=True)
+        st.link_button("📸 FotoBest Instagram", "https://www.instagram.com/fotobestofficial?utm_source=qr", use_container_width=True)
+
     with col_ig2:
-        st.link_button("🏛️ FotoBest Plato İnstagram", "https://www.instagram.com/afyoncekimplatosu?utm_source=qr", use_container_width=True)
-    st.markdown("", unsafe_allow_html=True)       
+        st.link_button("🏛️ FotoBest Plato Instagram", "https://www.instagram.com/afyoncekimplatosu?utm_source=qr", use_container_width=True)
+
     with col_yonet:
-        # st.popover buton tıklandığında doğrudan şık bir kutu açar, kapalıyken sayfada yer kaplamaz
+        # Popover menü formatı ve işlevselliği korunarak aynı satıra entegre edildi
         with st.popover("≡", help="Yönetici Girişi"):
             if not st.session_state.get("admin_giris", False):
                 st.markdown("<b>🔐 Yönetici Girişi</b>", unsafe_allow_html=True)
@@ -267,6 +267,8 @@ if menu == "Müşteri Teklif Formu":
                 if st.button("Oturumu Kapat", use_container_width=True, key="popover_cikis_btn"):
                     st.session_state.admin_giris = False
                     st.rerun()
+
+    st.markdown("<br>", unsafe_allow_html=True)
                     
     # 1. Oturum durumunu başlatıyoruz
     if "admin_giris" not in st.session_state:
