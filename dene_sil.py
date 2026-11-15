@@ -255,25 +255,23 @@ if menu == "Müşteri Teklif Formu":
     except Exception as e:
         st.warning("Kapak fotoğrafı yüklenemedi, dosya adını kontrol edin.")
 
-        # --- TEK SATIRDA 3 BUTON: 2 ADET İNSTAGRAM + 1 ADET POP-OVER YÖNETİM MENÜSÜ ---
-    col_ig1, col_ig2, col_yonet = st.columns([4, 4, 1])
+    # --- SAĞA HİZALI VE MOBİLDE YAN YANA 3 BUTON (SADECE İKONLAR) ---
+    col1, col2, col3, col4, col5 = st.columns([1.5, 1.5, 1, 1, 1])
 
-    with col_ig1:
-        st.link_button("📸 FotoBest Instagram", "https://www.instagram.com/fotobestofficial?utm_source=qr", use_container_width=True)
+    with col3:
+        st.link_button("📸", "https://www.instagram.com/fotobestofficial?utm_source=qr", use_container_width=True, help="FotoBest Instagram")
 
-    with col_ig2:
-        st.link_button("🏛️ FotoBest Plato Instagram", "https://www.instagram.com/afyoncekimplatosu?utm_source=qr", use_container_width=True)
+    with col4:
+        st.link_button("🏛️", "https://www.instagram.com/afyoncekimplatosu?utm_source=qr", use_container_width=True, help="FotoBest Plato Instagram")
 
-    with col_yonet:
-        # Popover menü formatı ve işlevselliği korunarak aynı satıra entegre edildi
+    with col5:
+        # Popover menü (Yönetici Girişi)
         with st.popover("≡", help="Yönetici Girişi"):
             if not st.session_state.get("admin_giris", False):
                 st.markdown("<b>🔐 Yönetici Girişi</b>", unsafe_allow_html=True)
-                
-                sifre_input = st.text_input("Şifre", type="password", key="popover_sifre", placeholder="Şifrenizi girin...")
-                
+                sifre_input = st.text_input("Şifre", type="password", key="popover_sifre", placeholder="Şifre...")
                 if st.button("Giriş Yap", use_container_width=True, key="popover_giris_btn"):
-                    if sifre_input == "1453":  # Kendi şifreniz
+                    if sifre_input == "1453":
                         st.session_state.admin_giris = True
                         st.success("Giriş başarılı!")
                         st.rerun()
@@ -284,7 +282,7 @@ if menu == "Müşteri Teklif Formu":
                 if st.button("Oturumu Kapat", use_container_width=True, key="popover_cikis_btn"):
                     st.session_state.admin_giris = False
                     st.rerun()
-                    
+
     # 1. Oturum durumunu başlatıyoruz
     if "admin_giris" not in st.session_state:
         st.session_state.admin_giris = False
