@@ -222,12 +222,6 @@ if menu == "Müşteri Teklif Formu":
     </style>
 """, unsafe_allow_html=True)
 
-    st.set_page_config(
-        page_title="Foto Best - Çekim & Paket Teklif Formu",
-        page_icon="logo.png",
-        layout="centered",
-        initial_sidebar_state=sidebar_durumu
-    )
     # 3. DİNAMİK CSS: Yönetici değilse üst barı/GitHub butonlarını gizle, yönetici ise göster
     if not st.session_state.admin_giris:
         st.markdown("""
@@ -261,7 +255,7 @@ if menu == "Müşteri Teklif Formu":
     except Exception as e:
         st.warning("Kapak fotoğrafı yüklenemedi, dosya adını kontrol edin.")
 
-    # --- TEK SATIRDA 3 BUTON: 2 ADET İNSTAGRAM + 1 ADET POP-OVER YÖNETİM MENÜSÜ ---
+        # --- TEK SATIRDA 3 BUTON: 2 ADET İNSTAGRAM + 1 ADET POP-OVER YÖNETİM MENÜSÜ ---
     col_ig1, col_ig2, col_yonet = st.columns([4, 4, 1])
 
     with col_ig1:
@@ -298,6 +292,13 @@ if menu == "Müşteri Teklif Formu":
     # 2. SAYfa YAPILANDIRMASI
     # Eğer yönetici girişi YAPILDIYSA sol menüyü aç ("auto"), yapılmadıysa kapat ("collapsed")
     sidebar_durumu = "auto" if st.session_state.admin_giris else "collapsed"
+
+    st.set_page_config(
+        page_title="Foto Best - Çekim & Paket Teklif Formu",
+        page_icon="logo.png",
+        layout="centered",
+        initial_sidebar_state=sidebar_durumu
+    )
 
     # --- 2. HAKKIMIZDA BİLGİ KARTI (Sade ve Hatasız) ---
     st.markdown("""
