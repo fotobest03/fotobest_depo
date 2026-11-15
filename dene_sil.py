@@ -222,44 +222,6 @@ if menu == "Müşteri Teklif Formu":
     </style>
 """, unsafe_allow_html=True)
 
-    # --- TEK SATIRDA 3 BUTON: 2 ADET İNSTAGRAM + 1 ADET POP-OVER YÖNETİM MENÜSÜ ---
-    col_ig1, col_ig2, col_yonet = st.columns([4, 4, 1])
-
-    with col_ig1:
-        st.link_button("📸 FotoBest Instagram", "https://www.instagram.com/fotobestofficial?utm_source=qr", use_container_width=True)
-
-    with col_ig2:
-        st.link_button("🏛️ FotoBest Plato Instagram", "https://www.instagram.com/afyoncekimplatosu?utm_source=qr", use_container_width=True)
-
-    with col_yonet:
-        # Popover menü formatı ve işlevselliği korunarak aynı satıra entegre edildi
-        with st.popover("≡", help="Yönetici Girişi"):
-            if not st.session_state.get("admin_giris", False):
-                st.markdown("<b>🔐 Yönetici Girişi</b>", unsafe_allow_html=True)
-                
-                sifre_input = st.text_input("Şifre", type="password", key="popover_sifre", placeholder="Şifrenizi girin...")
-                
-                if st.button("Giriş Yap", use_container_width=True, key="popover_giris_btn"):
-                    if sifre_input == "1453":  # Kendi şifreniz
-                        st.session_state.admin_giris = True
-                        st.success("Giriş başarılı!")
-                        st.rerun()
-                    else:
-                        st.error("Hatalı şifre!")
-            else:
-                st.success("🔓 Oturum Açık")
-                if st.button("Oturumu Kapat", use_container_width=True, key="popover_cikis_btn"):
-                    st.session_state.admin_giris = False
-                    st.rerun()
-                    
-    # 1. Oturum durumunu başlatıyoruz
-    if "admin_giris" not in st.session_state:
-        st.session_state.admin_giris = False
-
-    # 2. SAYfa YAPILANDIRMASI
-    # Eğer yönetici girişi YAPILDIYSA sol menüyü aç ("auto"), yapılmadıysa kapat ("collapsed")
-    sidebar_durumu = "auto" if st.session_state.admin_giris else "collapsed"
-
     st.set_page_config(
         page_title="Foto Best - Çekim & Paket Teklif Formu",
         page_icon="logo.png",
@@ -298,6 +260,44 @@ if menu == "Müşteri Teklif Formu":
         st.markdown('</div>', unsafe_allow_html=True)
     except Exception as e:
         st.warning("Kapak fotoğrafı yüklenemedi, dosya adını kontrol edin.")
+
+    # --- TEK SATIRDA 3 BUTON: 2 ADET İNSTAGRAM + 1 ADET POP-OVER YÖNETİM MENÜSÜ ---
+    col_ig1, col_ig2, col_yonet = st.columns([4, 4, 1])
+
+    with col_ig1:
+        st.link_button("📸 FotoBest Instagram", "https://www.instagram.com/fotobestofficial?utm_source=qr", use_container_width=True)
+
+    with col_ig2:
+        st.link_button("🏛️ FotoBest Plato Instagram", "https://www.instagram.com/afyoncekimplatosu?utm_source=qr", use_container_width=True)
+
+    with col_yonet:
+        # Popover menü formatı ve işlevselliği korunarak aynı satıra entegre edildi
+        with st.popover("≡", help="Yönetici Girişi"):
+            if not st.session_state.get("admin_giris", False):
+                st.markdown("<b>🔐 Yönetici Girişi</b>", unsafe_allow_html=True)
+                
+                sifre_input = st.text_input("Şifre", type="password", key="popover_sifre", placeholder="Şifrenizi girin...")
+                
+                if st.button("Giriş Yap", use_container_width=True, key="popover_giris_btn"):
+                    if sifre_input == "1453":  # Kendi şifreniz
+                        st.session_state.admin_giris = True
+                        st.success("Giriş başarılı!")
+                        st.rerun()
+                    else:
+                        st.error("Hatalı şifre!")
+            else:
+                st.success("🔓 Oturum Açık")
+                if st.button("Oturumu Kapat", use_container_width=True, key="popover_cikis_btn"):
+                    st.session_state.admin_giris = False
+                    st.rerun()
+                    
+    # 1. Oturum durumunu başlatıyoruz
+    if "admin_giris" not in st.session_state:
+        st.session_state.admin_giris = False
+
+    # 2. SAYfa YAPILANDIRMASI
+    # Eğer yönetici girişi YAPILDIYSA sol menüyü aç ("auto"), yapılmadıysa kapat ("collapsed")
+    sidebar_durumu = "auto" if st.session_state.admin_giris else "collapsed"
 
     # --- 2. HAKKIMIZDA BİLGİ KARTI (Sade ve Hatasız) ---
     st.markdown("""
