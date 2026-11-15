@@ -255,21 +255,34 @@ if menu == "Müşteri Teklif Formu":
     except Exception as e:
         st.warning("Kapak fotoğrafı yüklenemedi, dosya adını kontrol edin.")
 
-    # --- SAĞA HİZALI VE MOBİLDE ASLA ALT ALTA İNMEYEN BUTONLAR (FLEXBOX) ---
+    # --- 3 BUTONU TEK SATIRDA VE SAĞA HİZALI TUTAN ÖZEL CSS ---
     st.markdown("""
-        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-bottom: 10px;">
-            <a href="https://www.instagram.com/fotobestofficial?utm_source=qr" target="_blank" style="text-decoration: none;">
-                <button style="background-color: #ffffff; border: 1px solid #d1d5db; border-radius: 8px; padding: 8px 12px; cursor: pointer; font-size: 16px;" title="FotoBest Instagram">📸</button>
-            </a>
-            <a href="https://www.instagram.com/afyoncekimplatosu?utm_source=qr" target="_blank" style="text-decoration: none;">
-                <button style="background-color: #ffffff; border: 1px solid #d1d5db; border-radius: 8px; padding: 8px 12px; cursor: pointer; font-size: 16px;" title="FotoBest Plato Instagram">🏛️</button>
-            </a>
-        </div>
+        <style>
+            /* Bu stil sadece bu butonların olduğu satırı sağa yaslar ve yan yana sabitler */
+            [data-testid="stHorizontalBlock"] {
+                display: flex !important;
+                flex-direction: row !important;
+                justify-content: flex-end !important;
+                align-items: center !important;
+            }
+            [data-testid="stColumn"] {
+                width: auto !important;
+                flex: 0 0 auto !important;
+                min-width: unset !important;
+            }
+        </style>
     """, unsafe_allow_html=True)
 
-    # Yönetim paneli popover menüsü için sağ üst köşe entegrasyonu
-    col_bos, col_yonet = st.columns([11, 1])
-    with col_yonet:
+    # --- TEK SATIRDA 3'LÜ BUTON GRUBU ---
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        st.link_button("📸", "https://www.instagram.com/fotobestofficial?utm_source=qr", use_container_width=True, help="FotoBest Instagram")
+
+    with col2:
+        st.link_button("🏛️", "https://www.instagram.com/afyoncekimplatosu?utm_source=qr", use_container_width=True, help="FotoBest Plato Instagram")
+
+    with col3:
         with st.popover("≡", help="Yönetici Girişi"):
             if not st.session_state.get("admin_giris", False):
                 st.markdown("<b>🔐 Yönetici Girişi</b>", unsafe_allow_html=True)
@@ -287,6 +300,7 @@ if menu == "Müşteri Teklif Formu":
                     st.session_state.admin_giris = False
                     st.rerun()
 
+    st.markdown("<br>", unsafe_allow_html=True)
     # 1. Oturum durumunu başlatıyoruz
     if "admin_giris" not in st.session_state:
         st.session_state.admin_giris = False
