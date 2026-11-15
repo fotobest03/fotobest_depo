@@ -427,11 +427,13 @@ if menu == "Müşteri Teklif Formu":
                 </div>
             """, unsafe_allow_html=True)
                 
-            vip_klip_secildi = st.checkbox("🎬 Dış Çekim Klibi İstiyorum (+10.000 TL)")
-
-            if vip_klip_secildi:
-                klip_row = df_prices[(df_prices['Kategori'] == 'Dış Çekim Klibi') & (df_prices['Secenek'] == 'Evet')]
-                fiyat_vip_klip = float(klip_row['Fiyat'].values[0]) if not klip_row.empty else 10000.0
+            if vip_paket_secildi:
+                fiyat_vip = fiyat_vip_tablo                  
+                vip_klip_secildi = st.checkbox("🎬 Dış Çekim Klibi İstiyorum (+10.000 TL)")
+                if vip_klip_secildi:
+                    fiyat_vip_klip = 10000.0
+                else:
+                    fiyat_vip_klip = 0.0
 
         st.markdown("<br>", unsafe_allow_html=True)
 
