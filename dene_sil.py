@@ -267,8 +267,6 @@ if menu == "Müşteri Teklif Formu":
                 if st.button("Oturumu Kapat", use_container_width=True, key="popover_cikis_btn"):
                     st.session_state.admin_giris = False
                     st.rerun()
-
-    st.markdown("<br>", unsafe_allow_html=True)
                     
     # 1. Oturum durumunu başlatıyoruz
     if "admin_giris" not in st.session_state:
@@ -317,14 +315,6 @@ if menu == "Müşteri Teklif Formu":
     except Exception as e:
         st.warning("Kapak fotoğrafı yüklenemedi, dosya adını kontrol edin.")
 
-    # --- 2. ALT KISIMDA 2 ADET YAN YANA İNSTAGRAM BUTONU ---
-    col_ig1, col_ig2 = st.columns(2)
-    with col_ig1:
-        st.link_button("📸 FotoBest İnstagram", "https://www.instagram.com/fotobestofficial?utm_source=qr", use_container_width=True)
-    with col_ig2:
-        st.link_button("🏛️ FotoBest Plato İnstagram", "https://www.instagram.com/afyoncekimplatosu?utm_source=qr", use_container_width=True)
-    st.markdown("", unsafe_allow_html=True)
-    
     # --- 2. HAKKIMIZDA BİLGİ KARTI (Sade ve Hatasız) ---
     st.markdown("""
     <div style="background-color: #f8fbff; padding: 22px; border-radius: 12px; border-left: 6px solid #0066cc; border: 1px solid #d0e3ff; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
