@@ -223,7 +223,7 @@ if menu == "Müşteri Teklif Formu":
 """, unsafe_allow_html=True)
 
     # 3. DİNAMİK CSS: Yönetici değilse üst barı/GitHub butonlarını gizle, yönetici ise göster
-    if not st.session_state.admin_giris:
+    if not st.session_state.get("admin_giris", False):
         st.markdown("""
             <style>
                 .block-container {
