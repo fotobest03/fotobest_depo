@@ -526,7 +526,7 @@ if menu == "Müşteri Teklif Formu":
             secilen_mekan = st.selectbox("Çekim Mekanı", ["Seçiniz..."] + mekan_opts['Secenek'].tolist()) if not mekan_opts.empty else "Seçiniz..."
             
             if secilen_mekan != "Seçiniz...":
-                ilave_mekan_secildi = st.checkbox("Merkez Çekimi istiyorum (İlave Mekan - +1.500 TL)")
+                ilave_mekan_secildi = st.checkbox("Merkez Çekimi istiyorum (İlave Mekan +1.500 TL)")
                 if ilave_mekan_secildi:
                     fiyat_ek_mekan = 1500.0
 
