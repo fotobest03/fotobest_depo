@@ -267,25 +267,52 @@ if menu == "Müşteri Teklif Formu":
         </div>
     """, unsafe_allow_html=True)
 
-    # Yönetim paneli popover menüsü için sağ üst köşe entegrasyonu
-    col_bos, col_yonet = st.columns([11, 1])
-    with col_yonet:
-        with st.popover("≡", help="Yönetici Girişi"):
-            if not st.session_state.get("admin_giris", False):
-                st.markdown("<b>🔐 Yönetici Girişi</b>", unsafe_allow_html=True)
-                sifre_input = st.text_input("Şifre", type="password", key="popover_sifre", placeholder="Şifre...")
-                if st.button("Giriş Yap", use_container_width=True, key="popover_giris_btn"):
-                    if sifre_input == "1453":
-                        st.session_state.admin_giris = True
-                        st.success("Giriş başarılı!")
-                        st.rerun()
-                    else:
-                        st.error("Hatalı şifre!")
-            else:
-                st.success("🔓 Oturum Açık")
-                if st.button("Oturumu Kapat", use_container_width=True, key="popover_cikis_btn"):
-                    st.session_state.admin_giris = False
+    # --- CSS İLE 3 BUTONU TEK SATIRDA VE SAĞA HİZALI SABİTLEME ---
+st.markdown("""
+    <style>
+        /* Üst butonların olduğu satırı kesinlikle tek satırda ve sağa dayalı tutar */
+        [data-testid="stHorizontalBlock"] {
+            display: flex !important;
+            flex-direction: row !important;
+            justify-content: flex-end !important;
+            align-items: center !important;
+            gap: 8px !important;
+        }
+        [data-testid="stColumn"] {
+            width: auto !important;
+            flex: 0 0 auto !important;
+            min-width: unset !important;
+        }
+    </style>
+""", unsafe_allow_html=True)
+
+# --- TEK SATIRDA 3 BUTON (2 İNSTAGRAM İKONU + 1 YÖNETİM MENÜSÜ) ---
+col_ig1, col_ig2, col_yonet = st.columns(3)
+
+with col_ig1:
+    st.link_button("📸", "https://www.instagram.com/fotobestofficial?utm_source=qr", use_container_width=True, help="FotoBest Instagram")
+
+with col_ig2:
+    st.link_button("🏛️", "https://www.instagram.com/afyoncekimplatosu?utm_source=qr", use_container_width=True, help="FotoBest Plato Instagram")
+
+with col_yonet:
+    # Popover menü formatı ve işlevselliği bozulmadan aynı satırda yer alır
+    with st.popover("≡", help="Yönetici Girişi"):
+        if not st.session_state.get("admin_giris", False):
+            st.markdown("<b>🔐 Yönetici Girişi</b>", unsafe_allow_html=True)
+            sifre_input = st.text_input("Şifre", type="password", key="popover_sifre", placeholder="Şifre...")
+            if st.button("Giriş Yap", use_container_width=True, key="popover_giris_btn"):
+                if sifre_input == "1453":
+                    st.session_state.admin_giris = True
+                    st.success("Giriş başarılı!")
                     st.rerun()
+                else:
+                    st.error("Hatalı şifre!")
+        else:
+            st.success("🔓 Oturum Açık")
+            if st.button("Oturumu Kapat", use_container_width=True, key="popover_cikis_btn"):
+                st.session_state.admin_giris = False
+                st.rerun()
 
     # 1. Oturum durumunu başlatıyoruz
     if "admin_giris" not in st.session_state:
