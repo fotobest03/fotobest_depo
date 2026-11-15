@@ -380,7 +380,7 @@ if menu == "Müşteri Teklif Formu":
         if not ust_bolum_dolu:
             st.info("ℹ️ Lütfen yukarıdaki zorunlu alanları (`Ad Soyad`, geçerli `Telefon`, geçerli `E-Posta` ve `Şehir`) doğru formatta doldurunuz. Formun devamı bu alanlar eksiksiz doldurulduktan sonra açılacaktır.")
             st.stop() # <-- Bu komut üst bilgiler dolana kadar kodun aşağıya inmesini kesin olarak durdurur!
-
+        st.markdown("<br><br>", unsafe_allow_html=True)
         # Buradan sonrakiler SADECE üst alanlar tamamen doğru doldurulduğunda çalışır:
         st.success("✅ İletişim bilgileri doğrulandı. Lütfen paket ve tarih seçimini tamamlayınız.")
         st.markdown("---")
