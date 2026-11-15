@@ -7,6 +7,26 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
+st.markdown("""
+    <style>
+        /* Sayfanın en üstündeki boşluğu minimuma indirir */
+        .block-container {
+            padding-top: 0.5rem !important;
+            padding-bottom: 0rem !important;
+        }
+        
+        /* Sağ üstteki menü butonunun olduğu satırın alt boşluğunu sıfırlar */
+        [data-testid="stHorizontalBlock"] {
+            align-items: center;
+            margin-bottom: -20px !important;
+        }
+        
+        /* Kapak fotoğrafının üst boşluğunu sıfırlar */
+        .element-container {
+            margin-top: 0px !important;
+        }
+    </style>
+""", unsafe_allow_html=True)
 
 #--- SAYFA YAPILANDIRMASI VE GÖRÜNÜM AYARI ---
 st.set_page_config(page_title="Teklif ve Fiyat Yönetimi", page_icon="", layout="centered")
