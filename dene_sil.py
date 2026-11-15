@@ -530,7 +530,7 @@ if menu == "Müşteri Teklif Formu":
                 if ilave_mekan_secildi:
                     fiyat_ek_mekan = 1500.0
 
-            secilen_klip = st.radio("Dış Çekim Klibi İstiyorum", klip_opts['Secenek'].tolist()) if not klip_opts.empty else ""
+            secilen_klip = st.radio("Dış Çekim Klibi İstiyorum", klip_opts['Secenek'].tolist()[::-1]) if not klip_opts.empty else ""
 
             try:
                 f_ana_album = float(ana_album_opts[ana_album_opts['Secenek'] == secilen_ana_album]['Fiyat'].values[0]) if secilen_ana_album else 0.0
