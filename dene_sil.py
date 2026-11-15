@@ -603,7 +603,7 @@ if menu == "Müşteri Teklif Formu":
                 # İşlem tamamlandığında başarı mesajı ve balonlar
                 st.success("✨ Rezervasyonunuz başarıyla alındı!")
                 st.balloons()
-        st.markdown("<br><br><br>", unsafe_allow_html=True)
+        st.markdown("<br><br>", unsafe_allow_html=True)
 # ================= YÖNETİCİ PANELİ =================
 elif menu == "Yönetici Paneli (Fiyat & Takvim)":
     st.title("🔑 Yönetici Paneli")
