@@ -256,7 +256,7 @@ if menu == "Müşteri Teklif Formu":
         st.warning("Kapak fotoğrafı yüklenemedi, dosya adını kontrol edin.")
 
     # --- SAĞA HİZALI VE MOBİLDE YAN YANA 3 BUTON (SADECE İKONLAR) ---
-    col1, col2, col3, col4, col5 = st.columns([1.5, 1.5, 1, 1, 1])
+    col1, col2, col3, col4, col5 = st.columns([1, 1, 1, 1, 1])
 
     with col3:
         st.link_button("📸", "https://www.instagram.com/fotobestofficial?utm_source=qr", use_container_width=True, help="FotoBest Instagram")
