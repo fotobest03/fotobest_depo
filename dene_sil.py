@@ -208,35 +208,19 @@ if menu == "Müşteri Teklif Formu":
     
     # --- MÜKEMMEL DÜZEN: FOTOĞRAF TAM GENİŞLİK, FORM ORTALANMIŞ ---
     st.markdown("""
-        <style>
-            .block-container {
-                padding-top: 0rem !important;
-                padding-left: 1rem !important;
-                padding-right: 1rem !important;
-                max-width: 750px !important;
-                margin: 0 auto;
-            }
-            
-            
-
-            .full-width-banner {
-                width: 100vw !important;
-                position: relative;
-                left: 50vw;
-                right: 50vw;
-                margin-left: -50vw;
-                margin-right: -50vw;
-                margin-bottom: 25px;
-            }
-            .full-width-banner img {
-                width: 100% !important;
-                height: auto;
-                display: block;
-                max-height: 380px;
-                object-fit: cover;
-            }
-        </style>
-    """, unsafe_allow_html=True)
+    <style>
+        /* Sayfanın üst kısmını ve bileşen aralarındaki boşlukları minimuma indirir */
+        .block-container {
+            padding-top: 0.5rem !important;
+            padding-bottom: 0rem !important;
+        }
+        
+        /* Buton satırı ile hemen altındaki görsel/içerik arasındaki boşluğu ayarlar */
+        [data-testid="stHorizontalBlock"] {
+            margin-bottom: 5px !important;
+        }
+    </style>
+""", unsafe_allow_html=True)
 
     # --- TEK SATIRDA 3 BUTON: 2 ADET İNSTAGRAM + 1 ADET POP-OVER YÖNETİM MENÜSÜ ---
     col_ig1, col_ig2, col_yonet = st.columns([4, 4, 1])
