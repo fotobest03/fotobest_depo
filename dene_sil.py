@@ -255,64 +255,36 @@ if menu == "Müşteri Teklif Formu":
     except Exception as e:
         st.warning("Kapak fotoğrafı yüklenemedi, dosya adını kontrol edin.")
 
-    # --- SAĞA HİZALI VE MOBİLDE ASLA ALT ALTA İNMEYEN BUTONLAR (FLEXBOX) ---
-    st.markdown("""
-        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-bottom: 10px;">
-            <a href="https://www.instagram.com/fotobestofficial?utm_source=qr" target="_blank" style="text-decoration: none;">
-                <button style="background-color: #ffffff; border: 1px solid #d1d5db; border-radius: 8px; padding: 8px 12px; cursor: pointer; font-size: 16px;" title="FotoBest Instagram">📸</button>
-            </a>
-            <a href="https://www.instagram.com/afyoncekimplatosu?utm_source=qr" target="_blank" style="text-decoration: none;">
-                <button style="background-color: #ffffff; border: 1px solid #d1d5db; border-radius: 8px; padding: 8px 12px; cursor: pointer; font-size: 16px;" title="FotoBest Plato Instagram">🏛️</button>
-            </a>
-        </div>
-    """, unsafe_allow_html=True)
+    # --- SAĞA HİZALI 3'LÜ BUTON GRUBU (Global CSS kullanılmadan güvenli yapı) ---
+    # Sol tarafa geniş bir boşluk (`5`) vererek butonları otomatik olarak sağ köşeye itiyoruz.
+    col_bos, col_ig1, col_ig2, col_yonet = st.columns([5, 1, 1, 1])
 
-    # --- CSS İLE 3 BUTONU TEK SATIRDA VE SAĞA HİZALI SABİTLEME ---
-st.markdown("""
-    <style>
-        /* Üst butonların olduğu satırı kesinlikle tek satırda ve sağa dayalı tutar */
-        [data-testid="stHorizontalBlock"] {
-            display: flex !important;
-            flex-direction: row !important;
-            justify-content: flex-end !important;
-            align-items: center !important;
-            gap: 8px !important;
-        }
-        [data-testid="stColumn"] {
-            width: auto !important;
-            flex: 0 0 auto !important;
-            min-width: unset !important;
-        }
-    </style>
-""", unsafe_allow_html=True)
+    with col_ig1:
+        st.link_button("📸", "https://www.instagram.com/fotobestofficial?utm_source=qr", use_container_width=True, help="FotoBest Instagram")
 
-# --- TEK SATIRDA 3 BUTON (2 İNSTAGRAM İKONU + 1 YÖNETİM MENÜSÜ) ---
-col_ig1, col_ig2, col_yonet = st.columns(3)
+    with col_ig2:
+        st.link_button("🏛️", "https://www.instagram.com/afyoncekimplatosu?utm_source=qr", use_container_width=True, help="FotoBest Plato Instagram")
 
-with col_ig1:
-    st.link_button("📸", "https://www.instagram.com/fotobestofficial?utm_source=qr", use_container_width=True, help="FotoBest Instagram")
-
-with col_ig2:
-    st.link_button("🏛️", "https://www.instagram.com/afyoncekimplatosu?utm_source=qr", use_container_width=True, help="FotoBest Plato Instagram")
-
-with col_yonet:
-    # Popover menü formatı ve işlevselliği bozulmadan aynı satırda yer alır
-    with st.popover("≡", help="Yönetici Girişi"):
-        if not st.session_state.get("admin_giris", False):
-            st.markdown("<b>🔐 Yönetici Girişi</b>", unsafe_allow_html=True)
-            sifre_input = st.text_input("Şifre", type="password", key="popover_sifre", placeholder="Şifre...")
-            if st.button("Giriş Yap", use_container_width=True, key="popover_giris_btn"):
-                if sifre_input == "1453":
-                    st.session_state.admin_giris = True
-                    st.success("Giriş başarılı!")
+    with col_yonet:
+        # Popover menü formatı ve işlevselliği bozulmadan çalışır
+        with st.popover("≡", help="Yönetici Girişi"):
+            if not st.session_state.get("admin_giris", False):
+                st.markdown("<b>🔐 Yönetici Girişi</b>", unsafe_allow_html=True)
+                sifre_input = st.text_input("Şifre", type="password", key="popover_sifre", placeholder="Şifre...")
+                if st.button("Giriş Yap", use_container_width=True, key="popover_giris_btn"):
+                    if sifre_input == "1453":
+                        st.session_state.admin_giris = True
+                        st.success("Giriş başarılı!")
+                        st.rerun()
+                    else:
+                        st.error("Hatalı şifre!")
+            else:
+                st.success("🔓 Oturum Açık")
+                if st.button("Oturumu Kapat", use_container_width=True, key="popover_cikis_btn"):
+                    st.session_state.admin_giris = False
                     st.rerun()
-                else:
-                    st.error("Hatalı şifre!")
-        else:
-            st.success("🔓 Oturum Açık")
-            if st.button("Oturumu Kapat", use_container_width=True, key="popover_cikis_btn"):
-                st.session_state.admin_giris = False
-                st.rerun()
+
+    st.markdown("<br>", unsafe_allow_html=True)
 
     # 1. Oturum durumunu başlatıyoruz
     if "admin_giris" not in st.session_state:
