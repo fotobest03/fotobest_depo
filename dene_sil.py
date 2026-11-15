@@ -561,7 +561,7 @@ if menu == "Müşteri Teklif Formu":
             </div>
         """, unsafe_allow_html=True)
 
-        if st.button("Teklifi Gönder ve Kaydet"):
+        if st.button("Teklifi Gönder ve Kaydet", use_container_width=True):
             if tarih_kapali_mi:
                 st.error("⚠️ Seçtiğiniz tarih doludur, lütfen başka bir tarih seçiniz.")
             elif not vip_paket_secildi and not dijital_paket_secildi and secilen_mekan == "Seçiniz...":
@@ -603,7 +603,7 @@ if menu == "Müşteri Teklif Formu":
                 # İşlem tamamlandığında başarı mesajı ve balonlar
                 st.success("✨ Rezervasyonunuz başarıyla alındı!")
                 st.balloons()
-
+            st.markdown("<br><br><br>", unsafe_allow_html=True)
 # ================= YÖNETİCİ PANELİ =================
 elif menu == "Yönetici Paneli (Fiyat & Takvim)":
     st.title("🔑 Yönetici Paneli")
