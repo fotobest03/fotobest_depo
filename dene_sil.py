@@ -257,19 +257,19 @@ if menu == "Müşteri Teklif Formu":
 
     # --- SAĞA HİZALI 3'LÜ BUTON GRUBU (Global CSS kullanılmadan güvenli yapı) ---
     # Sol tarafa geniş bir boşluk (`5`) vererek butonları otomatik olarak sağ köşeye itiyoruz.
-    col_bos, col_ig1, col_ig2, col_yonet = st.columns([5, 1, 1, 1])
+    col_bos, col_ig1, col_ig2, col_yonet = st.columns([3, 1, 1, 1])
 
     with col_ig1:
-        st.link_button("📸", "https://www.instagram.com/fotobestofficial?utm_source=qr", use_container_width=True, help="FotoBest Instagram")
+        st.link_button("📸", "https://www.instagram.com/fotobestofficial?utm_source=qr", use_container_width=False, help="FotoBest Instagram")
 
     with col_ig2:
-        st.link_button("🏛️", "https://www.instagram.com/afyoncekimplatosu?utm_source=qr", use_container_width=True, help="FotoBest Plato Instagram")
+        st.link_button("🏛️", "https://www.instagram.com/afyoncekimplatosu?utm_source=qr", use_container_width=False, help="FotoBest Plato Instagram")
 
     with col_yonet:
         # Popover menü formatı ve işlevselliği bozulmadan çalışır
         with st.popover("≡", help="Yönetici Girişi"):
             if not st.session_state.get("admin_giris", False):
-                st.markdown("<b>🔐 Yönetici Girişi</b>", unsafe_allow_html=True)
+                st.markdown("<b>🔐 Yönetici Girişi</b>", unsafe_allow_html=False)
                 sifre_input = st.text_input("Şifre", type="password", key="popover_sifre", placeholder="Şifre...")
                 if st.button("Giriş Yap", use_container_width=True, key="popover_giris_btn"):
                     if sifre_input == "1453":
