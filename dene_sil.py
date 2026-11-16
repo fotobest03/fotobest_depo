@@ -19,7 +19,14 @@ st.set_page_config(
     #initial_sidebar_state="auto"
     initial_sidebar_state="collapsed"
 )
-
+st.markdown("""
+    <style>
+        /* Text input içindeki "Press Enter to apply" yazısını gizler */
+        div[data-baseweb="input"] span {
+            display: none !important;
+        }
+    </style>
+""", unsafe_allow_html=True)
 
 #--- AYARLAR VE GİZLİ BİLGİLER ---
 GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw8cuRim-zolXECVOWFrZ20wpf4TtqccNx4YjNfzlqpCqiS7XO54siAt7nY0oF8YW0X/exec"
