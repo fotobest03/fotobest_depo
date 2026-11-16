@@ -7,20 +7,15 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
-
-#--- SAYFA YAPILANDIRMASI VE GÖRÜNÜM AYARI ---
-st.set_page_config(page_title="Teklif ve Fiyat Yönetimi", page_icon="", layout="centered")
-
-# --- TARAYICI SEKMESİ AYARLARI (FAVICON VE BAŞLIK) ---
+# --- TEK VE DOĞRU SAYFA YAPILANDIRMASI ---
+sidebar_durumu = "auto" if st.session_state.get("admin_giris", False) else "collapsed"
 st.set_page_config(
     page_title="Foto Best - Çekim & Paket Teklif Formu",
-    page_icon="logo.png",  # <-- Buraya logomuzun dosya adını yazıyoruz (örn: logo.jpeg, logo.png vb.)
+    page_icon="logo.png",
     layout="centered",
-    #initial_sidebar_state="auto"
-    initial_sidebar_state="collapsed"
+    initial_sidebar_state=sidebar_durumu
 )
 
-#--- AYARLAR VE GİZLİ BİLGİLER ---
 GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw8cuRim-zolXECVOWFrZ20wpf4TtqccNx4YjNfzlqpCqiS7XO54siAt7nY0oF8YW0X/exec"
 GMAIL_KULLANICI = "afotobest@gmail.com"
 GMAIL_SIFRE = "byyewfosgesogdft"
@@ -32,11 +27,9 @@ def tarihi_duzelt(val):
     s = str(val).strip()
     if len(s) >= 10 and s[4] == '-' and s[7] == '-':
         return s[:10]
-    
     parcalar = s.split()
-    aylar = {'Jan': '01', 'Feb': '02', 'Mar': '03', 'Apr': '04', 'May': '05', 'Jun': '06', 
+    aylar = {'Jan': '01', 'Feb': '02', 'Mar': '03', 'Apr': '04', 'May': '05', 'Jun': '06',
              'Jul': '07', 'Aug': '08', 'Sep': '09', 'Oct': '10', 'Nov': '11', 'Dec': '12'}
-    
     if len(parcalar) >= 4 and parcalar[1] in aylar:
         try:
             gun = parcalar[2].zfill(2)
@@ -45,20 +38,17 @@ def tarihi_duzelt(val):
             return f"{yil}-{ay}-{gun}"
         except:
             pass
-            
     try:
         dt = pd.to_datetime(s, errors='coerce')
         if pd.notnull(dt):
             return dt.strftime('%Y-%m-%d')
     except:
         pass
-        
     return s.split("T")[0].strip()
 
-st.markdown("<br>", unsafe_allow_html=True)
-
-# --- GOOGLE E-TABLODAN VERİ ÇEKME ---
-def verileri_tablodan_getir():
+# --- GOOGLE E-TABLODAN HIZLI VERİ ÇEKME (ÖNBELLEKLİ) ---
+@st.cache_data(ttl=300) # Verileri 5 dakika boyunca hafızada tutarak gereksiz ağ yükünü ve yavaşlığı önler
+def py_verileri_getir_cached():
     fiyat_df = pd.DataFrame([
         {"Kategori": "Ana Albüm", "Secenek": "30 x 60 Mat Albüm", "Fiyat": 3500},
         {"Kategori": "Ana Albüm", "Secenek": "30 x 76 Mat Albüm", "Fiyat": 4500},
@@ -71,25 +61,15 @@ def verileri_tablodan_getir():
     ])
     kapali_df = pd.DataFrame(columns=["Tarih"])
     kampanya_df = pd.DataFrame(columns=["Tarih", "Indirim"])
-    
     try:
-        res = requests.get(GOOGLE_SCRIPT_URL, timeout=10)
+        res = requests.get(GOOGLE_SCRIPT_URL, timeout=5)
         data = res.json()
-        
-        # 1. Fiyatlar
         if "fiyatlar" in data and data["fiyatlar"]:
             fiyat_df = pd.DataFrame(data["fiyatlar"])
-            
-        # 2. Kapalı Tarihler
         if "kapali_tarihler" in data and data["kapali_tarihler"]:
-            temiz_kapali = []
-            for t in data["kapali_tarihler"]:
-                if t:
-                    temiz_kapali.append({"Tarih": tarihi_duzelt(t)})
+            temiz_kapali = [ {"Tarih": tarihi_duzelt(t)} for t in data["kapali_tarihler"] if t ]
             if temiz_kapali:
                 kapali_df = pd.DataFrame(temiz_kapali)
-                
-        # 3. Kampanyalar
         if "kampanyalar" in data and data["kampanyalar"]:
             temiz_kampanya = []
             for k in data["kampanyalar"]:
@@ -97,20 +77,23 @@ def verileri_tablodan_getir():
                     t_val = k["tarih"]
                     oran = k.get("oran", 0)
                     temiz_kampanya.append({
-                        "Tarih": tarihi_duzelt(t_val), 
+                        "Tarih": tarihi_duzelt(t_val),
                         "Indirim": int(oran) if oran != "" and not pd.isna(oran) else 0
                     })
             if temiz_kampanya:
                 kampanya_df = pd.DataFrame(temiz_kampanya)
-                
     except Exception as e:
         print(f"Veri çekme hatası: {e}")
-        
     return fiyat_df, kapali_df, kampanya_df
 
-# Oturum başlatma
+def verileri_tablodan_getir():
+    # Önbelleği temizleyerek güncel veriyi çekmek için kullanılır
+    st.cache_data.clear()
+    return py_verileri_getir_cached()
+
+# Oturum başlatma (İlk açılış hızı optimize edildi)
 if "prices_df" not in st.session_state:
-    f_df, k_df, kam_df = verileri_tablodan_getir()
+    f_df, k_df, kam_df = py_verileri_getir_cached()
     st.session_state.prices_df = f_df
     st.session_state.kapali_df = k_df
     st.session_state.kampanya_df = kam_df
