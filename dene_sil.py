@@ -19,14 +19,6 @@ st.set_page_config(
     #initial_sidebar_state="auto"
     initial_sidebar_state="collapsed"
 )
-st.markdown("""
-    <style>
-        /* Text input içindeki "Press Enter to apply" yazısını gizler */
-        div[data-baseweb="input"] span {
-            display: none !important;
-        }
-    </style>
-""", unsafe_allow_html=True)
 
 #--- AYARLAR VE GİZLİ BİLGİLER ---
 GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw8cuRim-zolXECVOWFrZ20wpf4TtqccNx4YjNfzlqpCqiS7XO54siAt7nY0oF8YW0X/exec"
@@ -321,7 +313,15 @@ if menu == "Müşteri Teklif Formu":
         layout="centered",
         initial_sidebar_state=sidebar_durumu
     )
-
+    st.markdown("""
+    <style>
+        /* Text input içindeki "Press Enter to apply" yazısını gizler */
+        div[data-baseweb="input"] span {
+            display: none !important;
+        }
+    </style>
+    """, unsafe_allow_html=True)
+    
     # --- 2. HAKKIMIZDA BİLGİ KARTI (Sade ve Hatasız) ---
     st.markdown("""
     <div style="background-color: #f8fbff; padding: 22px; border-radius: 12px; border-left: 6px solid #0066cc; border: 1px solid #d0e3ff; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
