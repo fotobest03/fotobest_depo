@@ -320,7 +320,7 @@ if menu == "Müşteri Teklif Formu":
     <div style="background-color: #f8fbff; padding: 22px; border-radius: 12px; border-left: 6px solid #0066cc; border: 1px solid #d0e3ff; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
         <h3 style="color: #004080; margin-top: 0; margin-bottom: 12px; font-size: 20px;">✨ Hakkımızda</h3>
         <p style="color: #333333; font-size: 14px; line-height: 1.6; margin-bottom: 15px;">
-            Afyonkarahisar merkezde hizmet veren <b>FotoBest</b>, yılların deneyimini modern teknolojiler ve sanatsal bir bakış açısıyla buluşturuyor. Bireysel ve kurumsal tüm fotoğrafçılık ihtiyaçlarınıza profesyonel çözümler sunuyoruz.
+            Afyonkarahisar merkezde hizmet veren <b>FotoBest</b> ailesi olarak, yılların deneyimini modern teknolojiler ve sanatsal bir bakış açısıyla buluşturuyoruz. Bireysel ve kurumsal tüm fotoğrafçılık ihtiyaçlarınıza profesyonel çözümler sunuyoruz.
         </p>
         <h4 style="color: #004080; font-size: 16px; margin-bottom: 8px;">Hizmetlerimiz:</h4>
         <ul style="color: #333333; font-size: 14px; line-height: 1.5; margin-bottom: 15px; padding-left: 20px;">
