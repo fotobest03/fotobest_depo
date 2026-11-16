@@ -313,14 +313,6 @@ if menu == "Müşteri Teklif Formu":
         layout="centered",
         initial_sidebar_state=sidebar_durumu
     )
-    st.markdown("""
-    <style>
-        /* Text input içindeki "Press Enter to apply" yazısını gizler */
-        div[data-baseweb="input"] span {
-            display: none !important;
-        }
-    </style>
-    """, unsafe_allow_html=True)
     
     # --- 2. HAKKIMIZDA BİLGİ KARTI (Sade ve Hatasız) ---
     st.markdown("""
