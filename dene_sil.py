@@ -529,7 +529,7 @@ if menu == "Müşteri Teklif Formu":
 
         toplam_tutar = ham_tutar
 
-        if kampanya_orani > 0 and vip_paket_secildi==False:
+        if kampanya_orani > 0 and vip_paket_secildi==False and dijital_paket_secildi==False:
             toplam_tutar = ham_tutar * (1 + kampanya_orani / 100)
             st.success(f"🎉 Bu tarihte **%{kampanya_orani} daha yüksek** fiyat!")
 
