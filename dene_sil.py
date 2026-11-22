@@ -540,7 +540,7 @@ if menu == "Müşteri Teklif Formu":
                 <h2 style="color: #16a085; margin: 5px 0 0 0;">{toplam_tutar:,.2f} TL</h2>
             </div>
         """, unsafe_allow_html=True)
-
+        st.info("ℹ️ Lütfen yukarıdaki zorunlu alanları (`Ad Soyad`, geçerli `Telefon`, geçerli `E-Posta` ve `Şehir`) doğru formatta doldurunuz. Formun devamı bu alanlar eksiksiz doldurulduktan sonra açılacaktır.")
         if st.button("Teklifi Gönder ve Kaydet", use_container_width=True):
             if tarih_kapali_mi:
                 st.error("⚠️ Seçtiğiniz tarih doludur, lütfen başka bir tarih seçiniz.")
