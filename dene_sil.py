@@ -540,7 +540,7 @@ if menu == "Müşteri Teklif Formu":
                 <h2 style="color: #16a085; margin: 5px 0 0 0;">{toplam_tutar:,.2f} TL</h2>
             </div>
         """, unsafe_allow_html=True)
-        st.info("ℹ️ Lütfen yukarıdaki zorunlu alanları (`Ad Soyad`, geçerli `Telefon`, geçerli `E-Posta` ve `Şehir`) doğru formatta doldurunuz. Formun devamı bu alanlar eksiksiz doldurulduktan sonra açılacaktır.")
+
         if st.button("Teklifi Gönder ve Kaydet", use_container_width=True):
             if tarih_kapali_mi:
                 st.error("⚠️ Seçtiğiniz tarih doludur, lütfen başka bir tarih seçiniz.")
@@ -584,6 +584,7 @@ if menu == "Müşteri Teklif Formu":
                 st.success("✨ Rezervasyonunuz başarıyla alındı!")
                 st.balloons()
         st.markdown("<br><br>", unsafe_allow_html=True)
+        st.info("ℹ️ Afyon FotoBest olarak, Yüzbaşı Bayburt Agah cad. 03200 Merkez/Afyonkarahisar adresindeki stüdyomuzda sizleri ağırlamaktan mutluluk duyarız. Bizimle 0535 474 42 81 numaralı telefondan iletişime geçebilir, sorularınız ve randevu talepleriniz için bize ulaşabilirsiniz.")
 # ================= YÖNETİCİ PANELİ =================
 elif menu == "Yönetici Paneli (Fiyat & Takvim)":
     st.title("🔑 Yönetici Paneli")
