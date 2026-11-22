@@ -3,6 +3,7 @@ import pandas as pd
 from datetime import datetime, date, timedelta
 import requests
 import json
+import time
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -694,9 +695,43 @@ if menu == "Müşteri Teklif Formu":
 
                 st.success("✨ Rezervasyonunuz başarıyla alındı!")
                 st.balloons()
+                # İşlem tamamlandığında başarı mesajı ve balonlar
+                st.success("✨ Rezervasyonunuz başarıyla alındı!")
+                st.balloons()
+
+                # Balonlar göründükten sonra 1. sayfaya dön ve form alanlarını sıfırla
+                time.sleep(2.5)
+                st.session_state.form_adim = 1
+
+                sifirlanacak_keyler = [
+                    "form_ad_soyad",
+                    "form_telefon",
+                    "form_email",
+                    "form_sehir",
+                    "form_siparis_notu",
+                    "vip_paket_secildi",
+                    "dijital_paket_secildi",
+                    "dijital_mekan",
+                    "tarih_belli_degil",
+                    "cekim_saati",
+                    "secilen_ana_album",
+                    "secilen_album",
+                    "secilen_tablo",
+                    "secilen_poz",
+                    "secilen_mekan",
+                    "ilave_mekan_secildi",
+                    "secilen_klip",
+                    "sosyal_medya_paylasimi",
+                ]
+                for k in sifirlanacak_keyler:
+                    if k in st.session_state:
+                        del st.session_state[k]
+
+                st.rerun()
 
         st.info("ℹ️ Afyon FotoBest olarak, Yüzbaşı Bayburt Agah cad. 03200 Merkez/Afyonkarahisar adresindeki stüdyomuzda sizleri ağırlamaktan mutluluk duyarız. Bizimle 0535 474 42 81 numaralı telefondan iletişime geçebilir, sorularınız ve randevu talepleriniz için bize ulaşabilirsiniz.")
         st.markdown("<br>", unsafe_allow_html=True)
+        
 
         sayfa_gezinme_butonlari(4, ileri_aktif=False)
         st.markdown("<br><br>", unsafe_allow_html=True)
