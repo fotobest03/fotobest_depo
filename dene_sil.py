@@ -445,6 +445,7 @@ if menu == "Müşteri Teklif Formu":
             st.info("ℹ️ Tarih ve saat alanı gizlendi. Randevu detayını daha sonra netleştirebilirsiniz.")
 
         sayfa_gezinme_butonlari(2, ileri_aktif=True)
+        st.markdown("<br><br>", unsafe_allow_html=True)
 
     # =========================================================================
     # 3. SAYFA: ALBÜM VE PAKET KOMBİNASYONLARI -> TABLO SEÇİMİ GÖRSELİ SONUNA KADAR
@@ -549,6 +550,7 @@ if menu == "Müşteri Teklif Formu":
             st.selectbox("Albüm İçi Poz Sayısı", poz_opts['Secenek'].tolist(), key="secilen_poz")
 
         sayfa_gezinme_butonlari(3, ileri_aktif=True)
+        st.markdown("<br><br>", unsafe_allow_html=True)
 
     # =========================================================================
     # 4. SAYFA: ÇEKİM MEKANI'NDAN SONUNA KADAR
@@ -697,6 +699,7 @@ if menu == "Müşteri Teklif Formu":
         st.markdown("<br>", unsafe_allow_html=True)
 
         sayfa_gezinme_butonlari(4, ileri_aktif=False)
+        st.markdown("<br><br>", unsafe_allow_html=True)
 # ================= YÖNETİCİ PANELİ =================
 elif menu == "Yönetici Paneli (Fiyat & Takvim)":
     st.title("🔑 Yönetici Paneli")
