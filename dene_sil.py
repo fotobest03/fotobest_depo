@@ -583,7 +583,6 @@ if menu == "Müşteri Teklif Formu":
                 # İşlem tamamlandığında başarı mesajı ve balonlar
                 st.success("✨ Rezervasyonunuz başarıyla alındı!")
                 st.balloons()
-        st.markdown("<br><br>", unsafe_allow_html=True)
         st.info("ℹ️ Afyon FotoBest olarak, Yüzbaşı Bayburt Agah cad. 03200 Merkez/Afyonkarahisar adresindeki stüdyomuzda sizleri ağırlamaktan mutluluk duyarız. Bizimle 0535 474 42 81 numaralı telefondan iletişime geçebilir, sorularınız ve randevu talepleriniz için bize ulaşabilirsiniz.")
 # ================= YÖNETİCİ PANELİ =================
 elif menu == "Yönetici Paneli (Fiyat & Takvim)":
