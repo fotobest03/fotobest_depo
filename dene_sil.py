@@ -509,13 +509,13 @@ if menu == "Müşteri Teklif Formu":
                 baslik_rengi = "#004080"
 
                 if "25x70" in temiz_secim:
-                    gorsel_dosyasi = "25x70.jpg"
+                    gorsel_dosyasi = "25x70.jpeg"
                     baslik_metni = f"🖼️ Seçili Ana Albüm: {secilen_ana_album}"
                     kutu_bg = "#fdf2e9"       # Yumuşak krem/turuncu tonu
                     kenar_rengi = "#e67e22"
                     baslik_rengi = "#b9770e"
                 elif "30x76" in temiz_secim:
-                    gorsel_dosyasi = "30×76.jpg"
+                    gorsel_dosyasi = "30×76.jpeg"
                     baslik_metni = f"🖼️ Seçili Ana Albüm: {secilen_ana_album}"
                     kutu_bg = "#eef6ff"       # Yumuşak mavi tonu
                     kenar_rengi = "#0066cc"
