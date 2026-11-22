@@ -498,6 +498,41 @@ if menu == "Müşteri Teklif Formu":
             klip_opts = df_prices[df_prices['Kategori'] == 'Dış Çekim Klibi']
 
             secilen_ana_album = st.selectbox("Ana Albüm", ana_album_opts['Secenek'].tolist()) if not ana_album_opts.empty else ""
+            
+            # --- ANA ALBÜM SEÇİMİNE GÖRE RENKLİ GÖRSEL KUTUSU ---
+            if secilen_ana_album:
+                temiz_secim = secilen_ana_album.replace(" ", "").lower()
+                gorsel_dosyasi = None
+                baslik_metni = ""
+                kutu_bg = "#f8f9fa"
+                kenar_rengi = "#0066cc"
+                baslik_rengi = "#004080"
+
+                if "25x70" in temiz_secim:
+                    gorsel_dosyasi = "25x70.jpg"
+                    baslik_metni = f"🖼️ Seçili Ana Albüm: {secilen_ana_album}"
+                    kutu_bg = "#fdf2e9"       # Yumuşak krem/turuncu tonu
+                    kenar_rengi = "#e67e22"
+                    baslik_rengi = "#b9770e"
+                elif "30x76" in temiz_secim:
+                    gorsel_dosyasi = "30×76.jpg"
+                    baslik_metni = f"🖼️ Seçili Ana Albüm: {secilen_ana_album}"
+                    kutu_bg = "#eef6ff"       # Yumuşak mavi tonu
+                    kenar_rengi = "#0066cc"
+                    baslik_rengi = "#004080"
+
+                if gorsel_dosyasi:
+                    st.markdown(f"""
+                        <div style="background-color: {kutu_bg}; padding: 14px 16px; border-radius: 10px; border-left: 5px solid {kenar_rengi}; border-top: 1px solid {kenar_rengi}33; border-right: 1px solid {kenar_rengi}33; border-bottom: 1px solid {kenar_rengi}33; margin: 6px 0 14px 0;">
+                            <div style="color: {baslik_rengi}; font-weight: 600; font-size: 14px; margin-bottom: 8px;">
+                                {baslik_metni}
+                            </div>
+                        </div>
+                    """, unsafe_allow_html=True)
+                    try:
+                        st.image(gorsel_dosyasi, use_container_width=True)
+                    except Exception:
+                        st.warning(f"⚠️ '{gorsel_dosyasi}' görseli bulunamadı. Görselin proje klasöründe olduğundan emin olun.")
             secilen_album = st.selectbox("Aile Albümü", album_opts['Secenek'].tolist()) if not album_opts.empty else ""
             secilen_tablo = st.selectbox("Tablo Seçimi", tablo_opts['Secenek'].tolist()) if not tablo_opts.empty else ""
             secilen_poz = st.selectbox("Albüm İçi Poz Sayısı", poz_opts['Secenek'].tolist()) if not poz_opts.empty else ""
