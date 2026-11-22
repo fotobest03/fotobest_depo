@@ -449,7 +449,6 @@ if menu == "Müşteri Teklif Formu":
         kampanya_dict = get_campaign_dict()
         closed_lst = get_closed_dates_list()
         # --- YENİ: DÜĞÜN TARİHİM BELLİ DEĞİL KUTUCUĞU ---
-        #st.markdown("<br>", unsafe_allow_html=True)
         st.markdown("---")
         tarih_belli_degil = st.checkbox("📅 Düğün tarihim belli değil (Daha sonra belirleyeceğim)")
 
@@ -584,6 +583,7 @@ if menu == "Müşteri Teklif Formu":
                 st.success("✨ Rezervasyonunuz başarıyla alındı!")
                 st.balloons()
         st.info("ℹ️ Afyon FotoBest olarak, Yüzbaşı Bayburt Agah cad. 03200 Merkez/Afyonkarahisar adresindeki stüdyomuzda sizleri ağırlamaktan mutluluk duyarız. Bizimle 0535 474 42 81 numaralı telefondan iletişime geçebilir, sorularınız ve randevu talepleriniz için bize ulaşabilirsiniz.")
+        st.markdown("<br>", unsafe_allow_html=True)
 # ================= YÖNETİCİ PANELİ =================
 elif menu == "Yönetici Paneli (Fiyat & Takvim)":
     st.title("🔑 Yönetici Paneli")
