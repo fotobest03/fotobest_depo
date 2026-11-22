@@ -535,6 +535,40 @@ if menu == "Müşteri Teklif Formu":
                         st.warning(f"⚠️ '{gorsel_dosyasi}' görseli bulunamadı. Görselin proje klasöründe olduğundan emin olun.")
             secilen_album = st.selectbox("Aile Albümü", album_opts['Secenek'].tolist()) if not album_opts.empty else ""
             secilen_tablo = st.selectbox("Tablo Seçimi", tablo_opts['Secenek'].tolist()) if not tablo_opts.empty else ""
+            # --- TABLO SEÇİMİNE GÖRE RENKLİ GÖRSEL KUTUSU ---
+            if secilen_tablo:
+                temiz_tablo = secilen_tablo.lower()
+                tablo_gorseli = None
+                tablo_baslik = ""
+                tablo_bg = "#f8f9fa"
+                tablo_kenar = "#0066cc"
+                tablo_baslik_renk = "#004080"
+
+                if "kanvas" in temiz_tablo:
+                    tablo_gorseli = "30-40_kanvas_tablo.png"
+                    tablo_baslik = f"🖼️ Seçili Tablo: {secilen_tablo}"
+                    tablo_bg = "#fdf2e9"        # Yumuşak krem/turuncu tonu
+                    tablo_kenar = "#e67e22"
+                    tablo_baslik_renk = "#b9770e"
+                elif "çerçeve" in temiz_tablo or "cerceve" in temiz_tablo:
+                    tablo_gorseli = "30x40_cerceveli_tablo.png"
+                    tablo_baslik = f"🖼️ Seçili Tablo: {secilen_tablo}"
+                    tablo_bg = "#eef6ff"        # Yumuşak mavi tonu
+                    tablo_kenar = "#0066cc"
+                    tablo_baslik_renk = "#004080"
+
+                if tablo_gorseli:
+                    st.markdown(f"""
+                        <div style="background-color: {tablo_bg}; padding: 14px 16px; border-radius: 10px; border-left: 5px solid {tablo_kenar}; border-top: 1px solid {tablo_kenar}33; border-right: 1px solid {tablo_kenar}33; border-bottom: 1px solid {tablo_kenar}33; margin: 6px 0 14px 0;">
+                            <div style="color: {tablo_baslik_renk}; font-weight: 600; font-size: 14px; margin-bottom: 8px;">
+                                {tablo_baslik}
+                            </div>
+                        </div>
+                    """, unsafe_allow_html=True)
+                    try:
+                        st.image(tablo_gorseli, use_container_width=True)
+                    except Exception:
+                        st.warning(f"⚠️ '{tablo_gorseli}' görseli bulunamadı. Görselin proje klasöründe olduğundan emin olun.")
             secilen_poz = st.selectbox("Albüm İçi Poz Sayısı", poz_opts['Secenek'].tolist()) if not poz_opts.empty else ""
             
             secilen_mekan = st.selectbox("Çekim Mekanı", ["Seçiniz..."] + mekan_opts['Secenek'].tolist()) if not mekan_opts.empty else "Seçiniz..."
