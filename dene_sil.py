@@ -367,6 +367,7 @@ if menu == "Müşteri Teklif Formu":
             st.success("✅ İletişim bilgileri doğrulandı.")
 
         sayfa_gezinme_butonlari(1, ileri_aktif=ust_bolum_dolu)
+        st.markdown("<br><br>", unsafe_allow_html=True)
 
     # =========================================================================
     # 2. SAYFA: VIP ÇEKİM PAKETİ + DİJİTAL PAKET + TARİH & ÇEKİM SAATİ
