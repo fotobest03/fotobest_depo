@@ -695,10 +695,7 @@ if menu == "Müşteri Teklif Formu":
 
                 st.success("✨ Rezervasyonunuz başarıyla alındı!")
                 st.balloons()
-                # İşlem tamamlandığında başarı mesajı ve balonlar
-                st.success("✨ Rezervasyonunuz başarıyla alındı!")
-                st.balloons()
-
+                
                 # Balonlar göründükten sonra 1. sayfaya dön ve form alanlarını sıfırla
                 time.sleep(2.5)
                 st.session_state.form_adim = 1
