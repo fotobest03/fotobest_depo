@@ -476,13 +476,13 @@ if menu == "Müşteri Teklif Formu":
             baslik_rengi = "#004080"
 
             if "25x70" in temiz_secim:
-                gorsel_dosyasi = "25x70.jpg"
+                gorsel_dosyasi = "25x70.jpeg"
                 baslik_metni = f"🖼️ Seçili Ana Albüm: {secilen_ana_album}"
                 kutu_bg = "#fdf2e9"
                 kenar_rengi = "#e67e22"
                 baslik_rengi = "#b9770e"
             elif "30x76" in temiz_secim:
-                gorsel_dosyasi = "30×76.jpg"
+                gorsel_dosyasi = "30×76.jpeg"
                 baslik_metni = f"🖼️ Seçili Ana Albüm: {secilen_ana_album}"
                 kutu_bg = "#eef6ff"
                 kenar_rengi = "#0066cc"
@@ -519,13 +519,13 @@ if menu == "Müşteri Teklif Formu":
             tablo_baslik_renk = "#004080"
 
             if "kanvas" in temiz_tablo:
-                tablo_gorseli = "30-40_kanvas_tablo.jpg"
+                tablo_gorseli = "30-40_kanvas_tablo.png"
                 tablo_baslik = f"🖼️ Seçili Tablo: {secilen_tablo}"
                 tablo_bg = "#fdf2e9"
                 tablo_kenar = "#e67e22"
                 tablo_baslik_renk = "#b9770e"
             elif "çerçeve" in temiz_tablo or "cerceve" in temiz_tablo:
-                tablo_gorseli = "30x40_cerceveli_tablo.jpg"
+                tablo_gorseli = "30x40_cerceveli_tablo.png"
                 tablo_baslik = f"🖼️ Seçili Tablo: {secilen_tablo}"
                 tablo_bg = "#eef6ff"
                 tablo_kenar = "#0066cc"
