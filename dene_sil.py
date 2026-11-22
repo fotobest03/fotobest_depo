@@ -474,7 +474,7 @@ if menu == "Müşteri Teklif Formu":
             kampanya_orani = kampanya_dict.get(rezervasyon_tarihi, 0)
 
             if tarih_kapali_mi:
-                st.error(f"⚠️ Seçtiğiniz tarih ({rezervasyon_tarihi.strftime('%d.%m.%Y')}) doludur.")
+                st.error(f"⚠️ Seçtiğiniz tarih ({rezervasyon_tarihi.strftime('%d.%m.%Y')}) doludur. İletişime geçiniz: 0535 474 42 81")
         else:
             st.info("ℹ️ Tarih ve saat alanı gizlendi. Randevu detayını daha sonra netleştirebilirsiniz.")
 
