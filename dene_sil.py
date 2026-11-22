@@ -382,7 +382,7 @@ if menu == "Müşteri Teklif Formu":
         st.markdown(f"""
             <div style="background-color: #fdf2e9; padding: 18px; border-radius: 10px; border-left: 6px solid #e67e22; border-top: 1px solid #f5cba7; border-right: 1px solid #f5cba7; border-bottom: 1px solid #f5cba7; margin-bottom: 8px;">
                 <h4 style="color: #b9770e; margin: 0 0 8px 0; font-size: 19px;">👑 VIP Çekim Paketi</h4>
-                <p style="color: #2c3e50; margin: 0; font-size: 15px; font-weight: 500;">Özel VIP stüdyo ve dış mekan imkanlarıyla sınırsız ve ayrıcalıklı çekim deneyimi.Bilgi için lütfen iletişime geçiniz: 0535 474 42 81 (Fiyat: {fiyat_vip_tablo:,.0f} TL)</p>
+                <p style="color: #2c3e50; margin: 0; font-size: 15px; font-weight: 500;">Özel VIP stüdyo ve dış mekan imkanlarıyla sınırsız ve ayrıcalıklı çekim deneyimi.Bilgi için lütfen iletişime geçiniz: 0535 474 42 81 </p>
             </div>
         """, unsafe_allow_html=True)
 
