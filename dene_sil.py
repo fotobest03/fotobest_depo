@@ -417,8 +417,6 @@ if menu == "Müşteri Teklif Formu":
                 else:
                     fiyat_vip_klip = 0.0
 
-        st.markdown("<br>", unsafe_allow_html=True)
-
         # --- 2. ÖZEL DİJİTAL ÇEKİM SEÇENEĞİ ---
         dijital_paket_secildi = False
         secilen_ana_album = ""
