@@ -429,9 +429,9 @@ if menu == "Müşteri Teklif Formu":
         else:
             st.session_state.dijital_paket_secildi = False
         st.markdown("""
-                        <div style="background-color: #eef6ff; padding: 18px; border-radius: 10px; border-left: 6px solid #0066cc; border-top: 1px solid #d0e3ff; border-right: 1px solid #d0e3ff; border-bottom: 1px solid #d0e3ff; margin-bottom: 8px;">
-                            <h4 style="color: #004080; margin: 0 0 8px 0; font-size: 19px;">✨ Özel Dijital Çekim Seçeneği</h4>
-                            <p style="color: #2c3e50; margin: 0; font-size: 15px; font-weight: 500;">Albüm istemiyorsanız sadece dijital çekim paketimizi tercih edebilirsiniz. Bu paket sadece dijital ortamda teslim edilecektir.</p>
+                        <div style="background-color: #fef9e7; padding: 18px; border-radius: 10px; border: 1px dashed #f39c12; margin: 10px 0 15px 0;"">
+                            <h4 style="color: #004080; margin: 0 0 8px 0; font-size: 19px;">💡 Kişisel Çekim Paketi Oluşturun</h4>
+                            <p style="color: #2c3e50; margin: 0; font-size: 15px; font-weight: 500;">Hayalinizdeki çekim ve albüm detaylarını kendiniz belirlemek isterseniz hazır paketlerimize bağlı kalmak zorunda değilsiniz. Düğün tarihinizi seçtikten sonra sonraki sayfada kendi paketinizi kolayca oluşturabilirsiniz.</p>
                         </div>
                     """, unsafe_allow_html=True)
         
